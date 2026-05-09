@@ -1,21 +1,22 @@
 import 'package:flutter/material.dart';
-import 'package:medicare_app/presentation/providers/product_provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:medicare_app/core/providers.dart';
 import 'package:medicare_app/presentation/screens/cart/cart_screen.dart';
 import 'package:medicare_app/presentation/screens/home/categories_screen.dart';
 import 'package:medicare_app/presentation/screens/profile/profile_screen.dart';
 import 'package:medicare_app/presentation/widgets/home/home_app_bar.dart';
 import 'package:medicare_app/presentation/widgets/home/product_card.dart';
-import 'package:provider/provider.dart';
+import 'package:badges/badges.dart' as badges;
 import 'trending_screen.dart';
 
-class HomeScreen extends StatefulWidget {
+class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends ConsumerState<HomeScreen> {
   int _selectedIndex = 0;
 
   final List<Widget> _screens = [
@@ -28,6 +29,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final cartItemCount = ref.watch(cartProviderNotifier).cartItemCount;
+
     return Scaffold(
       body: _screens[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
@@ -41,28 +44,42 @@ class _HomeScreenState extends State<HomeScreen> {
         type: BottomNavigationBarType.fixed,
         selectedItemColor: Colors.black,
         unselectedItemColor: Colors.black,
-        items: const [
-          BottomNavigationBarItem(
+        items: [
+          const BottomNavigationBarItem(
             icon: Icon(Icons.home_outlined),
             activeIcon: Icon(Icons.home),
             label: 'Home',
           ),
-          BottomNavigationBarItem(
+          const BottomNavigationBarItem(
             icon: Icon(Icons.trending_up_outlined),
             activeIcon: Icon(Icons.trending_up),
             label: 'Trending',
           ),
-          BottomNavigationBarItem(
+          const BottomNavigationBarItem(
             icon: Icon(Icons.category_outlined),
             activeIcon: Icon(Icons.category),
             label: 'Categories',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.shopping_cart_outlined),
-            activeIcon: Icon(Icons.shopping_cart),
+            icon: badges.Badge(
+              showBadge: cartItemCount > 0,
+              badgeContent: Text(
+                cartItemCount > 9 ? '9+' : '$cartItemCount',
+                style: const TextStyle(color: Colors.white, fontSize: 10),
+              ),
+              child: const Icon(Icons.shopping_cart_outlined),
+            ),
+            activeIcon: badges.Badge(
+              showBadge: cartItemCount > 0,
+              badgeContent: Text(
+                cartItemCount > 9 ? '9+' : '$cartItemCount',
+                style: const TextStyle(color: Colors.white, fontSize: 10),
+              ),
+              child: const Icon(Icons.shopping_cart),
+            ),
             label: 'Cart',
           ),
-          BottomNavigationBarItem(
+          const BottomNavigationBarItem(
             icon: Icon(Icons.person_outline),
             activeIcon: Icon(Icons.person),
             label: 'Profile',
@@ -73,55 +90,62 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-class HomeContentScreen extends StatefulWidget {
+class HomeContentScreen extends ConsumerStatefulWidget {
   const HomeContentScreen({super.key});
 
   @override
-  State<HomeContentScreen> createState() => _HomeContentScreenState();
+  ConsumerState<HomeContentScreen> createState() => _HomeContentScreenState();
 }
 
-class _HomeContentScreenState extends State<HomeContentScreen> {
-  final TextEditingController _searchController = TextEditingController();
-  final FocusNode _searchFocusNode = FocusNode();
+class _HomeContentScreenState extends ConsumerState<HomeContentScreen> {
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final productProvider = Provider.of<ProductProvider>(
-        context,
-        listen: false,
-      );
+      final productProvider = ref.read(productProviderNotifier);
       productProvider.loadProducts();
+    });
+
+    _scrollController.addListener(() {
+      if (_scrollController.position.pixels >=
+          _scrollController.position.maxScrollExtent - 200) {
+        final productProvider = ref.read(productProviderNotifier);
+        if (!productProvider.isLoading &&
+            !productProvider.isLoadingMore &&
+            productProvider.hasNextPage) {
+          productProvider.loadProducts();
+        }
+      }
     });
   }
 
   @override
   void dispose() {
-    _searchController.dispose();
-    _searchFocusNode.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final productProvider = ref.watch(productProviderNotifier);
+    
     return Scaffold(
       appBar: const HomeAppBar(),
       body: Column(
         children: [
-          // Search Bar
-          Padding(padding: const EdgeInsets.all(16), child: _buildSearchBar()),
           // Products
-          // Replace the GridView.builder with ListView.builder
           Expanded(
-            child: Consumer<ProductProvider>(
-              builder: (context, productProvider, child) {
+            child: Builder(
+              builder: (context) {
                 if (productProvider.isLoading &&
                     productProvider.products.isEmpty) {
                   return const Center(child: CircularProgressIndicator());
                 }
 
-                if (productProvider.errorMessage != null) {
+                if (productProvider.errorMessage != null &&
+                    productProvider.products.isEmpty) {
                   return Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -136,7 +160,7 @@ class _HomeContentScreenState extends State<HomeContentScreen> {
                         const SizedBox(height: 16),
                         ElevatedButton(
                           onPressed: () {
-                            productProvider.loadProducts();
+                            productProvider.loadProducts(refresh: true);
                           },
                           child: const Text('Retry'),
                         ),
@@ -167,80 +191,35 @@ class _HomeContentScreenState extends State<HomeContentScreen> {
                   );
                 }
 
-                // Use ListView.builder for single column (one row per product)
-                // In the ListView.builder, update the ProductCard usage
-                // In the ListView.builder, update the ProductCard usage
-                return ListView.builder(
-                  padding: const EdgeInsets.all(16),
-                  itemCount: productProvider.products.length,
-                  itemBuilder: (context, index) {
-                    final product = productProvider.products[index];
-                    return ProductCard(
-                      product: product,
-                      // Remove onAddToCart parameter - it's now handled inside ProductCard
-                    );
-                  },
+                return RefreshIndicator(
+                  onRefresh: () => productProvider.loadProducts(refresh: true),
+                  child: ListView.builder(
+                    controller: _scrollController,
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    padding: const EdgeInsets.all(16),
+                    itemCount: productProvider.products.length +
+                        (productProvider.isLoadingMore ? 1 : 0),
+                    itemBuilder: (context, index) {
+                      if (index == productProvider.products.length) {
+                        return const Padding(
+                          padding: EdgeInsets.symmetric(vertical: 16.0),
+                          child: Center(
+                            child: CircularProgressIndicator(),
+                          ),
+                        );
+                      }
+
+                      final product = productProvider.products[index];
+                      return ProductCard(
+                        product: product,
+                      );
+                    },
+                  ),
                 );
               },
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildSearchBar() {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.shade100,
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: TextField(
-        controller: _searchController,
-        focusNode: _searchFocusNode,
-        onChanged: (value) {
-          final productProvider = Provider.of<ProductProvider>(
-            context,
-            listen: false,
-          );
-          if (value.isEmpty) {
-            productProvider.clearSearch();
-          } else {
-            productProvider.searchProducts(value);
-          }
-        },
-        decoration: InputDecoration(
-          hintText: 'Napa Extra...',
-          prefixIcon: const Icon(Icons.search, color: Colors.grey),
-          suffixIcon: _searchController.text.isNotEmpty
-              ? IconButton(
-                  icon: const Icon(Icons.clear, color: Colors.grey),
-                  onPressed: () {
-                    _searchController.clear();
-                    final productProvider = Provider.of<ProductProvider>(
-                      context,
-                      listen: false,
-                    );
-                    productProvider.clearSearch();
-                    _searchFocusNode.unfocus();
-                  },
-                )
-              : null,
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(16),
-            borderSide: BorderSide.none,
-          ),
-          filled: true,
-          fillColor: Colors.grey.shade50,
-          contentPadding: const EdgeInsets.symmetric(vertical: 14),
-        ),
       ),
     );
   }

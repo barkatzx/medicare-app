@@ -1,31 +1,26 @@
 import 'package:flutter/material.dart';
-import 'package:medicare_app/presentation/providers/cart_provider.dart';
-import 'package:medicare_app/presentation/providers/notification_provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:medicare_app/core/providers.dart';
 import 'package:medicare_app/presentation/widgets/common/custom_theme.dart';
-import 'package:provider/provider.dart';
-import '../../providers/auth_provider.dart';
 
-class HomeAppBar extends StatefulWidget implements PreferredSizeWidget {
+class HomeAppBar extends ConsumerStatefulWidget implements PreferredSizeWidget {
   const HomeAppBar({super.key});
 
   @override
-  State<HomeAppBar> createState() => _HomeAppBarState();
+  ConsumerState<HomeAppBar> createState() => _HomeAppBarState();
 
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 }
 
-class _HomeAppBarState extends State<HomeAppBar> {
+class _HomeAppBarState extends ConsumerState<HomeAppBar> {
   @override
   void initState() {
     super.initState();
-    // Load notification and cart counts
+    // Load notification counts
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final notificationProvider = Provider.of<NotificationProvider>(
-        context,
-        listen: false,
-      );
-      final cartProvider = Provider.of<CartProvider>(context, listen: false);
+      final notificationProvider = ref.read(notificationProviderNotifier);
+      final cartProvider = ref.read(cartProviderNotifier);
       notificationProvider.loadNotifications();
       cartProvider.loadCartCount();
     });
@@ -33,12 +28,10 @@ class _HomeAppBarState extends State<HomeAppBar> {
 
   @override
   Widget build(BuildContext context) {
-    final user = Provider.of<AuthProvider>(context).currentUser;
-    final notificationProvider = Provider.of<NotificationProvider>(context);
-    final cartProvider = Provider.of<CartProvider>(context);
+    final user = ref.watch(authProviderNotifier).currentUser;
+    final notificationProvider = ref.watch(notificationProviderNotifier);
 
     final unreadCount = notificationProvider.unreadCount;
-    final cartItemCount = cartProvider.cartItemCount;
 
     return AppBar(
       elevation: 0,
@@ -88,56 +81,23 @@ class _HomeAppBarState extends State<HomeAppBar> {
         ],
       ),
       actions: [
-        // Cart Icon with Badge
-        Stack(
-          children: [
-            Container(
-              decoration: BoxDecoration(
-                color: CustomTheme.surfaceColor,
-                shape: BoxShape.circle,
-              ),
-              child: IconButton(
-                icon: Icon(
-                  Icons.shopping_cart_outlined,
-                  color: CustomTheme.textSecondary,
-                  size: 20,
-                ),
-                onPressed: () {
-                  Navigator.pushNamed(context, '/cart');
-                },
-                splashRadius: 24,
-              ),
+        // Search Icon
+        Container(
+          decoration: BoxDecoration(
+            color: CustomTheme.surfaceColor,
+            shape: BoxShape.circle,
+          ),
+          child: IconButton(
+            icon: Icon(
+              Icons.search,
+              color: CustomTheme.textSecondary,
+              size: 20,
             ),
-            if (cartItemCount > 0)
-              Positioned(
-                right: 4,
-                top: 4,
-                child: Container(
-                  padding: const EdgeInsets.all(2),
-                  decoration: BoxDecoration(
-                    color: CustomTheme.errorColor,
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: CustomTheme.surfaceColor,
-                      width: 1.5,
-                    ),
-                  ),
-                  constraints: const BoxConstraints(
-                    minWidth: 16,
-                    minHeight: 16,
-                  ),
-                  child: Text(
-                    cartItemCount > 9 ? '9+' : '$cartItemCount',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 9,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-              ),
-          ],
+            onPressed: () {
+              Navigator.pushNamed(context, '/search');
+            },
+            splashRadius: 24,
+          ),
         ),
 
         // Spacing between cart and notification icons

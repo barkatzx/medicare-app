@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:medicare_app/core/providers.dart';
 import '../../../routes/app_routes.dart';
-import '../../providers/auth_provider.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final authProvider = Provider.of<AuthProvider>(context);
+  Widget build(BuildContext context, WidgetRef ref) {
+    final authProvider = ref.watch(authProviderNotifier);
     final user = authProvider.currentUser;
 
     return Scaffold(
@@ -117,7 +117,7 @@ class ProfileScreen extends StatelessWidget {
               title: 'Logout',
               textColor: Colors.red,
               onTap: () async {
-                await authProvider.logout();
+                await ref.read(authProviderNotifier).logout();
                 // Use context directly instead of mounted
                 if (context.mounted) {
                   Navigator.pushReplacementNamed(context, AppRoutes.login);

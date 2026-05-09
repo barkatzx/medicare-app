@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
 class CustomTheme {
-  // Font Families - Use 'Lufga' as the family name
-  static const String primaryFontFamily = 'Lufga';
-  static const String secondaryFontFamily = 'Lufga';
+  // Font Families - Use 'Outfit' as the family name
+  static const String primaryFontFamily = 'Outfit';
+  static const String secondaryFontFamily = 'Outfit';
 
   // Colors
   static const Color primaryColor = Color(0xFF010101);
@@ -83,7 +83,7 @@ class CustomTheme {
   ];
 }
 
-// Custom Text Styles with Lufga Font
+// Custom Text Styles with Outfit Font
 class CustomTextStyle {
   static TextStyle get heading1 => TextStyle(
     fontFamily: CustomTheme.primaryFontFamily,

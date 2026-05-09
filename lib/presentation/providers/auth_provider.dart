@@ -66,6 +66,7 @@ class AuthProvider extends ChangeNotifier {
       );
 
       _currentUser = user;
+      _isInitialized = true;
       _setLoading(false);
       return true;
     } catch (e) {
@@ -100,6 +101,7 @@ class AuthProvider extends ChangeNotifier {
       );
 
       _currentUser = user;
+      _isInitialized = true;
       _setLoading(false);
       return true;
     } catch (e) {
@@ -118,7 +120,8 @@ class AuthProvider extends ChangeNotifier {
   Future<void> logout() async {
     await loginUseCase.repository.logout();
     _currentUser = null;
-    _isInitialized = false;
+    // We intentionally keep _isInitialized = true, because the app has already done
+    // its initial setup. It just means the current state is "logged out".
     _pendingApprovalMessage = null;
     _errorMessage = null;
     notifyListeners();

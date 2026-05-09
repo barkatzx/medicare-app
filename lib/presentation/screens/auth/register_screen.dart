@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:medicare_app/core/providers.dart';
 import 'package:medicare_app/presentation/widgets/common/custom_theme.dart';
-import 'package:provider/provider.dart';
 import '../../../routes/app_routes.dart';
-import '../../providers/auth_provider.dart';
 import '../../widgets/common/custom_button.dart';
 import '../../widgets/common/custom_textfield.dart';
 
-class RegisterScreen extends StatefulWidget {
+class RegisterScreen extends ConsumerStatefulWidget {
   const RegisterScreen({super.key});
 
   @override
-  State<RegisterScreen> createState() => _RegisterScreenState();
+  ConsumerState<RegisterScreen> createState() => _RegisterScreenState();
 }
 
-class _RegisterScreenState extends State<RegisterScreen> {
+class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
@@ -180,8 +180,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 const SizedBox(height: 24),
 
                 // Error Message
-                Consumer<AuthProvider>(
-                  builder: (context, authProvider, child) {
+                Consumer(
+                  builder: (context, ref, child) {
+                    final authProvider = ref.watch(authProviderNotifier);
                     if (authProvider.errorMessage != null) {
                       return Container(
                         padding: const EdgeInsets.all(12),
@@ -203,8 +204,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ),
 
                 // Register Button
-                Consumer<AuthProvider>(
-                  builder: (context, authProvider, child) {
+                Consumer(
+                  builder: (context, ref, child) {
+                    final authProvider = ref.watch(authProviderNotifier);
                     return CustomButton(
                       text: 'Register',
                       isLoading: authProvider.isLoading,
@@ -249,7 +251,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   Future<void> _handleRegister() async {
     if (_formKey.currentState!.validate()) {
-      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      final authProvider = ref.read(authProviderNotifier);
 
       // Additional validation
       if (_passwordController.text.length < 6) {
@@ -285,10 +287,23 @@ class _RegisterScreenState extends State<RegisterScreen> {
       );
 
       if (success && mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Registration successful!')),
-        );
-        Navigator.pushReplacementNamed(context, AppRoutes.home);
+        if (authProvider.isPendingApproval) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+                content: Text(
+                    'Registration successful. Please wait for admin approval.')),
+          );
+          Navigator.pushNamedAndRemoveUntil(
+            context,
+            AppRoutes.pendingApproval,
+            (route) => false,
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Registration successful!')),
+          );
+          Navigator.pushReplacementNamed(context, AppRoutes.home);
+        }
       } else if (authProvider.pendingApprovalMessage != null && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(authProvider.pendingApprovalMessage!)),

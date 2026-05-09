@@ -1,29 +1,29 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:medicare_app/core/providers.dart';
 import 'package:medicare_app/domain/entities/cart_entity.dart';
 import 'package:medicare_app/presentation/providers/cart_provider.dart';
 import 'package:medicare_app/presentation/widgets/common/custom_theme.dart';
-import 'package:provider/provider.dart';
 
-class CartScreen extends StatefulWidget {
+class CartScreen extends ConsumerStatefulWidget {
   const CartScreen({super.key});
 
   @override
-  State<CartScreen> createState() => _CartScreenState();
+  ConsumerState<CartScreen> createState() => _CartScreenState();
 }
 
-class _CartScreenState extends State<CartScreen> {
+class _CartScreenState extends ConsumerState<CartScreen> {
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final provider = Provider.of<CartProvider>(context, listen: false);
-      provider.loadCart();
+      ref.read(cartProviderNotifier).loadCart();
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final provider = Provider.of<CartProvider>(context);
+    final provider = ref.watch(cartProviderNotifier);
     final cartItems = provider.cartItems;
     final isLoading = provider.isLoading;
     final subtotal = provider.subtotal;
@@ -287,7 +287,7 @@ class _CartScreenState extends State<CartScreen> {
                     Row(
                       children: [
                         Text(
-                          '${item.finalPrice.toStringAsFixed(2)}\৳',
+                          '${item.finalPrice.toStringAsFixed(2)}৳',
                           style: CustomTextStyle.heading3.copyWith(
                             color: CustomTheme.primaryColor,
                           ),
@@ -295,7 +295,7 @@ class _CartScreenState extends State<CartScreen> {
                         if (item.discountedPrice != null) ...[
                           SizedBox(width: CustomTheme.spacingSM),
                           Text(
-                            '${item.price.toStringAsFixed(2)}\৳',
+                            '${item.price.toStringAsFixed(2)}৳',
                             style: CustomTextStyle.bodySmall.copyWith(
                               decoration: TextDecoration.lineThrough,
                             ),
@@ -317,7 +317,7 @@ class _CartScreenState extends State<CartScreen> {
                           ),
                         ),
                         child: Text(
-                          'Save ${item.itemSavings.toStringAsFixed(2)}\৳',
+                          'Save ${item.itemSavings.toStringAsFixed(2)}৳',
                           style: TextStyle(
                             color: CustomTheme.errorColor,
                             fontSize: CustomTheme.fontSizeXS,
@@ -395,7 +395,7 @@ class _CartScreenState extends State<CartScreen> {
                           ),
                         ),
                         // Quantity Number
-                        Container(
+                        SizedBox(
                           width: 40,
                           child: Text(
                             '${item.quantity}',
@@ -585,13 +585,15 @@ class _CartScreenState extends State<CartScreen> {
             onPressed: () async {
               Navigator.pop(context);
               await provider.clearCart();
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('Cart cleared successfully'),
-                  backgroundColor: CustomTheme.successColor,
-                  behavior: SnackBarBehavior.floating,
-                ),
-              );
+              if (mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Cart cleared successfully'),
+                    backgroundColor: CustomTheme.successColor,
+                    behavior: SnackBarBehavior.floating,
+                  ),
+                );
+              }
             },
             child: Text(
               'Clear',
@@ -637,13 +639,15 @@ class _CartScreenState extends State<CartScreen> {
             onPressed: () async {
               Navigator.pop(context);
               await provider.removeFromCart(itemId);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('Item removed from cart'),
-                  backgroundColor: CustomTheme.successColor,
-                  behavior: SnackBarBehavior.floating,
-                ),
-              );
+              if (mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Item removed from cart'),
+                    backgroundColor: CustomTheme.successColor,
+                    behavior: SnackBarBehavior.floating,
+                  ),
+                );
+              }
             },
             child: Text(
               'Remove',

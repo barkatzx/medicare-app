@@ -1,21 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:medicare_app/presentation/providers/auth_provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:medicare_app/core/providers.dart';
 import 'package:medicare_app/presentation/widgets/common/custom_button.dart';
 import 'package:medicare_app/presentation/widgets/common/custom_theme.dart';
-import 'package:provider/provider.dart';
 import '../../../routes/app_routes.dart';
 
-class PendingApprovalScreen extends StatefulWidget {
+class PendingApprovalScreen extends ConsumerStatefulWidget {
   const PendingApprovalScreen({super.key});
 
   @override
-  State<PendingApprovalScreen> createState() => _PendingApprovalScreenState();
+  ConsumerState<PendingApprovalScreen> createState() => _PendingApprovalScreenState();
 }
 
-class _PendingApprovalScreenState extends State<PendingApprovalScreen> {
+class _PendingApprovalScreenState extends ConsumerState<PendingApprovalScreen> {
   @override
   Widget build(BuildContext context) {
-    final authProvider = Provider.of<AuthProvider>(context);
+    final authProvider = ref.watch(authProviderNotifier);
 
     return Scaffold(
       backgroundColor: CustomTheme.backgroundColor,
@@ -129,8 +129,9 @@ class _PendingApprovalScreenState extends State<PendingApprovalScreen> {
                 CustomButton(
                   text: 'Check Status',
                   onPressed: () async {
-                    await authProvider.initialize();
-                    if (authProvider.isLoggedIn && authProvider.isCustomer) {
+                    await ref.read(authProviderNotifier).initialize();
+                    final currentAuthProvider = ref.read(authProviderNotifier);
+                    if (currentAuthProvider.isLoggedIn && currentAuthProvider.isCustomer) {
                       if (mounted) {
                         Navigator.pushReplacementNamed(context, AppRoutes.home);
                       }
@@ -144,7 +145,7 @@ class _PendingApprovalScreenState extends State<PendingApprovalScreen> {
                 // Back to Login Button
                 GestureDetector(
                   onTap: () async {
-                    await authProvider.logout();
+                    await ref.read(authProviderNotifier).logout();
                     if (mounted) {
                       Navigator.pushReplacementNamed(context, AppRoutes.login);
                     }

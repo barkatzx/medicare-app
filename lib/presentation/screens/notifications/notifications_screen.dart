@@ -1,31 +1,28 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:medicare_app/core/providers.dart';
 import 'package:medicare_app/presentation/providers/notification_provider.dart';
 import 'package:medicare_app/presentation/widgets/common/custom_theme.dart';
-import 'package:provider/provider.dart';
 
-class NotificationsScreen extends StatefulWidget {
+class NotificationsScreen extends ConsumerStatefulWidget {
   const NotificationsScreen({super.key});
 
   @override
-  State<NotificationsScreen> createState() => _NotificationsScreenState();
+  ConsumerState<NotificationsScreen> createState() => _NotificationsScreenState();
 }
 
-class _NotificationsScreenState extends State<NotificationsScreen> {
+class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final provider = Provider.of<NotificationProvider>(
-        context,
-        listen: false,
-      );
-      provider.loadNotifications();
+      ref.read(notificationProviderNotifier).loadNotifications();
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final provider = Provider.of<NotificationProvider>(context);
+    final provider = ref.watch(notificationProviderNotifier);
     final notifications = provider.notifications;
     final isLoading = provider.isLoading;
 
@@ -65,42 +62,46 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               // In the app bar actions, update the onPressed:
               onPressed: () async {
                 try {
-                  await provider.markAllAsRead();
+                  await ref.read(notificationProviderNotifier).markAllAsRead();
                   // Show success message
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        'All notifications marked as read',
-                        style: TextStyle(color: Colors.white),
-                      ),
-                      backgroundColor: CustomTheme.successColor,
-                      behavior: SnackBarBehavior.floating,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(
-                          CustomTheme.radiusMD,
+                  if (mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          'All notifications marked as read',
+                          style: TextStyle(color: Colors.white),
                         ),
+                        backgroundColor: CustomTheme.successColor,
+                        behavior: SnackBarBehavior.floating,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(
+                            CustomTheme.radiusMD,
+                          ),
+                        ),
+                        duration: Duration(seconds: 2),
                       ),
-                      duration: Duration(seconds: 2),
-                    ),
-                  );
+                    );
+                  }
                 } catch (e) {
                   // Show error message
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        'Failed to mark all as read: ${e.toString()}',
-                        style: TextStyle(color: Colors.white),
-                      ),
-                      backgroundColor: CustomTheme.errorColor,
-                      behavior: SnackBarBehavior.floating,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(
-                          CustomTheme.radiusMD,
+                  if (mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          'Failed to mark all as read: ${e.toString()}',
+                          style: TextStyle(color: Colors.white),
                         ),
+                        backgroundColor: CustomTheme.errorColor,
+                        behavior: SnackBarBehavior.floating,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(
+                            CustomTheme.radiusMD,
+                          ),
+                        ),
+                        duration: Duration(seconds: 3),
                       ),
-                      duration: Duration(seconds: 3),
-                    ),
-                  );
+                    );
+                  }
                 }
               },
               style: TextButton.styleFrom(
@@ -151,7 +152,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
 
     return RefreshIndicator(
       onRefresh: () async {
-        await provider.loadNotifications();
+        await ref.read(notificationProviderNotifier).loadNotifications();
       },
       color: CustomTheme.primaryColor,
       backgroundColor: CustomTheme.surfaceColor,
@@ -297,11 +298,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         child: InkWell(
           onTap: () async {
             if (!isRead) {
-              final provider = Provider.of<NotificationProvider>(
-                context,
-                listen: false,
-              );
-              await provider.markAsRead(notification.id);
+              await ref.read(notificationProviderNotifier).markAsRead(notification.id);
             }
           },
           borderRadius: BorderRadius.circular(CustomTheme.radiusLG),

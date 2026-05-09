@@ -1,40 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import '../presentation/providers/auth_provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:medicare_app/core/providers.dart';
 import '../presentation/screens/auth/pending_approval_screen.dart';
-import 'app_routes.dart';
 
 class AuthGuard {
-  static Future<bool> checkAuthentication(BuildContext context) async {
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
-
-    // Initialize if not done yet
-    if (!authProvider.isInitialized) {
-      await authProvider.initialize();
-    }
-
-    // Check if user is pending approval
-    if (authProvider.isPendingApproval) {
-      Navigator.pushReplacementNamed(context, '/pending-approval');
-      return false;
-    }
-
-    // Check if user is logged in and is customer
-    if (!authProvider.isLoggedIn || !authProvider.isCustomer) {
-      Navigator.pushNamedAndRemoveUntil(
-        context,
-        AppRoutes.login,
-        (route) => false,
-      );
-      return false;
-    }
-
-    return true;
-  }
-
   static Widget protectRoute(Widget child) {
-    return Consumer<AuthProvider>(
-      builder: (context, authProvider, _) {
+    return Consumer(
+      builder: (context, ref, _) {
+        final authProvider = ref.watch(authProviderNotifier);
+        
         if (!authProvider.isInitialized) {
           return const Scaffold(
             body: Center(

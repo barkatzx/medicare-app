@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:medicare_app/presentation/providers/cart_provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:medicare_app/core/providers.dart';
 import 'package:medicare_app/presentation/widgets/common/custom_theme.dart';
-import 'package:provider/provider.dart';
 import '../../../domain/entities/product_entity.dart';
 
 class ProductCard extends StatelessWidget {
   final ProductEntity product;
 
-  const ProductCard({Key? key, required this.product}) : super(key: key);
+  const ProductCard({super.key, required this.product});
 
   @override
   Widget build(BuildContext context) {
@@ -16,11 +16,10 @@ class ProductCard extends StatelessWidget {
         Navigator.pushNamed(context, '/product-detail', arguments: product.id);
       },
       child: Container(
-        margin: EdgeInsets.only(bottom: CustomTheme.spacingMD),
+        margin: EdgeInsets.only(bottom: CustomTheme.spacingSM),
         decoration: BoxDecoration(
           color: CustomTheme.surfaceColor,
-          borderRadius: BorderRadius.circular(CustomTheme.radiusLG),
-          boxShadow: CustomTheme.boxShadowLight,
+          borderRadius: BorderRadius.circular(CustomTheme.radiusMD),
         ),
         child: Padding(
           padding: EdgeInsets.all(CustomTheme.spacingMD),
@@ -180,91 +179,49 @@ class ProductCard extends StatelessWidget {
   }
 }
 
-// Separate Stateful Widget for Add to Cart Button to handle local state
-class _AddToCartButton extends StatefulWidget {
+class _AddToCartButton extends ConsumerWidget {
   final ProductEntity product;
 
   const _AddToCartButton({required this.product});
 
   @override
-  State<_AddToCartButton> createState() => _AddToCartButtonState();
-}
-
-class _AddToCartButtonState extends State<_AddToCartButton> {
-  bool _isAdding = false;
-
-  Future<void> _addToCart(CartProvider cartProvider) async {
-    if (_isAdding) return;
-
-    setState(() {
-      _isAdding = true;
-    });
-
-    // Don't await - fire and forget for instant UI
-    cartProvider
-        .addToCart(widget.product.id, 1)
-        .then((success) {
-          if (mounted) {
-            setState(() {
-              _isAdding = false;
-            });
-
-            if (success) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(
-                    '${widget.product.name} added to cart',
-                    style: const TextStyle(color: Colors.white, fontSize: 12),
-                  ),
-                  backgroundColor: CustomTheme.successColor,
-                  behavior: SnackBarBehavior.floating,
-                  duration: const Duration(milliseconds: 800),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(CustomTheme.radiusMD),
-                  ),
+  Widget build(BuildContext context, WidgetRef ref) {
+    return GestureDetector(
+      onTap: () {
+        final cartProvider = ref.read(cartProviderNotifier);
+        
+        // Optimistic UI, instantaneous add to cart without blocking
+        cartProvider.addToCart(product.id, 1).then((success) {
+          if (success && context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  '${product.name} added to cart',
+                  style: const TextStyle(color: Colors.white, fontSize: 12),
                 ),
-              );
-            }
-          }
-        })
-        .catchError((error) {
-          if (mounted) {
-            setState(() {
-              _isAdding = false;
-            });
+                backgroundColor: CustomTheme.successColor,
+                behavior: SnackBarBehavior.floating,
+                duration: const Duration(milliseconds: 800),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(CustomTheme.radiusMD),
+                ),
+              ),
+            );
           }
         });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final cartProvider = Provider.of<CartProvider>(context, listen: false);
-
-    return GestureDetector(
-      onTap: () => _addToCart(cartProvider),
+      },
       child: Container(
-        width: 40,
-        height: 40,
+        width: 20,
+        height: 30,
         decoration: BoxDecoration(
-          color: _isAdding
-              ? CustomTheme.primaryColor.withOpacity(0.5)
-              : CustomTheme.primaryColor.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(CustomTheme.radiusMD),
+          color: CustomTheme.backgroundColor,
+          borderRadius: BorderRadius.circular(CustomTheme.radiusSM),
         ),
-        child: _isAdding
-            ? SizedBox(
-                width: 18,
-                height: 18,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  color: CustomTheme.primaryColor,
-                ),
-              )
-            : Icon(
-                Icons.shopping_cart_outlined,
-                size: 20,
-                color: CustomTheme.primaryColor,
-              ),
+        child: Icon(
+          Icons.add,
+          size: 20,
+          color: CustomTheme.primaryColor,
+        ),
       ),
     );
   }

@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:medicare_app/core/providers.dart';
 import 'package:medicare_app/presentation/widgets/common/custom_theme.dart';
-import 'package:provider/provider.dart';
 import '../../../routes/app_routes.dart';
-import '../../providers/auth_provider.dart';
 import '../../widgets/common/custom_button.dart';
 import '../../widgets/common/custom_textfield.dart';
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({Key? key}) : super(key: key);
+class LoginScreen extends ConsumerStatefulWidget {
+  const LoginScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  ConsumerState<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final _phoneController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -113,8 +113,9 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 SizedBox(height: CustomTheme.spacingXXL), // Removed const
                 // Error Message
-                Consumer<AuthProvider>(
-                  builder: (context, authProvider, child) {
+                Consumer(
+                  builder: (context, ref, child) {
+                    final authProvider = ref.watch(authProviderNotifier);
                     if (authProvider.errorMessage != null) {
                       return Container(
                         padding: EdgeInsets.all(CustomTheme.spacingMD),
@@ -151,8 +152,9 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
 
                 // Login Button
-                Consumer<AuthProvider>(
-                  builder: (context, authProvider, child) {
+                Consumer(
+                  builder: (context, ref, child) {
+                    final authProvider = ref.watch(authProviderNotifier);
                     return CustomButton(
                       text: 'Login',
                       isLoading: authProvider.isLoading,
@@ -193,7 +195,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Future<void> _handleLogin() async {
     if (_formKey.currentState!.validate()) {
-      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      final authProvider = ref.read(authProviderNotifier);
 
       showDialog(
         context: context,
@@ -236,9 +238,10 @@ class _LoginScreenState extends State<LoginScreen> {
           (route) => false,
         );
       } else if (authProvider.pendingApprovalMessage != null && mounted) {
-        _showPendingApprovalDialog(
+        Navigator.pushNamedAndRemoveUntil(
           context,
-          authProvider.pendingApprovalMessage!,
+          AppRoutes.pendingApproval,
+          (route) => false,
         );
       } else if (authProvider.errorMessage != null && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -255,56 +258,4 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  void _showPendingApprovalDialog(BuildContext context, String message) {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => Dialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(CustomTheme.radiusXL),
-        ),
-        child: Padding(
-          padding: EdgeInsets.all(CustomTheme.spacingXXL),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                padding: EdgeInsets.all(CustomTheme.spacingLG),
-                decoration: BoxDecoration(
-                  color: CustomTheme.warningColor.withOpacity(0.1),
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  Icons.pending_actions,
-                  size: 50,
-                  color: CustomTheme.warningColor,
-                ),
-              ),
-              SizedBox(height: CustomTheme.spacingXL),
-              Text(
-                'Account Pending Approval',
-                style: CustomTextStyle.heading2,
-                textAlign: TextAlign.center,
-              ),
-              SizedBox(height: CustomTheme.spacingMD),
-              Text(
-                message,
-                style: CustomTextStyle.bodyMedium,
-                textAlign: TextAlign.center,
-              ),
-              SizedBox(height: CustomTheme.spacingXXL),
-              CustomButton(
-                text: 'OK',
-                onPressed: () {
-                  Navigator.pop(context);
-                  _phoneController.clear();
-                  _passwordController.clear();
-                },
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
 }

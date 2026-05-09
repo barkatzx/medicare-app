@@ -14,7 +14,7 @@ dependencies:
   http: ^1.1.0
 
   # State Management
-  provider: ^6.0.5
+  flutter_riverpod: ^2.5.1
 
   # Storage
   shared_preferences: ^2.2.2
@@ -40,17 +40,6 @@ flutter:
     - assets/images/
 
   fonts:
-    - family: Lufga
+    - family: Outfit
       fonts:
-        - asset: assets/fonts/LufgaThin.ttf
-          weight: 100
-        - asset: assets/fonts/LufgaLight.ttf
-          weight: 300
-        - asset: assets/fonts/LufgaRegular.ttf
-          weight: 400
-        - asset: assets/fonts/LufgaMedium.ttf
-          weight: 500
-        - asset: assets/fonts/LufgaSemiBold.ttf
-          weight: 600
-        - asset: assets/fonts/LufgaBold.ttf
-          weight: 700
+        - asset: assets/fonts/Outfit-Regular.ttf

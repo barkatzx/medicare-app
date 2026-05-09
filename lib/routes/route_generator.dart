@@ -6,6 +6,7 @@ import '../presentation/screens/auth/forgot_password_screen.dart';
 import '../presentation/screens/auth/pending_approval_screen.dart';
 import '../presentation/screens/home/home_screen.dart';
 import '../presentation/screens/home/categories_screen.dart';
+import '../presentation/screens/search/search_screen.dart';
 import '../presentation/screens/home/trending_screen.dart';
 import '../presentation/screens/cart/cart_screen.dart';
 import '../presentation/screens/cart/checkout_screen.dart';
@@ -28,7 +29,7 @@ class RouteGenerator {
         return MaterialPageRoute(builder: (_) => const RegisterScreen());
       case AppRoutes.forgotPassword:
         return MaterialPageRoute(builder: (_) => const ForgotPasswordScreen());
-      case '/pending-approval':
+      case AppRoutes.pendingApproval:
         return MaterialPageRoute(builder: (_) => const PendingApprovalScreen());
       case AppRoutes.productDetail:
         return MaterialPageRoute(
@@ -56,6 +57,10 @@ class RouteGenerator {
       case AppRoutes.checkout:
         return MaterialPageRoute(
           builder: (_) => AuthGuard.protectRoute(const CheckoutScreen()),
+        );
+      case AppRoutes.search:
+        return MaterialPageRoute(
+          builder: (_) => AuthGuard.protectRoute(const SearchScreen()),
         );
       case AppRoutes.myOrders:
         return MaterialPageRoute(

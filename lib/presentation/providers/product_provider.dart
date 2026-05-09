@@ -10,26 +10,66 @@ class ProductProvider extends ChangeNotifier {
   List<ProductEntity> _products = [];
   List<ProductEntity> _filteredProducts = [];
   bool _isLoading = false;
+  bool _isLoadingMore = false;
   String _searchQuery = '';
   String? _errorMessage;
+
+  int _currentPage = 1;
+  bool _hasNextPage = true;
 
   List<ProductEntity> get products =>
       _searchQuery.isEmpty ? _products : _filteredProducts;
   bool get isLoading => _isLoading;
+  bool get isLoadingMore => _isLoadingMore;
   String? get errorMessage => _errorMessage;
   String get searchQuery => _searchQuery;
+  bool get hasNextPage => _hasNextPage;
 
-  Future<void> loadProducts() async {
-    _setLoading(true);
+  Future<void> loadProducts({bool refresh = false}) async {
+    if (refresh) {
+      _currentPage = 1;
+      _hasNextPage = true;
+    }
+
+    if (!_hasNextPage) return;
+    if (_isLoading || _isLoadingMore) return;
+
+    if (refresh || _products.isEmpty) {
+      _setLoading(true);
+    } else {
+      _isLoadingMore = true;
+      notifyListeners();
+    }
     _errorMessage = null;
 
     try {
-      _products = await productRepository.getProducts();
+      final newProducts = await productRepository.getProducts(
+        page: _currentPage,
+        limit: 20,
+      );
+      
+      if (refresh || _products.isEmpty) {
+        _products = newProducts;
+      } else {
+        _products.addAll(newProducts);
+      }
+      
+      if (newProducts.length < 20) {
+        _hasNextPage = false;
+      } else {
+        _currentPage++;
+      }
+      
       _filteredProducts = _products;
-      _setLoading(false);
     } catch (e) {
       _errorMessage = e.toString();
-      _setLoading(false);
+    } finally {
+      if (refresh || _products.isEmpty) {
+        _setLoading(false);
+      } else {
+        _isLoadingMore = false;
+        notifyListeners();
+      }
     }
   }
 
