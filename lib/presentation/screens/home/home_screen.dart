@@ -198,9 +198,37 @@ class _HomeContentScreenState extends ConsumerState<HomeContentScreen> {
                     physics: const AlwaysScrollableScrollPhysics(),
                     padding: const EdgeInsets.all(16),
                     itemCount: productProvider.products.length +
-                        (productProvider.isLoadingMore ? 1 : 0),
+                        (productProvider.isLoadingMore ? 1 : 0) +
+                        (productProvider.errorMessage != null &&
+                                productProvider.products.isNotEmpty
+                            ? 1
+                            : 0),
                     itemBuilder: (context, index) {
-                      if (index == productProvider.products.length) {
+                      // Error item at the bottom
+                      if (productProvider.errorMessage != null &&
+                          productProvider.products.isNotEmpty &&
+                          index == productProvider.products.length + (productProvider.isLoadingMore ? 1 : 0)) {
+                        return Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Column(
+                            children: [
+                              Text(
+                                productProvider.errorMessage!,
+                                style: const TextStyle(color: Colors.red),
+                                textAlign: TextAlign.center,
+                              ),
+                              TextButton(
+                                onPressed: () => productProvider.loadProducts(),
+                                child: const Text('Retry'),
+                              ),
+                            ],
+                          ),
+                        );
+                      }
+
+                      // Loading item at the bottom
+                      if (productProvider.isLoadingMore &&
+                          index == productProvider.products.length) {
                         return const Padding(
                           padding: EdgeInsets.symmetric(vertical: 16.0),
                           child: Center(

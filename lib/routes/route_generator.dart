@@ -6,6 +6,7 @@ import '../presentation/screens/auth/forgot_password_screen.dart';
 import '../presentation/screens/auth/pending_approval_screen.dart';
 import '../presentation/screens/home/home_screen.dart';
 import '../presentation/screens/home/categories_screen.dart';
+import '../presentation/screens/categories/category_products_screen.dart';
 import '../presentation/screens/search/search_screen.dart';
 import '../presentation/screens/home/trending_screen.dart';
 import '../presentation/screens/cart/cart_screen.dart';
@@ -45,6 +46,16 @@ class RouteGenerator {
       case AppRoutes.categories:
         return MaterialPageRoute(
           builder: (_) => AuthGuard.protectRoute(const CategoriesScreen()),
+        );
+      case AppRoutes.categoryProducts:
+        final args = settings.arguments as Map<String, dynamic>;
+        return MaterialPageRoute(
+          builder: (_) => AuthGuard.protectRoute(
+            CategoryProductsScreen(
+              categoryId: args['id'] as String,
+              categoryName: args['name'] as String,
+            ),
+          ),
         );
       case AppRoutes.trending:
         return MaterialPageRoute(

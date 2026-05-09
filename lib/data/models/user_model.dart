@@ -8,6 +8,10 @@ class User {
   final String role;
   final DateTime createdAt;
   final DateTime updatedAt;
+  final String? pharmacyName;
+  final String? defaultAddressId;
+  final List<dynamic> addresses;
+  final List<dynamic> notifications;
 
   User({
     required this.id,
@@ -19,6 +23,10 @@ class User {
     required this.role,
     required this.createdAt,
     required this.updatedAt,
+    this.pharmacyName,
+    this.defaultAddressId,
+    this.addresses = const [],
+    this.notifications = const [],
   });
 
   factory User.fromJson(Map<String, dynamic> json) {
@@ -26,7 +34,7 @@ class User {
       id: json['id'] ?? '',
       name: json['name'] ?? '',
       email: json['email'] ?? '',
-      phone: json['phone'],
+      phone: json['phone_number'] ?? json['phone'],
       avatar: json['avatar'],
       isApproved: json['isApproved'] ?? false,
       role: json['role'] ?? 'customer',
@@ -36,6 +44,10 @@ class User {
       updatedAt: DateTime.parse(
         json['updatedAt'] ?? DateTime.now().toIso8601String(),
       ),
+      pharmacyName: json['pharmacy_name'],
+      defaultAddressId: json['defaultAddressId'],
+      addresses: json['addresses'] ?? [],
+      notifications: json['notifications'] ?? [],
     );
   }
 
@@ -44,12 +56,16 @@ class User {
       'id': id,
       'name': name,
       'email': email,
-      'phone': phone,
+      'phone_number': phone,
       'avatar': avatar,
       'isApproved': isApproved,
       'role': role,
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt.toIso8601String(),
+      'pharmacy_name': pharmacyName,
+      'defaultAddressId': defaultAddressId,
+      'addresses': addresses,
+      'notifications': notifications,
     };
   }
 }

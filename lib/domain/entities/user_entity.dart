@@ -8,6 +8,9 @@ class UserEntity {
   final bool isApproved;
   final String? pharmacyName;
   final DateTime createdAt;
+  final String? defaultAddressId;
+  final List<dynamic> addresses;
+  final List<dynamic> notifications;
 
   UserEntity({
     required this.id,
@@ -19,6 +22,9 @@ class UserEntity {
     required this.isApproved,
     this.pharmacyName,
     required this.createdAt,
+    this.defaultAddressId,
+    this.addresses = const [],
+    this.notifications = const [],
   });
 
   factory UserEntity.fromJson(Map<String, dynamic> json) {
@@ -34,6 +40,9 @@ class UserEntity {
       createdAt: DateTime.parse(
         json['createdAt'] ?? DateTime.now().toIso8601String(),
       ),
+      defaultAddressId: json['defaultAddressId'],
+      addresses: json['addresses'] ?? [],
+      notifications: json['notifications'] ?? [],
     );
   }
 
@@ -48,6 +57,9 @@ class UserEntity {
       'isApproved': isApproved,
       'pharmacy_name': pharmacyName,
       'createdAt': createdAt.toIso8601String(),
+      'defaultAddressId': defaultAddressId,
+      'addresses': addresses,
+      'notifications': notifications,
     };
   }
 

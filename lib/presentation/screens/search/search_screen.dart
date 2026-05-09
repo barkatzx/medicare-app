@@ -13,6 +13,7 @@ class SearchScreen extends ConsumerStatefulWidget {
 class _SearchScreenState extends ConsumerState<SearchScreen> {
   final TextEditingController _searchController = TextEditingController();
   final FocusNode _searchFocusNode = FocusNode();
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
@@ -21,12 +22,26 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       FocusScope.of(context).requestFocus(_searchFocusNode);
     });
+
+    _scrollController.addListener(() {
+      if (_scrollController.position.pixels >=
+          _scrollController.position.maxScrollExtent - 200) {
+        final productProvider = ref.read(productProviderNotifier);
+        if (!productProvider.isLoading &&
+            !productProvider.isLoadingMore &&
+            productProvider.hasNextPage &&
+            productProvider.searchQuery.isNotEmpty) {
+          productProvider.searchProducts(productProvider.searchQuery);
+        }
+      }
+    });
   }
 
   @override
   void dispose() {
     _searchController.dispose();
     _searchFocusNode.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -144,9 +159,19 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
             }
 
             return ListView.builder(
+              controller: _scrollController,
               padding: const EdgeInsets.all(16),
-              itemCount: productProvider.products.length,
+              itemCount: productProvider.products.length + (productProvider.isLoadingMore ? 1 : 0),
               itemBuilder: (context, index) {
+                if (productProvider.isLoadingMore && index == productProvider.products.length) {
+                  return const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 16.0),
+                    child: Center(
+                      child: CircularProgressIndicator(),
+                    ),
+                  );
+                }
+                
                 final product = productProvider.products[index];
                 return ProductCard(product: product);
               },

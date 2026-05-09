@@ -30,14 +30,32 @@ class ProductEntity {
   });
 
   factory ProductEntity.fromJson(Map<String, dynamic> json) {
+    double parseDouble(dynamic value) {
+      if (value == null) return 0.0;
+      if (value is num) return value.toDouble();
+      if (value is String) return double.tryParse(value) ?? 0.0;
+      return 0.0;
+    }
+
+    final double price = parseDouble(json['price']);
+    final double? discountedPrice = json['discountedPrice'] != null
+        ? parseDouble(json['discountedPrice'])
+        : null;
+
+    final double finalPrice = json['finalPrice'] != null
+        ? parseDouble(json['finalPrice'])
+        : (discountedPrice ?? price);
+
+    final double savings = json['savings'] != null
+        ? parseDouble(json['savings'])
+        : (price - finalPrice);
+
     return ProductEntity(
       id: json['id'],
       name: json['name'],
       description: json['description'] ?? '',
-      price: (json['price'] as num).toDouble(),
-      discountedPrice: json['discountedPrice'] != null
-          ? (json['discountedPrice'] as num).toDouble()
-          : null,
+      price: price,
+      discountedPrice: discountedPrice,
       discountPercent: json['discountPercent'] ?? 0,
       stock: json['stock'] ?? 0,
       categoryId: json['categoryId'] ?? '',
@@ -45,8 +63,8 @@ class ProductEntity {
       images: (json['images'] as List? ?? [])
           .map((img) => ProductImage.fromJson(img))
           .toList(),
-      finalPrice: (json['finalPrice'] as num).toDouble(),
-      savings: (json['savings'] as num).toDouble(),
+      finalPrice: finalPrice,
+      savings: savings,
       discountBadge: json['discountBadge'],
     );
   }

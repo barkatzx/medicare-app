@@ -10,6 +10,8 @@ import '../data/repositories/notification_repository.dart';
 import '../data/repositories/notification_repository_impl.dart';
 import '../data/repositories/product_repository.dart';
 import '../data/repositories/product_repository_impl.dart';
+import '../data/repositories/category_repository.dart';
+import '../data/repositories/category_repository_impl.dart';
 import '../domain/usecases/auth/login_usecase.dart';
 import '../domain/usecases/auth/register_usecase.dart';
 import '../domain/usecases/auth/verify_auth_usecase.dart';
@@ -17,6 +19,8 @@ import '../presentation/providers/auth_provider.dart';
 import '../presentation/providers/cart_provider.dart';
 import '../presentation/providers/notification_provider.dart';
 import '../presentation/providers/product_provider.dart';
+import '../presentation/providers/category_provider.dart';
+import '../presentation/providers/category_products_provider.dart';
 
 // Core
 final sharedPreferencesProvider = Provider<SharedPreferences>((ref) {
@@ -60,6 +64,13 @@ final notificationRepositoryProvider = Provider<NotificationRepository>((ref) {
   );
 });
 
+final categoryRepositoryProvider = Provider<CategoryRepository>((ref) {
+  return CategoryRepositoryImpl(
+    client: ref.watch(httpClientProvider),
+    prefsHelper: ref.watch(sharedPrefsHelperProvider),
+  );
+});
+
 // Use Cases
 final loginUseCaseProvider = Provider<LoginUseCase>((ref) {
   return LoginUseCase(ref.watch(authRepositoryProvider));
@@ -97,5 +108,18 @@ final cartProviderNotifier = ChangeNotifierProvider<CartProvider>((ref) {
 final notificationProviderNotifier = ChangeNotifierProvider<NotificationProvider>((ref) {
   return NotificationProvider(
     notificationRepository: ref.watch(notificationRepositoryProvider),
+  );
+});
+
+final categoryProviderNotifier = ChangeNotifierProvider<CategoryProvider>((ref) {
+  return CategoryProvider(
+    categoryRepository: ref.watch(categoryRepositoryProvider),
+  );
+});
+
+final categoryProductsProviderFamily = ChangeNotifierProvider.autoDispose.family<CategoryProductsProvider, String>((ref, categoryId) {
+  return CategoryProductsProvider(
+    productRepository: ref.watch(productRepositoryProvider),
+    categoryId: categoryId,
   );
 });
