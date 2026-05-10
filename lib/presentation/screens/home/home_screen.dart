@@ -52,7 +52,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             _buildNavItem(0, Icons.home_outlined, Icons.home, 'Home'),
-            _buildNavItem(1, Icons.trending_up_outlined, Icons.trending_up, 'Trending'),
+            _buildNavItem(1, Icons.shortcut_outlined, Icons.shortcut_rounded, 'Shortcuts'),
             _buildNavItem(2, Icons.category_outlined, Icons.category, 'Categories'),
             _buildNavItem(3, Icons.shopping_cart_outlined, Icons.shopping_cart, 'Cart', badgeCount: cartItemCount),
             _buildNavItem(4, Icons.person_outline, Icons.person, 'Profile'),

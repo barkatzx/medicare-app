@@ -22,100 +22,73 @@ class ProductCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(CustomTheme.radiusMD),
         ),
         child: Padding(
-          padding: EdgeInsets.all(CustomTheme.spacingMD),
+          padding: const EdgeInsets.all(8),
           child: Row(
             children: [
-              // First Flex Box - Product Image
-              Expanded(
-                flex: 2,
+              // Left Side - Product Image
+              Container(
+                width: 60,
+                height: 60,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(CustomTheme.radiusMD),
+                  color: CustomTheme.backgroundColor,
+                ),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(CustomTheme.radiusMD),
                   child: product.images.isNotEmpty
                       ? Image.network(
                           product.images.first.url,
-                          height: 80,
-                          width: double.infinity,
                           fit: BoxFit.cover,
                           loadingBuilder: (context, child, loadingProgress) {
                             if (loadingProgress == null) return child;
-                            return Container(
-                              height: 80,
-                              color: CustomTheme.secondaryColor.withOpacity(
-                                0.1,
-                              ),
-                              child: const Center(
-                                child: SizedBox(
-                                  width: 20,
-                                  height: 20,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                  ),
-                                ),
+                            return const Center(
+                              child: SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(strokeWidth: 2),
                               ),
                             );
                           },
-                          errorBuilder: (context, error, stackTrace) {
-                            return Container(
-                              height: 80,
-                              color: CustomTheme.secondaryColor.withOpacity(
-                                0.1,
-                              ),
-                              child: Icon(
-                                Icons.medical_services,
-                                size: 35,
-                                color: CustomTheme.secondaryColor,
-                              ),
-                            );
-                          },
+                          errorBuilder: (context, error, stackTrace) => _buildImagePlaceholder(),
                         )
-                      : Container(
-                          height: 80,
-                          color: CustomTheme.secondaryColor.withOpacity(0.1),
-                          child: Icon(
-                            Icons.medical_services,
-                            size: 35,
-                            color: CustomTheme.secondaryColor,
-                          ),
-                        ),
+                      : _buildImagePlaceholder(),
                 ),
               ),
-              SizedBox(width: CustomTheme.spacingMD),
+              const SizedBox(width: 20),
 
-              // Second Flex Box - Product Details
+              // Middle - Product Details
               Expanded(
-                flex: 4,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Category Name
                     Text(
                       product.categoryName,
-                      style: CustomTextStyle.caption,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+                      style: CustomTextStyle.caption.copyWith(
+                        color: CustomTheme.primaryColor.withOpacity(0.5),
+                        fontWeight: CustomTheme.fontWeightBold,
+                        letterSpacing: 0.5,
+                        fontSize: 12,
+                      ),
                     ),
-                    SizedBox(height: CustomTheme.spacingXS),
-
-                    // Product Name
+                    const SizedBox(height: 5),
                     Text(
                       product.name,
                       style: CustomTextStyle.bodyMedium.copyWith(
                         fontWeight: CustomTheme.fontWeightSemiBold,
-                        height: 1.3,
+                        color: CustomTheme.textPrimary,
+                        height: 1.2,
                       ),
-                      maxLines: 2,
+                      maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    SizedBox(height: CustomTheme.spacingSM),
-
-                    // Price Section
+                    const SizedBox(height: 5),
                     _buildPriceSection(),
                   ],
                 ),
               ),
 
-              // Third Flex Box - Cart Icon with Instant Add
-              Expanded(flex: 1, child: _AddToCartButton(product: product)),
+              // Right Side - Add Icon
+              _AddToCartButton(product: product),
             ],
           ),
         ),
@@ -123,59 +96,56 @@ class ProductCard extends StatelessWidget {
     );
   }
 
+  Widget _buildImagePlaceholder() {
+    return Center(
+      child: Icon(
+        Icons.medical_services_outlined,
+        size: 30,
+        color: CustomTheme.primaryColor.withOpacity(0.1),
+      ),
+    );
+  }
+
   Widget _buildPriceSection() {
-    if (product.discountedPrice != null) {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Text(
-                '\$${product.finalPrice.toStringAsFixed(2)}',
-                style: CustomTextStyle.heading3.copyWith(
-                  color: CustomTheme.primaryColor,
-                  fontWeight: CustomTheme.fontWeightBold,
-                ),
-              ),
-              SizedBox(width: CustomTheme.spacingSM),
-              Text(
-                '\$${product.price.toStringAsFixed(2)}',
-                style: CustomTextStyle.bodySmall.copyWith(
-                  decoration: TextDecoration.lineThrough,
-                ),
-              ),
-            ],
+    final hasDiscount = product.discountedPrice != null;
+
+    return Wrap(
+      crossAxisAlignment: WrapCrossAlignment.center,
+      spacing: 5,
+      children: [
+        Text(
+          '৳${product.finalPrice.toStringAsFixed(0)}',
+          style: CustomTextStyle.heading4.copyWith(
+            color: CustomTheme.primaryColor,
+            fontWeight: CustomTheme.fontWeightBold,
           ),
-          SizedBox(height: CustomTheme.spacingXS),
-          Container(
-            padding: EdgeInsets.symmetric(
-              horizontal: CustomTheme.spacingSM,
-              vertical: CustomTheme.spacingXS,
+        ),
+        if (hasDiscount) ...[
+          Text(
+            '৳${product.price.toStringAsFixed(0)}',
+            style: CustomTextStyle.heading4.copyWith(
+              decoration: TextDecoration.lineThrough,
+              color: CustomTheme.textTertiary,
             ),
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
             decoration: BoxDecoration(
               color: CustomTheme.errorColor.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(CustomTheme.radiusSM),
+              borderRadius: BorderRadius.circular(12),
             ),
             child: Text(
-              product.discountBadge ?? '${product.discountPercent}% OFF',
+              '${product.discountPercent}% OFF',
               style: TextStyle(
                 color: CustomTheme.errorColor,
-                fontSize: CustomTheme.fontSizeXS,
+                fontSize: 12,
                 fontWeight: CustomTheme.fontWeightBold,
               ),
             ),
           ),
         ],
-      );
-    } else {
-      return Text(
-        '\$${product.price.toStringAsFixed(2)}',
-        style: CustomTextStyle.heading3.copyWith(
-          color: CustomTheme.primaryColor,
-          fontWeight: CustomTheme.fontWeightBold,
-        ),
-      );
-    }
+      ],
+    );
   }
 }
 
@@ -215,8 +185,8 @@ class _AddToCartButton extends ConsumerWidget {
         });
       },
       child: Container(
-        width: 20,
-        height: 30,
+        width: 40,
+        height: 40,
         decoration: BoxDecoration(
           color: CustomTheme.backgroundColor,
           borderRadius: BorderRadius.circular(CustomTheme.radiusSM),
