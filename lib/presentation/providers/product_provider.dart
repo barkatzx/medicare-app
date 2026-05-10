@@ -32,29 +32,34 @@ class ProductProvider extends ChangeNotifier {
     if (refresh) {
       _currentPage = 1;
       _hasNextPage = true;
+      _errorMessage = null;
     }
 
     if (_searchQuery.isNotEmpty && !refresh) return;
     if (!_hasNextPage) return;
     if (_isLoading || _isLoadingMore) return;
 
-    if (refresh || _products.isEmpty) {
-      _setLoading(true);
+    final bool isFirstLoad = _products.isEmpty || refresh;
+    
+    if (isFirstLoad) {
+      _isLoading = true;
     } else {
       _isLoadingMore = true;
-      notifyListeners();
     }
     _errorMessage = null;
+    notifyListeners();
 
     try {
+      print('Loading products page: $_currentPage');
       final paginatedResponse = await productRepository.getProducts(
         page: _currentPage,
         limit: 20,
       );
       
       final newProducts = paginatedResponse.products;
+      print('Received ${newProducts.length} products, hasNextPage: ${paginatedResponse.hasNextPage}');
       
-      if (refresh || _products.isEmpty) {
+      if (isFirstLoad) {
         _products = newProducts;
       } else {
         _products = [..._products, ...newProducts];
@@ -68,15 +73,15 @@ class ProductProvider extends ChangeNotifier {
       if (_searchQuery.isEmpty) {
         _filteredProducts = _products;
       }
+      
+      print('Total products loaded: ${_products.length}, nextPage: $_currentPage, hasNextPage: $_hasNextPage');
     } catch (e) {
+      print('LoadProducts error: $e');
       _errorMessage = e.toString();
     } finally {
-      if (refresh || _products.isEmpty) {
-        _setLoading(false);
-      } else {
-        _isLoadingMore = false;
-        notifyListeners();
-      }
+      _isLoading = false;
+      _isLoadingMore = false;
+      notifyListeners();
     }
   }
 
@@ -132,12 +137,9 @@ class ProductProvider extends ChangeNotifier {
     } catch (e) {
       _errorMessage = e.toString();
     } finally {
-      if (refresh || _filteredProducts.isEmpty) {
-        _setLoading(false);
-      } else {
-        _isLoadingMore = false;
-        notifyListeners();
-      }
+      _isLoading = false;
+      _isLoadingMore = false;
+      notifyListeners();
     }
   }
 

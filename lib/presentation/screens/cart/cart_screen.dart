@@ -112,7 +112,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
     double total,
     double totalSavings,
   ) {
-    if (isLoading) {
+    if (isLoading && cartItems.isEmpty) {
       return _buildLoadingState();
     }
 

@@ -30,6 +30,8 @@ class ApiConstants {
   static String cartItem(String itemId) =>
       '$baseUrl/users/cart/item/$itemId';
   static String get clearCart => '$baseUrl/users/cart/clear';
+  static String removeFromCart(String itemId) =>
+      '$baseUrl/users/cart/item/$itemId';
 
   // ==================== NOTIFICATION ROUTES ====================
   static String get notifications => '$baseUrl/users/notifications';
@@ -41,6 +43,9 @@ class ApiConstants {
   static String get products => '$baseUrl/products';
   static String get productsOnSale => '$baseUrl/products/on-sale';
   static String get searchProducts => '$baseUrl/products/search';
+  static String get trendingProducts => '$baseUrl/products/trending';
+  static String get featuredProducts => '$baseUrl/products/featured';
+  static String get newProducts => '$baseUrl/products/new';
   static String productDetail(String id) => '$baseUrl/products/$id';
 
   // ==================== CATEGORY ROUTES ====================

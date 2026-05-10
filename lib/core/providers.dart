@@ -21,6 +21,7 @@ import '../presentation/providers/notification_provider.dart';
 import '../presentation/providers/product_provider.dart';
 import '../presentation/providers/category_provider.dart';
 import '../presentation/providers/category_products_provider.dart';
+import '../presentation/providers/special_products_provider.dart';
 
 // Core
 final sharedPreferencesProvider = Provider<SharedPreferences>((ref) {
@@ -121,5 +122,11 @@ final categoryProductsProviderFamily = ChangeNotifierProvider.autoDispose.family
   return CategoryProductsProvider(
     productRepository: ref.watch(productRepositoryProvider),
     categoryId: categoryId,
+  );
+});
+
+final specialProductsProviderNotifier = ChangeNotifierProvider<SpecialProductsProvider>((ref) {
+  return SpecialProductsProvider(
+    productRepository: ref.watch(productRepositoryProvider),
   );
 });

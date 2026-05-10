@@ -13,214 +13,141 @@ class CartRepositoryImpl implements CartRepository {
 
   @override
   Future<CartEntity> getCart() async {
-    try {
-      final token = await prefsHelper.getToken();
-      if (token == null) {
-        throw Exception('User not authenticated');
+    final token = await prefsHelper.getToken();
+    if (token == null) throw Exception('User not authenticated');
+
+    final response = await client
+        .get(
+          Uri.parse(ApiConstants.cart),
+          headers: ApiConstants.getHeaders(token: token),
+        )
+        .timeout(ApiConstants.connectionTimeout);
+
+    print('getCart status: ${response.statusCode}');
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      if (data['success'] == true && data['data'] != null) {
+        return CartEntity.fromJson(data['data']);
       }
-
-      print('Getting cart from: ${ApiConstants.cart}');
-
-      final response = await client
-          .get(
-            Uri.parse(ApiConstants.cart),
-            headers: ApiConstants.getHeaders(token: token),
-          )
-          .timeout(
-            ApiConstants.connectionTimeout,
-            onTimeout: () {
-              throw Exception('Connection timeout');
-            },
-          );
-
-      print('Cart response status: ${response.statusCode}');
-      print('Cart response body: ${response.body}');
-
-      if (response.statusCode == 200) {
-        final responseData = json.decode(response.body);
-        print('Parsed response: $responseData');
-
-        // Check if response has data wrapper
-        if (responseData['data'] != null && responseData['success'] == true) {
-          return CartEntity.fromJson(responseData['data']);
-        } else {
-          return CartEntity.fromJson(responseData);
-        }
-      } else {
-        throw Exception('Failed to load cart');
-      }
-    } catch (e) {
-      print('Get cart error: $e');
-      throw Exception('Error loading cart: $e');
+      return CartEntity.fromJson(data);
     }
+    throw Exception('Failed to load cart');
   }
 
   @override
   Future<int> getCartCount() async {
-    try {
-      final token = await prefsHelper.getToken();
-      if (token == null) {
-        return 0;
-      }
+    final token = await prefsHelper.getToken();
+    if (token == null) return 0;
 
+    try {
       final response = await client
           .get(
-            Uri.parse(ApiConstants.cart),
+            Uri.parse(ApiConstants.cartCount),
             headers: ApiConstants.getHeaders(token: token),
           )
-          .timeout(
-            ApiConstants.connectionTimeout,
-            onTimeout: () {
-              throw Exception('Connection timeout');
-            },
-          );
+          .timeout(ApiConstants.connectionTimeout);
 
       if (response.statusCode == 200) {
-        final responseData = json.decode(response.body);
-        if (responseData['data'] != null) {
-          return responseData['data']['itemCount'] ?? 0;
-        }
-        return 0;
-      } else {
-        return 0;
+        final data = json.decode(response.body);
+        // Backend returns: { message: "...", data: { count: N } }
+        return data['data']?['count'] ?? 0;
       }
+      return 0;
     } catch (e) {
-      print('Get cart count error: $e');
+      print('getCartCount error: $e');
       return 0;
     }
   }
 
   @override
   Future<void> addToCart(String productId, int quantity) async {
-    try {
-      final token = await prefsHelper.getToken();
-      if (token == null) {
-        throw Exception('User not authenticated');
-      }
+    final token = await prefsHelper.getToken();
+    if (token == null) throw Exception('User not authenticated');
 
-      final requestBody = {'productId': productId, 'quantity': quantity};
+    final body = {'productId': productId, 'quantity': quantity};
+    print('addToCart body: $body');
 
-      print('Adding to cart - URL: ${ApiConstants.addToCart}');
-      print('Request body: $requestBody');
+    final response = await client
+        .post(
+          Uri.parse(ApiConstants.addToCart),
+          headers: ApiConstants.getHeaders(token: token),
+          body: json.encode(body),
+        )
+        .timeout(ApiConstants.connectionTimeout);
 
-      final response = await client
-          .post(
-            Uri.parse(ApiConstants.addToCart),
-            headers: ApiConstants.getHeaders(token: token),
-            body: json.encode(requestBody),
-          )
-          .timeout(
-            ApiConstants.connectionTimeout,
-            onTimeout: () {
-              throw Exception('Connection timeout');
-            },
-          );
+    print('addToCart status: ${response.statusCode}, body: ${response.body}');
 
-      print('Add to cart response status: ${response.statusCode}');
-      print('Add to cart response body: ${response.body}');
+    if (response.statusCode >= 200 && response.statusCode < 300) return;
 
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        return;
-      } else {
-        final errorBody = json.decode(response.body);
-        throw Exception(errorBody['message'] ?? 'Failed to add to cart');
-      }
-    } catch (e) {
-      print('Add to cart error: $e');
-      throw Exception('Error adding to cart: $e');
-    }
+    final errData = json.decode(response.body);
+    throw Exception(errData['error'] ?? errData['message'] ?? 'Failed to add to cart');
   }
 
   @override
   Future<void> updateCartItem(String itemId, int quantity) async {
-    try {
-      final token = await prefsHelper.getToken();
-      if (token == null) {
-        throw Exception('User not authenticated');
-      }
+    final token = await prefsHelper.getToken();
+    if (token == null) throw Exception('User not authenticated');
 
-      final requestBody = {'quantity': quantity};
+    final url = ApiConstants.cartItem(itemId);
+    print('updateCartItem PUT: $url, quantity: $quantity');
 
-      final response = await client
-          .put(
-            Uri.parse(ApiConstants.cartItem(itemId)),
-            headers: ApiConstants.getHeaders(token: token),
-            body: json.encode(requestBody),
-          )
-          .timeout(
-            ApiConstants.connectionTimeout,
-            onTimeout: () {
-              throw Exception('Connection timeout');
-            },
-          );
+    final response = await client
+        .put(
+          Uri.parse(url),
+          headers: ApiConstants.getHeaders(token: token),
+          body: json.encode({'quantity': quantity}),
+        )
+        .timeout(ApiConstants.connectionTimeout);
 
-      if (response.statusCode != 200) {
-        final errorBody = json.decode(response.body);
-        throw Exception(errorBody['message'] ?? 'Failed to update cart item');
-      }
-    } catch (e) {
-      print('Update cart item error: $e');
-      throw Exception('Error updating cart item: $e');
-    }
+    print('updateCartItem status: ${response.statusCode}');
+
+    if (response.statusCode >= 200 && response.statusCode < 300) return;
+
+    final errData = json.decode(response.body);
+    throw Exception(errData['error'] ?? errData['message'] ?? 'Failed to update cart item');
   }
 
   @override
   Future<void> removeFromCart(String itemId) async {
-    try {
-      final token = await prefsHelper.getToken();
-      if (token == null) {
-        throw Exception('User not authenticated');
-      }
+    final token = await prefsHelper.getToken();
+    if (token == null) throw Exception('User not authenticated');
 
-      final response = await client
-          .delete(
-            Uri.parse(ApiConstants.cartItem(itemId)),
-            headers: ApiConstants.getHeaders(token: token),
-          )
-          .timeout(
-            ApiConstants.connectionTimeout,
-            onTimeout: () {
-              throw Exception('Connection timeout');
-            },
-          );
+    final url = ApiConstants.removeFromCart(itemId);
+    print('removeFromCart DELETE: $url');
 
-      if (response.statusCode != 200) {
-        final errorBody = json.decode(response.body);
-        throw Exception(errorBody['message'] ?? 'Failed to remove from cart');
-      }
-    } catch (e) {
-      print('Remove from cart error: $e');
-      throw Exception('Error removing from cart: $e');
-    }
+    final response = await client
+        .delete(
+          Uri.parse(url),
+          headers: ApiConstants.getHeaders(token: token),
+        )
+        .timeout(ApiConstants.connectionTimeout);
+
+    print('removeFromCart status: ${response.statusCode}');
+
+    if (response.statusCode >= 200 && response.statusCode < 300) return;
+
+    final errData = json.decode(response.body);
+    throw Exception(errData['error'] ?? errData['message'] ?? 'Failed to remove from cart');
   }
 
   @override
   Future<void> clearCart() async {
-    try {
-      final token = await prefsHelper.getToken();
-      if (token == null) {
-        throw Exception('User not authenticated');
-      }
+    final token = await prefsHelper.getToken();
+    if (token == null) throw Exception('User not authenticated');
 
-      final response = await client
-          .delete(
-            Uri.parse(ApiConstants.clearCart),
-            headers: ApiConstants.getHeaders(token: token),
-          )
-          .timeout(
-            ApiConstants.connectionTimeout,
-            onTimeout: () {
-              throw Exception('Connection timeout');
-            },
-          );
+    final response = await client
+        .delete(
+          Uri.parse(ApiConstants.clearCart),
+          headers: ApiConstants.getHeaders(token: token),
+        )
+        .timeout(ApiConstants.connectionTimeout);
 
-      if (response.statusCode != 200) {
-        final errorBody = json.decode(response.body);
-        throw Exception(errorBody['message'] ?? 'Failed to clear cart');
-      }
-    } catch (e) {
-      print('Clear cart error: $e');
-      throw Exception('Error clearing cart: $e');
-    }
+    print('clearCart status: ${response.statusCode}');
+
+    if (response.statusCode >= 200 && response.statusCode < 300) return;
+
+    final errData = json.decode(response.body);
+    throw Exception(errData['error'] ?? errData['message'] ?? 'Failed to clear cart');
   }
 }

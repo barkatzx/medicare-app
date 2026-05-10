@@ -192,14 +192,18 @@ class _AddToCartButton extends ConsumerWidget {
         
         // Optimistic UI, instantaneous add to cart without blocking
         cartProvider.addToCart(product.id, 1).then((success) {
-          if (success && context.mounted) {
+          if (context.mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(
-                  '${product.name} added to cart',
+                  success
+                      ? '${product.name} added to cart'
+                      : 'Failed to add to cart',
                   style: const TextStyle(color: Colors.white, fontSize: 12),
                 ),
-                backgroundColor: CustomTheme.successColor,
+                backgroundColor: success
+                    ? CustomTheme.successColor
+                    : CustomTheme.errorColor,
                 behavior: SnackBarBehavior.floating,
                 duration: const Duration(milliseconds: 800),
                 shape: RoundedRectangleBorder(

@@ -23,11 +23,13 @@ class CartProvider extends ChangeNotifier {
 
   Function(String message, {bool isError})? onShowMessage;
 
-  Future<void> loadCart() async {
+  Future<void> loadCart({bool silent = false}) async {
     if (_isLoading) return;
 
-    _isLoading = true;
-    notifyListeners();
+    if (!silent) {
+      _isLoading = true;
+      notifyListeners();
+    }
 
     try {
       _cart = await cartRepository.getCart();
@@ -38,7 +40,9 @@ class CartProvider extends ChangeNotifier {
       _cart = null;
       _cartItemCount = 0;
     } finally {
-      _isLoading = false;
+      if (!silent) {
+        _isLoading = false;
+      }
       notifyListeners();
     }
   }
@@ -57,17 +61,25 @@ class CartProvider extends ChangeNotifier {
     try {
       print('Adding to cart: productId=$productId, quantity=$quantity');
 
+      // Optimistic increment
+      _cartItemCount += quantity;
+      notifyListeners();
+
       // Call API to add to cart
       await cartRepository.addToCart(productId, quantity);
 
-      // Reload cart to get updated items
-      loadCart();
+      // Quietly reload cart to get updated items in the background
+      loadCart(silent: true);
 
       // Show success message
       onShowMessage?.call('Product added to cart', isError: false);
 
       return true;
     } catch (e) {
+      // Revert optimistic count
+      _cartItemCount -= quantity;
+      notifyListeners();
+      
       print('Error adding to cart: $e');
       onShowMessage?.call('Failed to add product to cart', isError: true);
       return false;

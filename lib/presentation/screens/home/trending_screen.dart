@@ -1,85 +1,154 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:medicare_app/core/providers.dart';
+import 'package:medicare_app/presentation/providers/special_products_provider.dart';
+import 'package:medicare_app/presentation/widgets/home/product_card.dart';
+import 'package:medicare_app/presentation/widgets/common/custom_theme.dart';
 
-class TrendingScreen extends StatelessWidget {
+class TrendingScreen extends ConsumerStatefulWidget {
   const TrendingScreen({super.key});
+
+  @override
+  ConsumerState<TrendingScreen> createState() => _TrendingScreenState();
+}
+
+class _TrendingScreenState extends ConsumerState<TrendingScreen> with SingleTickerProviderStateMixin {
+  late TabController _tabController;
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 3, vsync: this);
+    
+    // Initial load
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadCurrentTab();
+    });
+
+    _tabController.addListener(() {
+      if (!_tabController.indexIsChanging) {
+        _loadCurrentTab();
+      }
+    });
+  }
+
+  void _loadCurrentTab() {
+    final provider = ref.read(specialProductsProviderNotifier);
+    final type = _getTypeForIndex(_tabController.index);
+    if (provider.getProducts(type).isEmpty) {
+      provider.loadProducts(type);
+    }
+  }
+
+  ProductListType _getTypeForIndex(int index) {
+    switch (index) {
+      case 0:
+        return ProductListType.trending;
+      case 1:
+        return ProductListType.featured;
+      case 2:
+        return ProductListType.newProduct;
+      default:
+        return ProductListType.trending;
+    }
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Trending Products'),
+        title: const Text('Discover'),
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
         elevation: 0,
-      ),
-      body: GridView.builder(
-        padding: const EdgeInsets.all(16),
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          crossAxisSpacing: 12,
-          mainAxisSpacing: 12,
-          childAspectRatio: 0.7,
+        bottom: TabBar(
+          controller: _tabController,
+          labelColor: CustomTheme.primaryColor,
+          unselectedLabelColor: Colors.grey,
+          indicatorColor: CustomTheme.primaryColor,
+          tabs: const [
+            Tab(text: 'Trending'),
+            Tab(text: 'Featured'),
+            Tab(text: 'New Product'),
+          ],
         ),
-        itemCount: 10,
+      ),
+      body: TabBarView(
+        controller: _tabController,
+        children: [
+          _ProductList(type: ProductListType.trending),
+          _ProductList(type: ProductListType.featured),
+          _ProductList(type: ProductListType.newProduct),
+        ],
+      ),
+    );
+  }
+}
+
+class _ProductList extends ConsumerWidget {
+  final ProductListType type;
+
+  const _ProductList({required this.type});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final provider = ref.watch(specialProductsProviderNotifier);
+    final products = provider.getProducts(type);
+    final isLoading = provider.isLoading(type);
+    final errorMessage = provider.getErrorMessage(type);
+
+    if (isLoading && products.isEmpty) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    if (errorMessage != null && products.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.error_outline, size: 48, color: Colors.red),
+            const SizedBox(height: 16),
+            Text(errorMessage),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () => provider.loadProducts(type, refresh: true),
+              child: const Text('Retry'),
+            ),
+          ],
+        ),
+      );
+    }
+
+    if (products.isEmpty) {
+      return const Center(child: Text('No products found'));
+    }
+
+    return RefreshIndicator(
+      onRefresh: () => provider.loadProducts(type, refresh: true),
+      child: ListView.builder(
+        padding: const EdgeInsets.all(16),
+        itemCount: products.length + (provider.hasNextPage(type) ? 1 : 0),
         itemBuilder: (context, index) {
-          return Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.grey.shade200,
-                  blurRadius: 8,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                ClipRRect(
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(12),
-                    topRight: Radius.circular(12),
-                  ),
-                  child: Container(
-                    height: 150,
-                    color: Colors.grey.shade300,
-                    child: const Center(
-                      child: Icon(
-                        Icons.trending_up,
-                        size: 40,
-                        color: Colors.grey,
-                      ),
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(8),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'Trending Product',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 14,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        '\$99.99',
-                        style: TextStyle(
-                          color: Theme.of(context).primaryColor,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          );
+          if (index == products.length) {
+            // Trigger load more
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (!provider.isLoadingMore(type)) {
+                provider.loadProducts(type);
+              }
+            });
+            return const Padding(
+              padding: EdgeInsets.all(16.0),
+              child: Center(child: CircularProgressIndicator()),
+            );
+          }
+
+          return ProductCard(product: products[index]);
         },
       ),
     );
