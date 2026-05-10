@@ -17,8 +17,14 @@ class ApiConstants {
   static String get changePassword => '$baseUrl/users/change-password';
 
   // ==================== ADDRESS ROUTES ====================
-  static String get addresses => '$baseUrl/users/addresses/';
+  static String get addresses => '$baseUrl/users/addresses';
   static String addressDetail(String addressId) =>
+      '$baseUrl/users/addresses/$addressId';
+  static String updateAddress(String addressId) =>
+      '$baseUrl/users/addresses/$addressId';
+  static String setDefaultAddress(String addressId) =>
+      '$baseUrl/users/addresses/$addressId';
+  static String deleteAddress(String addressId) =>
       '$baseUrl/users/addresses/$addressId';
 
   // ==================== CART ROUTES ====================
@@ -67,9 +73,9 @@ class ApiConstants {
   static const String methodDelete = 'DELETE';
 
   // ==================== HEADERS ====================
-  static Map<String, String> getHeaders({String? token}) {
+  static Map<String, String> getHeaders({String? token, bool includeContentType = true}) {
     return {
-      'Content-Type': 'application/json',
+      if (includeContentType) 'Content-Type': 'application/json',
       'Accept': 'application/json',
       if (token != null) 'Authorization': 'Bearer $token',
     };

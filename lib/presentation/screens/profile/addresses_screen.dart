@@ -171,7 +171,14 @@ class _AddressesScreenState extends ConsumerState<AddressesScreen> {
               SizedBox(
                 width: double.infinity,
                 child: OutlinedButton(
-                  onPressed: () => addressProvider.setDefaultAddress(address.id),
+                  onPressed: () async {
+                    final success = await addressProvider.setDefaultAddress(address.id);
+                    if (!success && mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text(addressProvider.error ?? 'Failed to set default address')),
+                      );
+                    }
+                  },
                   style: OutlinedButton.styleFrom(
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(CustomTheme.radiusMD)),
                   ),
@@ -206,9 +213,15 @@ class _AddressesScreenState extends ConsumerState<AddressesScreen> {
             child: const Text('Cancel'),
           ),
           TextButton(
-            onPressed: () {
-              ref.read(addressProviderNotifier).deleteAddress(address.id);
-              Navigator.pop(context);
+            onPressed: () async {
+              final provider = ref.read(addressProviderNotifier);
+              final success = await provider.deleteAddress(address.id);
+              if (mounted) Navigator.pop(context);
+              if (!success && mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(provider.error ?? 'Failed to delete address')),
+                );
+              }
             },
             child: Text('Delete', style: TextStyle(color: CustomTheme.errorColor)),
           ),

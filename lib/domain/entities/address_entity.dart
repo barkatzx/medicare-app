@@ -25,7 +25,7 @@ class AddressEntity {
 
   factory AddressEntity.fromJson(Map<String, dynamic> json) {
     return AddressEntity(
-      id: json['id'] ?? '',
+      id: json['id'] ?? json['_id'] ?? '',
       userId: json['userId'] ?? '',
       street: json['street'] ?? '',
       city: json['city'] ?? '',

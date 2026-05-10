@@ -56,10 +56,13 @@ class AddressRepositoryImpl implements AddressRepository {
     if (token == null) throw Exception('User not authenticated');
 
     final response = await client.put(
-      Uri.parse(ApiConstants.addressDetail(id)),
+      Uri.parse(ApiConstants.updateAddress(id)),
       headers: ApiConstants.getHeaders(token: token),
       body: json.encode(data),
     ).timeout(ApiConstants.connectionTimeout);
+    
+    print('updateAddress status: ${response.statusCode}');
+    print('updateAddress body: ${response.body}');
 
     if (response.statusCode >= 200 && response.statusCode < 300) {
       final responseData = json.decode(response.body);
@@ -74,7 +77,7 @@ class AddressRepositoryImpl implements AddressRepository {
     if (token == null) throw Exception('User not authenticated');
 
     final response = await client.put(
-      Uri.parse(ApiConstants.addressDetail(id)),
+      Uri.parse(ApiConstants.setDefaultAddress(id)),
       headers: ApiConstants.getHeaders(token: token),
       body: json.encode({'isDefault': true}),
     ).timeout(ApiConstants.connectionTimeout);
@@ -89,13 +92,24 @@ class AddressRepositoryImpl implements AddressRepository {
     final token = await prefsHelper.getToken();
     if (token == null) throw Exception('User not authenticated');
 
-    final response = await client.delete(
-      Uri.parse(ApiConstants.addressDetail(id)),
-      headers: ApiConstants.getHeaders(token: token),
-    ).timeout(ApiConstants.connectionTimeout);
+    try {
+      final url = ApiConstants.deleteAddress(id);
+      print('DEBUG: Calling DELETE: $url');
+      
+      final response = await client.delete(
+        Uri.parse(url),
+        headers: ApiConstants.getHeaders(token: token, includeContentType: false),
+      ).timeout(ApiConstants.connectionTimeout);
 
-    if (response.statusCode < 200 || response.statusCode >= 300) {
-      throw Exception('Failed to delete address');
+      print('DEBUG: deleteAddress status: ${response.statusCode}');
+      print('DEBUG: deleteAddress body: ${response.body}');
+
+      if (response.statusCode < 200 || response.statusCode >= 300) {
+        throw Exception('Failed to delete address: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('DEBUG: Error in deleteAddress: $e');
+      rethrow;
     }
   }
 }
