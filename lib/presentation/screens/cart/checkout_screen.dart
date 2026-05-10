@@ -5,7 +5,9 @@ import 'package:http/http.dart' as http;
 import 'package:medicare_app/core/constants/api_constants.dart';
 import 'package:medicare_app/core/providers.dart';
 import 'package:medicare_app/domain/entities/cart_entity.dart';
+import 'package:medicare_app/domain/entities/address_entity.dart';
 import 'package:medicare_app/presentation/providers/cart_provider.dart';
+import 'package:medicare_app/presentation/screens/orders/order_confirm_screen.dart';
 import 'package:medicare_app/presentation/widgets/common/custom_theme.dart';
 
 class CheckoutScreen extends ConsumerStatefulWidget {
@@ -698,9 +700,35 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
   }
 
   // ─── Actions ───
-  void _handleContinue(CartProvider cartProvider) {
+  void _handleContinue(CartProvider cartProvider) async {
     if (_currentStep == 0) {
       if (_formKey.currentState?.validate() ?? false) {
+        final addressProvider = ref.read(addressProviderNotifier);
+        
+        // If there are no addresses or no default address, and they filled the form
+        if (addressProvider.addresses.isEmpty) {
+          setState(() => _isPlacingOrder = true);
+          final success = await addressProvider.addAddress(AddressEntity(
+            id: '', userId: '',
+            street: _addressController.text.trim(),
+            city: _cityController.text.trim(),
+            state: 'Dhaka Division',
+            postalCode: '1000',
+            country: 'Bangladesh',
+            isDefault: true,
+          ));
+          setState(() => _isPlacingOrder = false);
+          
+          if (!success) {
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text(addressProvider.error ?? 'Failed to save address')),
+              );
+            }
+            return;
+          }
+        }
+        
         setState(() => _currentStep = 1);
       }
     } else {
@@ -716,14 +744,17 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
       final token = await prefsHelper.getToken();
       if (token == null) throw Exception('Not authenticated');
 
+      final addressProvider = ref.read(addressProviderNotifier);
+      final defaultAddress = addressProvider.addresses.where((a) => a.isDefault).firstOrNull ??
+          (addressProvider.addresses.isNotEmpty ? addressProvider.addresses.first : null);
+
+      if (defaultAddress == null) {
+        throw Exception('Please select or add a shipping address first');
+      }
+
       final body = {
-        'shippingAddress': {
-          'name': _nameController.text.trim(),
-          'phone': _phoneController.text.trim(),
-          'address': _addressController.text.trim(),
-          'city': _cityController.text.trim(),
-        },
-        'paymentMethod': _selectedPayment,
+        'shippingAddressId': defaultAddress.id,
+        'paymentMethod': _selectedPayment == 'cash_on_delivery' ? 'cod' : _selectedPayment,
         if (_notesController.text.trim().isNotEmpty) 'notes': _notesController.text.trim(),
       };
 
@@ -736,11 +767,19 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
           .timeout(ApiConstants.connectionTimeout);
 
       if (response.statusCode >= 200 && response.statusCode < 300) {
+        final respData = json.decode(response.body);
+        final orderId = respData['data']?['id']?.toString() ?? respData['data']?['_id']?.toString();
+        
         // Clear cart after successful order
         await cartProvider.clearCart();
 
         if (mounted) {
-          _showOrderSuccess();
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => OrderConfirmScreen(orderId: orderId),
+            ),
+          );
         }
       } else {
         final errData = json.decode(response.body);
@@ -759,63 +798,5 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
     } finally {
       if (mounted) setState(() => _isPlacingOrder = false);
     }
-  }
-
-  void _showOrderSuccess() {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(CustomTheme.radiusLG)),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            SizedBox(height: CustomTheme.spacingMD),
-            Container(
-              width: 72, height: 72,
-              decoration: BoxDecoration(
-                color: CustomTheme.successColor.withOpacity(0.1),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(Icons.check_circle, size: 48, color: CustomTheme.successColor),
-            ),
-            SizedBox(height: CustomTheme.spacingLG),
-            Text('Order Placed!', style: CustomTextStyle.heading2),
-            SizedBox(height: CustomTheme.spacingSM),
-            Text(
-              'Your order has been placed successfully. You can track it in My Orders.',
-              textAlign: TextAlign.center,
-              style: CustomTextStyle.bodyMedium,
-            ),
-            SizedBox(height: CustomTheme.spacingXL),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.of(ctx).pop();
-                  Navigator.of(context).popUntil((route) => route.isFirst);
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: CustomTheme.primaryColor,
-                  padding: EdgeInsets.symmetric(vertical: CustomTheme.spacingMD),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(CustomTheme.radiusRound)),
-                ),
-                child: Text('Continue Shopping', style: CustomTextStyle.button),
-              ),
-            ),
-            SizedBox(height: CustomTheme.spacingSM),
-            TextButton(
-              onPressed: () {
-                Navigator.of(ctx).pop();
-                Navigator.of(context).popUntil((route) => route.isFirst);
-                Navigator.pushNamed(context, '/my-orders');
-              },
-              child: Text('View My Orders', style: CustomTextStyle.bodyMedium.copyWith(
-                color: CustomTheme.primaryColor, fontWeight: CustomTheme.fontWeightSemiBold)),
-            ),
-          ],
-        ),
-      ),
-    );
   }
 }
