@@ -23,7 +23,7 @@ class AddressProvider extends ChangeNotifier {
     try {
       _addresses = await addressRepository.getAddresses();
     } catch (e) {
-      _error = e.toString();
+      _error = e.toString().replaceFirst('Exception: ', '');
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -32,13 +32,14 @@ class AddressProvider extends ChangeNotifier {
 
   Future<bool> addAddress(AddressEntity address) async {
     _isLoading = true;
+    _error = null;
     notifyListeners();
     try {
-      await addressRepository.addAddress(address);
-      await loadAddresses();
+      final newAddress = await addressRepository.addAddress(address);
+      _addresses = [..._addresses, newAddress];
       return true;
     } catch (e) {
-      _error = e.toString();
+      _error = e.toString().replaceFirst('Exception: ', '');
       return false;
     } finally {
       _isLoading = false;
@@ -47,6 +48,10 @@ class AddressProvider extends ChangeNotifier {
   }
 
   Future<bool> updateAddress(String id, Map<String, dynamic> data) async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+
     final oldAddresses = List<AddressEntity>.from(_addresses);
     final index = _addresses.indexWhere((a) => a.id == id);
     
@@ -64,27 +69,37 @@ class AddressProvider extends ChangeNotifier {
     }
 
     try {
-      await addressRepository.updateAddress(id, data);
-      await loadAddresses(); // Force re-fetch for consistency
+      final updatedAddress = await addressRepository.updateAddress(id, data);
+      final currentIndex = _addresses.indexWhere((a) => a.id == id);
+      if (currentIndex != -1) {
+        _addresses[currentIndex] = updatedAddress;
+      } else {
+        _addresses.add(updatedAddress);
+      }
       return true;
     } catch (e) {
       _addresses = oldAddresses; // Rollback
-      _error = e.toString();
+      _error = e.toString().replaceFirst('Exception: ', '');
       return false;
     } finally {
+      _isLoading = false;
       notifyListeners();
     }
   }
 
   Future<bool> setDefaultAddress(String id) async {
     _isLoading = true;
+    _error = null;
     notifyListeners();
     try {
       await addressRepository.setDefaultAddress(id);
-      await loadAddresses(); // Force re-fetch for consistency
+      // Update local state for immediate feedback
+      _addresses = _addresses.map((a) {
+        return a.copyWith(isDefault: a.id == id);
+      }).toList();
       return true;
     } catch (e) {
-      _error = e.toString();
+      _error = e.toString().replaceFirst('Exception: ', '');
       return false;
     } finally {
       _isLoading = false;
@@ -93,6 +108,10 @@ class AddressProvider extends ChangeNotifier {
   }
 
   Future<bool> deleteAddress(String id) async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+
     final oldAddresses = List<AddressEntity>.from(_addresses);
     
     // Optimistic Delete
@@ -101,13 +120,13 @@ class AddressProvider extends ChangeNotifier {
 
     try {
       await addressRepository.deleteAddress(id);
-      await loadAddresses(); // Force re-fetch for consistency
       return true;
     } catch (e) {
       _addresses = oldAddresses; // Rollback
-      _error = e.toString();
+      _error = e.toString().replaceFirst('Exception: ', '');
       return false;
     } finally {
+      _isLoading = false;
       notifyListeners();
     }
   }

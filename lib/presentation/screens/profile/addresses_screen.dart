@@ -4,6 +4,7 @@ import '../../../core/providers.dart';
 import '../../../domain/entities/address_entity.dart';
 import '../../providers/address_provider.dart';
 import '../../widgets/common/custom_theme.dart';
+import '../../widgets/common/loading_widget.dart';
 
 class AddressesScreen extends ConsumerStatefulWidget {
   const AddressesScreen({super.key});
@@ -39,7 +40,13 @@ class _AddressesScreenState extends ConsumerState<AddressesScreen> {
         ),
         title: Text('My Addresses', style: CustomTextStyle.heading2),
       ),
-      body: _buildBody(isLoading, addresses, addressProvider),
+      body: Stack(
+        children: [
+          _buildBody(isLoading, addresses, addressProvider),
+          if (isLoading)
+            const LoadingWidget(message: 'Processing...'),
+        ],
+      ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _showAddressForm(context),
         backgroundColor: CustomTheme.primaryColor,
@@ -51,7 +58,7 @@ class _AddressesScreenState extends ConsumerState<AddressesScreen> {
 
   Widget _buildBody(bool isLoading, List<AddressEntity> addresses, AddressProvider addressProvider) {
     if (isLoading && addresses.isEmpty) {
-      return const Center(child: CircularProgressIndicator());
+      return const LoadingWidget(isOverlay: false);
     }
 
     if (addressProvider.error != null && addresses.isEmpty) {
@@ -204,22 +211,29 @@ class _AddressesScreenState extends ConsumerState<AddressesScreen> {
   void _showDeleteConfirmation(AddressEntity address) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         title: const Text('Delete Address'),
         content: const Text('Are you sure you want to delete this address?'),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.pop(dialogContext),
             child: const Text('Cancel'),
           ),
           TextButton(
             onPressed: () async {
               final provider = ref.read(addressProviderNotifier);
               final success = await provider.deleteAddress(address.id);
-              if (mounted) Navigator.pop(context);
+              
+              if (dialogContext.mounted) {
+                Navigator.pop(dialogContext);
+              }
+              
               if (!success && mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(provider.error ?? 'Failed to delete address')),
+                  SnackBar(
+                    content: Text(provider.error ?? 'Failed to delete address'),
+                    backgroundColor: CustomTheme.errorColor,
+                  ),
                 );
               }
             },
@@ -271,72 +285,82 @@ class _AddressFormSheetState extends ConsumerState<AddressFormSheet> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.only(
-        bottom: MediaQuery.of(context).viewInsets.bottom,
-        top: 24,
-        left: 24,
-        right: 24,
-      ),
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      child: SingleChildScrollView(
-        child: Form(
-          key: _formKey,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                widget.address == null ? 'Add New Address' : 'Edit Address',
-                style: CustomTextStyle.heading2,
-              ),
-              const SizedBox(height: 24),
-              _buildField('Street Address', _streetController),
-              const SizedBox(height: 16),
-              Row(
+    final isLoading = ref.watch(addressProviderNotifier).isLoading;
+
+    return Stack(
+      children: [
+        Container(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom,
+            top: 24,
+            left: 24,
+            right: 24,
+          ),
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          ),
+          child: SingleChildScrollView(
+            child: Form(
+              key: _formKey,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Expanded(child: _buildField('City', _cityController)),
-                  const SizedBox(width: 16),
-                  Expanded(child: _buildField('Postal Code', _zipController)),
+                  Text(
+                    widget.address == null ? 'Add New Address' : 'Edit Address',
+                    style: CustomTextStyle.heading2,
+                  ),
+                  const SizedBox(height: 24),
+                  _buildField('Street Address', _streetController),
+                  const SizedBox(height: 16),
+                  Row(
+                    children: [
+                      Expanded(child: _buildField('City', _cityController)),
+                      const SizedBox(width: 16),
+                      Expanded(child: _buildField('Postal Code', _zipController)),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  _buildField('State/Division', _stateController),
+                  const SizedBox(height: 16),
+                  _buildField('Country', _countryController),
+                  const SizedBox(height: 16),
+                  SwitchListTile(
+                    contentPadding: EdgeInsets.zero,
+                    title: Text('Set as default address', style: CustomTextStyle.bodyMedium),
+                    value: _isDefault,
+                    onChanged: (val) => setState(() => _isDefault = val),
+                    activeTrackColor: CustomTheme.primaryColor.withOpacity(0.5),
+                    activeColor: CustomTheme.primaryColor,
+                  ),
+                  const SizedBox(height: 24),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 50,
+                    child: ElevatedButton(
+                      onPressed: isLoading ? null : _submit,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: CustomTheme.primaryColor,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(CustomTheme.radiusMD)),
+                      ),
+                      child: Text(
+                        widget.address == null ? 'Add Address' : 'Update Address',
+                        style: CustomTextStyle.button,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 32),
                 ],
               ),
-              const SizedBox(height: 16),
-              _buildField('State/Division', _stateController),
-              const SizedBox(height: 16),
-              _buildField('Country', _countryController),
-              const SizedBox(height: 16),
-              SwitchListTile(
-                contentPadding: EdgeInsets.zero,
-                title: Text('Set as default address', style: CustomTextStyle.bodyMedium),
-                value: _isDefault,
-                onChanged: (val) => setState(() => _isDefault = val),
-                activeTrackColor: CustomTheme.primaryColor.withOpacity(0.5),
-                activeColor: CustomTheme.primaryColor,
-              ),
-              const SizedBox(height: 24),
-              SizedBox(
-                width: double.infinity,
-                height: 50,
-                child: ElevatedButton(
-                  onPressed: _submit,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: CustomTheme.primaryColor,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(CustomTheme.radiusMD)),
-                  ),
-                  child: Text(
-                    widget.address == null ? 'Add Address' : 'Update Address',
-                    style: CustomTextStyle.button,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 32),
-            ],
+            ),
           ),
         ),
-      ),
+        if (isLoading)
+          const Positioned.fill(
+            child: LoadingWidget(message: 'Saving address...'),
+          ),
+      ],
     );
   }
 
@@ -380,10 +404,13 @@ class _AddressFormSheetState extends ConsumerState<AddressFormSheet> {
     }
 
     if (success && mounted) {
-      Navigator.pop(context);
+      Navigator.of(context).pop();
     } else if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(provider.error ?? 'An error occurred')),
+        SnackBar(
+          content: Text(provider.error ?? 'An error occurred'),
+          backgroundColor: CustomTheme.errorColor,
+        ),
       );
     }
   }

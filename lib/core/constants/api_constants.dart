@@ -41,7 +41,7 @@ class ApiConstants {
   static String get notifications => '$baseUrl/users/notifications';
   static String get markAllRead => '$baseUrl/users/notifications/read-all';
   static String markNotificationRead(String notificationId) =>
-      '$baseUrl/users/notifications/$notificationId/read';
+      '$baseUrl/users/notifications/$notificationId';
 
   // ==================== PRODUCT ROUTES ====================
   static String get products => '$baseUrl/products';
@@ -77,7 +77,10 @@ class ApiConstants {
     return {
       if (includeContentType) 'Content-Type': 'application/json',
       'Accept': 'application/json',
-      if (token != null) 'Authorization': 'Bearer $token',
+      if (token != null) ...{
+        'Authorization': 'Bearer $token',
+        'customer-token': token,
+      },
     };
   }
 }

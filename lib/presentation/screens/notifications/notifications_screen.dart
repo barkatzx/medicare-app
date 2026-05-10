@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medicare_app/core/providers.dart';
 import 'package:medicare_app/presentation/providers/notification_provider.dart';
 import 'package:medicare_app/presentation/widgets/common/custom_theme.dart';
+import 'package:medicare_app/presentation/widgets/common/loading_widget.dart';
 
 class NotificationsScreen extends ConsumerStatefulWidget {
   const NotificationsScreen({super.key});
@@ -12,12 +13,27 @@ class NotificationsScreen extends ConsumerStatefulWidget {
 }
 
 class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
+  final ScrollController _scrollController = ScrollController();
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(notificationProviderNotifier).loadNotifications();
     });
+    _scrollController.addListener(_onScroll);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 200) {
+      ref.read(notificationProviderNotifier).loadMoreNotifications();
+    }
   }
 
   @override
@@ -28,111 +44,53 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
 
     return Scaffold(
       backgroundColor: CustomTheme.backgroundColor,
-      appBar: _buildAppBar(provider, notifications),
+      appBar: _buildAppBar(provider),
       body: _buildBody(provider, notifications, isLoading),
     );
   }
 
-  PreferredSizeWidget _buildAppBar(
-    NotificationProvider provider,
-    List notifications,
-  ) {
+  PreferredSizeWidget _buildAppBar(NotificationProvider provider) {
     return AppBar(
       elevation: 0,
       backgroundColor: CustomTheme.backgroundColor,
       scrolledUnderElevation: 0,
-      leading: Container(
-        margin: EdgeInsets.only(left: CustomTheme.spacingMD),
-        decoration: BoxDecoration(
-          color: CustomTheme.surfaceColor,
-          shape: BoxShape.circle,
-        ),
-        child: IconButton(
-          icon: Icon(Icons.arrow_back, color: CustomTheme.textPrimary),
-          onPressed: () => Navigator.pop(context),
-          splashRadius: 24,
-        ),
+      leading: IconButton(
+        icon: Icon(Icons.arrow_back, color: CustomTheme.textPrimary),
+        onPressed: () => Navigator.pop(context),
       ),
       title: Text('Notifications', style: CustomTextStyle.heading2),
       actions: [
-        if (notifications.isNotEmpty && provider.unreadCount > 0)
-          Container(
-            margin: EdgeInsets.only(right: CustomTheme.spacingMD),
-            child: TextButton(
-              // In the app bar actions, update the onPressed:
-              onPressed: () async {
-                try {
-                  await ref.read(notificationProviderNotifier).markAllAsRead();
-                  // Show success message
-                  if (mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(
-                          'All notifications marked as read',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                        backgroundColor: CustomTheme.successColor,
-                        behavior: SnackBarBehavior.floating,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(
-                            CustomTheme.radiusMD,
-                          ),
-                        ),
-                        duration: Duration(seconds: 2),
-                      ),
-                    );
-                  }
-                } catch (e) {
-                  // Show error message
-                  if (mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(
-                          'Failed to mark all as read: ${e.toString()}',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                        backgroundColor: CustomTheme.errorColor,
-                        behavior: SnackBarBehavior.floating,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(
-                            CustomTheme.radiusMD,
-                          ),
-                        ),
-                        duration: Duration(seconds: 3),
-                      ),
-                    );
-                  }
-                }
-              },
-              style: TextButton.styleFrom(
-                padding: EdgeInsets.symmetric(
-                  horizontal: CustomTheme.spacingMD,
-                  vertical: CustomTheme.spacingSM,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(CustomTheme.radiusRound),
-                ),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    Icons.done_all,
-                    size: 18,
-                    color: CustomTheme.primaryColor,
-                  ),
-                  SizedBox(width: CustomTheme.spacingSM),
-                  Text(
-                    'Mark all read',
-                    style: CustomTextStyle.bodySmall.copyWith(
-                      color: CustomTheme.primaryColor,
-                      fontWeight: CustomTheme.fontWeightMedium,
+        if (provider.unreadCount > 0)
+          TextButton.icon(
+            onPressed: () async {
+              try {
+                await provider.markAllAsRead();
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: const Text('All marked as read'),
+                      backgroundColor: CustomTheme.successColor,
+                      behavior: SnackBarBehavior.floating,
                     ),
-                  ),
-                ],
-              ),
-            ),
+                  );
+                }
+              } catch (e) {
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Failed: $e'),
+                      backgroundColor: CustomTheme.errorColor,
+                      behavior: SnackBarBehavior.floating,
+                    ),
+                  );
+                }
+              }
+            },
+            icon: const Icon(Icons.done_all, size: 18),
+            label: const Text('Mark all read'),
+            style: TextButton.styleFrom(foregroundColor: CustomTheme.primaryColor),
           ),
+        const SizedBox(width: 8),
       ],
     );
   }
@@ -142,142 +100,85 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
     List notifications,
     bool isLoading,
   ) {
-    if (isLoading && notifications.isEmpty) {
-      return _buildLoadingState();
-    }
+    return Column(
+      children: [
+        _buildFilters(provider),
+        Expanded(
+          child: isLoading && notifications.isEmpty
+              ? const LoadingWidget(isOverlay: false)
+              : notifications.isEmpty
+                  ? _buildEmptyState(provider.unreadOnly)
+                  : RefreshIndicator(
+                      onRefresh: () => provider.loadNotifications(),
+                      color: CustomTheme.primaryColor,
+                      child: ListView.builder(
+                        controller: _scrollController,
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        itemCount: notifications.length + (provider.isLoadingMore ? 1 : 0),
+                        itemBuilder: (context, index) {
+                          if (index == notifications.length) {
+                            return const Padding(
+                              padding: EdgeInsets.symmetric(vertical: 16),
+                              child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+                            );
+                          }
+                          return _buildNotificationCard(notifications[index]);
+                        },
+                      ),
+                    ),
+        ),
+      ],
+    );
+  }
 
-    if (notifications.isEmpty) {
-      return _buildEmptyState();
-    }
-
-    return RefreshIndicator(
-      onRefresh: () async {
-        await ref.read(notificationProviderNotifier).loadNotifications();
-      },
-      color: CustomTheme.primaryColor,
-      backgroundColor: CustomTheme.surfaceColor,
-      child: CustomScrollView(
-        slivers: [
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: EdgeInsets.fromLTRB(
-                CustomTheme.spacingMD,
-                CustomTheme.spacingMD,
-                CustomTheme.spacingMD,
-                0,
-              ),
-              child: Row(
-                children: [
-                  Container(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: CustomTheme.spacingSM,
-                      vertical: CustomTheme.spacingXS,
-                    ),
-                    decoration: BoxDecoration(
-                      color: CustomTheme.primaryColor.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(
-                        CustomTheme.radiusRound,
-                      ),
-                    ),
-                    child: Text(
-                      '${notifications.length} Total',
-                      style: CustomTextStyle.caption.copyWith(
-                        color: CustomTheme.primaryColor,
-                        fontWeight: CustomTheme.fontWeightMedium,
-                      ),
-                    ),
-                  ),
-                  const Spacer(),
-                  if (provider.unreadCount > 0)
-                    Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: CustomTheme.spacingSM,
-                        vertical: CustomTheme.spacingXS,
-                      ),
-                      decoration: BoxDecoration(
-                        color: CustomTheme.warningColor.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(
-                          CustomTheme.radiusRound,
-                        ),
-                      ),
-                      child: Text(
-                        '${provider.unreadCount} Unread',
-                        style: CustomTextStyle.caption.copyWith(
-                          color: CustomTheme.warningColor,
-                          fontWeight: CustomTheme.fontWeightMedium,
-                        ),
-                      ),
-                    ),
-                ],
-              ),
-            ),
+  Widget _buildFilters(NotificationProvider provider) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+      child: Row(
+        children: [
+          _FilterChip(
+            label: 'All',
+            isSelected: !provider.unreadOnly,
+            onTap: () {
+              if (provider.unreadOnly) provider.toggleUnreadFilter();
+            },
           ),
-          SliverPadding(
-            padding: EdgeInsets.all(CustomTheme.spacingMD),
-            sliver: SliverList(
-              delegate: SliverChildBuilderDelegate((context, index) {
-                final notification = notifications[index];
-                return _buildNotificationCard(notification);
-              }, childCount: notifications.length),
-            ),
+          const SizedBox(width: 12),
+          _FilterChip(
+            label: 'Unread',
+            count: provider.unreadCount > 0 ? provider.unreadCount : null,
+            isSelected: provider.unreadOnly,
+            onTap: () {
+              if (!provider.unreadOnly) provider.toggleUnreadFilter();
+            },
           ),
         ],
       ),
     );
   }
 
-  Widget _buildLoadingState() {
+  Widget _buildEmptyState(bool isUnreadOnly) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Container(
-            width: 60,
-            height: 60,
-            decoration: BoxDecoration(
-              color: CustomTheme.surfaceColor,
-              shape: BoxShape.circle,
-            ),
-            child: const Padding(
-              padding: EdgeInsets.all(12),
-              child: CircularProgressIndicator(strokeWidth: 2),
-            ),
+          Icon(
+            isUnreadOnly ? Icons.mark_chat_read_outlined : Icons.notifications_none_outlined,
+            size: 80,
+            color: CustomTheme.textTertiary.withOpacity(0.5),
           ),
-          SizedBox(height: CustomTheme.spacingLG),
-          Text('Loading notifications...', style: CustomTextStyle.bodyMedium),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildEmptyState() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            padding: EdgeInsets.all(CustomTheme.spacingXXL),
-            decoration: BoxDecoration(
-              color: CustomTheme.surfaceColor,
-              shape: BoxShape.circle,
-            ),
-            child: Icon(
-              Icons.notifications_none_outlined,
-              size: 64,
-              color: CustomTheme.textTertiary,
-            ),
-          ),
-          SizedBox(height: CustomTheme.spacingXL),
+          const SizedBox(height: 16),
           Text(
-            'No notifications yet',
-            style: CustomTextStyle.heading3.copyWith(
-              color: CustomTheme.textSecondary,
-            ),
+            isUnreadOnly ? 'No unread notifications' : 'No notifications yet',
+            style: CustomTextStyle.heading3.copyWith(color: CustomTheme.textSecondary),
           ),
-          SizedBox(height: CustomTheme.spacingSM),
+          const SizedBox(height: 8),
           Text(
-            'We\'ll notify you when something arrives',
+            isUnreadOnly 
+                ? 'You\'re all caught up!' 
+                : 'We\'ll notify you when something important happens',
             style: CustomTextStyle.bodyMedium,
+            textAlign: TextAlign.center,
           ),
         ],
       ),
@@ -285,117 +186,97 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
   }
 
   Widget _buildNotificationCard(dynamic notification) {
-    final isRead = notification.isRead;
+    final bool isRead = notification.isRead;
 
     return Container(
-      margin: EdgeInsets.only(bottom: CustomTheme.spacingMD),
+      margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: CustomTheme.surfaceColor,
+        color: isRead ? CustomTheme.surfaceColor : CustomTheme.primaryColor.withOpacity(0.03),
         borderRadius: BorderRadius.circular(CustomTheme.radiusLG),
+        border: Border.all(
+          color: isRead ? CustomTheme.borderLight : CustomTheme.primaryColor.withOpacity(0.1),
+          width: 1,
+        ),
+        boxShadow: isRead ? null : [
+          BoxShadow(
+            color: CustomTheme.primaryColor.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          onTap: () async {
+          onTap: () {
             if (!isRead) {
-              await ref.read(notificationProviderNotifier).markAsRead(notification.id);
+              ref.read(notificationProviderNotifier).markAsRead(notification.id);
             }
           },
           borderRadius: BorderRadius.circular(CustomTheme.radiusLG),
           child: Padding(
-            padding: EdgeInsets.all(CustomTheme.spacingLG),
+            padding: const EdgeInsets.all(16),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Icon Container
                 Container(
-                  padding: EdgeInsets.all(CustomTheme.spacingMD),
+                  padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: isRead
-                          ? [
-                              CustomTheme.borderLight,
-                              CustomTheme.borderLight.withOpacity(0.5),
-                            ]
-                          : [
-                              CustomTheme.primaryColor,
-                              CustomTheme.primaryColor.withOpacity(0.7),
-                            ],
-                    ),
+                    color: isRead ? CustomTheme.backgroundColor : CustomTheme.primaryColor.withOpacity(0.1),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
-                    _getNotificationIcon(notification.type),
-                    size: 22,
-                    color: isRead ? CustomTheme.textSecondary : Colors.white,
+                    _getIcon(notification.type),
+                    size: 20,
+                    color: isRead ? CustomTheme.textSecondary : CustomTheme.primaryColor,
                   ),
                 ),
-                SizedBox(width: CustomTheme.spacingMD),
-
-                // Content
+                const SizedBox(width: 16),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Expanded(
                             child: Text(
                               notification.title,
                               style: CustomTextStyle.bodyMedium.copyWith(
-                                fontWeight: isRead
-                                    ? CustomTheme.fontWeightMedium
-                                    : CustomTheme.fontWeightSemiBold,
-                                color: isRead
-                                    ? CustomTheme.textSecondary
-                                    : CustomTheme.textPrimary,
+                                fontWeight: isRead ? FontWeight.w500 : FontWeight.w700,
+                                color: isRead ? CustomTheme.textSecondary : CustomTheme.textPrimary,
                               ),
                             ),
                           ),
-                          if (!isRead)
-                            Container(
-                              width: 8,
-                              height: 8,
-                              decoration: BoxDecoration(
-                                color: CustomTheme.primaryColor,
-                                shape: BoxShape.circle,
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: CustomTheme.primaryColor.withOpacity(
-                                      0.4,
-                                    ),
-                                    blurRadius: 4,
-                                  ),
-                                ],
-                              ),
-                            ),
-                        ],
-                      ),
-                      SizedBox(height: CustomTheme.spacingSM),
-                      Text(
-                        notification.message,
-                        style: CustomTextStyle.bodySmall,
-                      ),
-                      SizedBox(height: CustomTheme.spacingSM),
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.access_time,
-                            size: 12,
-                            color: CustomTheme.textTertiary,
-                          ),
-                          SizedBox(width: CustomTheme.spacingXS),
                           Text(
                             notification.formattedDate,
-                            style: CustomTextStyle.caption,
+                            style: CustomTextStyle.caption.copyWith(
+                              color: CustomTheme.textTertiary,
+                              fontSize: 10,
+                            ),
                           ),
                         ],
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        notification.message,
+                        style: CustomTextStyle.bodySmall.copyWith(
+                          color: isRead ? CustomTheme.textTertiary : CustomTheme.textSecondary,
+                        ),
                       ),
                     ],
                   ),
                 ),
+                if (!isRead)
+                  Container(
+                    margin: const EdgeInsets.only(left: 8, top: 4),
+                    width: 8,
+                    height: 8,
+                    decoration: const BoxDecoration(
+                      color: CustomTheme.primaryColor,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
               ],
             ),
           ),
@@ -404,20 +285,82 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
     );
   }
 
-  IconData _getNotificationIcon(String? type) {
-    switch (type) {
-      case 'order':
-        return Icons.shopping_bag_outlined;
-      case 'payment':
-        return Icons.payment_outlined;
-      case 'promotion':
-        return Icons.local_offer_outlined;
-      case 'alert':
-        return Icons.notifications_active_outlined;
-      case 'message':
-        return Icons.message_outlined;
-      default:
-        return Icons.notifications_none_outlined;
+  IconData _getIcon(String? type) {
+    switch (type?.toLowerCase()) {
+      case 'order': return Icons.shopping_bag_outlined;
+      case 'payment': return Icons.account_balance_wallet_outlined;
+      case 'promotion': return Icons.local_offer_outlined;
+      case 'alert': return Icons.error_outline;
+      default: return Icons.notifications_none_outlined;
     }
+  }
+}
+
+class _FilterChip extends StatelessWidget {
+  final String label;
+  final int? count;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  const _FilterChip({
+    required this.label,
+    this.count,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        decoration: BoxDecoration(
+          color: isSelected ? CustomTheme.primaryColor : CustomTheme.surfaceColor,
+          borderRadius: BorderRadius.circular(CustomTheme.radiusRound),
+          border: Border.all(
+            color: isSelected ? CustomTheme.primaryColor : CustomTheme.borderLight,
+          ),
+          boxShadow: isSelected ? [
+            BoxShadow(
+              color: CustomTheme.primaryColor.withOpacity(0.3),
+              blurRadius: 8,
+              offset: const Offset(0, 4),
+            )
+          ] : null,
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              label,
+              style: CustomTextStyle.bodyMedium.copyWith(
+                color: isSelected ? Colors.white : CustomTheme.textSecondary,
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+              ),
+            ),
+            if (count != null) ...[
+              const SizedBox(width: 6),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: isSelected ? Colors.white.withOpacity(0.2) : CustomTheme.primaryColor.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Text(
+                  count.toString(),
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                    color: isSelected ? Colors.white : CustomTheme.primaryColor,
+                  ),
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
   }
 }

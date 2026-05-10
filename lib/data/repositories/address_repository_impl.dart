@@ -29,7 +29,13 @@ class AddressRepositoryImpl implements AddressRepository {
       final List list = data['data'] ?? [];
       return list.map((item) => AddressEntity.fromJson(item)).toList();
     }
-    throw Exception('Failed to fetch addresses: ${response.statusCode}');
+    
+    try {
+      final data = json.decode(response.body);
+      throw Exception(data['error'] ?? data['message'] ?? 'Failed to fetch addresses: ${response.statusCode}');
+    } catch (_) {
+      throw Exception('Failed to fetch addresses: ${response.statusCode}');
+    }
   }
 
   @override
@@ -47,7 +53,13 @@ class AddressRepositoryImpl implements AddressRepository {
       final data = json.decode(response.body);
       return AddressEntity.fromJson(data['data'] ?? data);
     }
-    throw Exception('Failed to add address');
+    
+    try {
+      final data = json.decode(response.body);
+      throw Exception(data['error'] ?? data['message'] ?? 'Failed to add address');
+    } catch (_) {
+      throw Exception('Failed to add address');
+    }
   }
 
   @override
@@ -68,7 +80,13 @@ class AddressRepositoryImpl implements AddressRepository {
       final responseData = json.decode(response.body);
       return AddressEntity.fromJson(responseData['data'] ?? responseData);
     }
-    throw Exception('Failed to update address');
+    
+    try {
+      final data = json.decode(response.body);
+      throw Exception(data['error'] ?? data['message'] ?? 'Failed to update address');
+    } catch (_) {
+      throw Exception('Failed to update address');
+    }
   }
 
   @override
@@ -83,7 +101,12 @@ class AddressRepositoryImpl implements AddressRepository {
     ).timeout(ApiConstants.connectionTimeout);
 
     if (response.statusCode < 200 || response.statusCode >= 300) {
-      throw Exception('Failed to set default address');
+      try {
+        final data = json.decode(response.body);
+        throw Exception(data['error'] ?? data['message'] ?? 'Failed to set default address');
+      } catch (_) {
+        throw Exception('Failed to set default address');
+      }
     }
   }
 
@@ -105,11 +128,13 @@ class AddressRepositoryImpl implements AddressRepository {
       print('DEBUG: deleteAddress body: ${response.body}');
 
       if (response.statusCode < 200 || response.statusCode >= 300) {
-        throw Exception('Failed to delete address: ${response.statusCode}');
+        final data = json.decode(response.body);
+        throw Exception(data['error'] ?? data['message'] ?? 'Failed to delete address: ${response.statusCode}');
       }
     } catch (e) {
       print('DEBUG: Error in deleteAddress: $e');
-      rethrow;
+      if (e is Exception) rethrow;
+      throw Exception(e.toString());
     }
   }
 }

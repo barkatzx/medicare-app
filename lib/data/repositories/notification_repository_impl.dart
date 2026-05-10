@@ -14,7 +14,8 @@ class NotificationRepositoryImpl implements NotificationRepository {
   @override
   Future<List<NotificationEntity>> getNotifications({
     int page = 1,
-    int limit = 20,
+    int limit = 10,
+    bool unreadOnly = false,
   }) async {
     try {
       final token = await prefsHelper.getToken();
@@ -22,9 +23,17 @@ class NotificationRepositoryImpl implements NotificationRepository {
         throw Exception('User not authenticated');
       }
 
+      final uri = Uri.parse(ApiConstants.notifications).replace(
+        queryParameters: {
+          'page': page.toString(),
+          'limit': limit.toString(),
+          if (unreadOnly) 'unreadOnly': 'true',
+        },
+      );
+
       final response = await client
           .get(
-            Uri.parse('${ApiConstants.notifications}?page=$page&limit=$limit'),
+            uri,
             headers: ApiConstants.getHeaders(token: token),
           )
           .timeout(
@@ -33,9 +42,6 @@ class NotificationRepositoryImpl implements NotificationRepository {
               throw Exception('Connection timeout');
             },
           );
-
-      print('Get notifications response: ${response.statusCode}');
-      print('Get notifications body: ${response.body}');
 
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);
@@ -53,7 +59,6 @@ class NotificationRepositoryImpl implements NotificationRepository {
         throw Exception('Failed to load notifications');
       }
     } catch (e) {
-      print('Get notifications error: $e');
       throw Exception('Error loading notifications: $e');
     }
   }
@@ -66,9 +71,13 @@ class NotificationRepositoryImpl implements NotificationRepository {
         return 0;
       }
 
+      final uri = Uri.parse(ApiConstants.notifications).replace(
+        queryParameters: {'unreadOnly': 'true'},
+      );
+
       final response = await client
           .get(
-            Uri.parse(ApiConstants.notifications),
+            uri,
             headers: ApiConstants.getHeaders(token: token),
           )
           .timeout(
@@ -82,16 +91,18 @@ class NotificationRepositoryImpl implements NotificationRepository {
         final responseData = json.decode(response.body);
 
         if (responseData['data'] != null) {
+          final totalCount = responseData['data']['totalCount'] ?? 0;
+          if (totalCount > 0) return totalCount;
+          
           final notifications =
               responseData['data']['notifications'] as List? ?? [];
-          return notifications.where((n) => n['isRead'] == false).length;
+          return notifications.length;
         }
         return 0;
       } else {
         return 0;
       }
     } catch (e) {
-      print('Get unread count error: $e');
       return 0;
     }
   }
@@ -105,7 +116,7 @@ class NotificationRepositoryImpl implements NotificationRepository {
       }
 
       final response = await client
-          .patch(
+          .put(
             Uri.parse(ApiConstants.markNotificationRead(notificationId)),
             headers: ApiConstants.getHeaders(token: token),
           )
@@ -116,17 +127,13 @@ class NotificationRepositoryImpl implements NotificationRepository {
             },
           );
 
-      print('Mark as read response: ${response.statusCode}');
-      print('Mark as read body: ${response.body}');
-
-      if (response.statusCode != 200 && response.statusCode != 201) {
+      if (response.statusCode != 200 && response.statusCode != 204) {
         final errorBody = json.decode(response.body);
         throw Exception(
           errorBody['message'] ?? 'Failed to mark notification as read',
         );
       }
     } catch (e) {
-      print('Mark as read error: $e');
       throw Exception('Error marking notification as read: $e');
     }
   }
@@ -140,7 +147,7 @@ class NotificationRepositoryImpl implements NotificationRepository {
       }
 
       final response = await client
-          .post(
+          .put(
             Uri.parse(ApiConstants.markAllRead),
             headers: ApiConstants.getHeaders(token: token),
           )
@@ -151,19 +158,11 @@ class NotificationRepositoryImpl implements NotificationRepository {
             },
           );
 
-      print('Response status: ${response.statusCode}');
-      print('Response body: ${response.body}');
-
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        final responseData = json.decode(response.body);
-        print('Success: ${responseData['message']}');
-        return;
-      } else {
+      if (response.statusCode != 200 && response.statusCode != 204) {
         final errorBody = json.decode(response.body);
         throw Exception(errorBody['message'] ?? 'Failed to mark all as read');
       }
     } catch (e) {
-      print('Mark all as read error: $e');
       throw Exception('Error marking all notifications as read: $e');
     }
   }

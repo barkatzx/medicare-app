@@ -13,6 +13,7 @@ class NotificationProvider extends ChangeNotifier {
   int _currentPage = 1;
   bool _hasMore = true;
   int _unreadCount = 0;
+  bool _unreadOnly = false;
   String? _errorMessage;
 
   List<NotificationEntity> get notifications => _notifications;
@@ -20,6 +21,7 @@ class NotificationProvider extends ChangeNotifier {
   bool get isLoadingMore => _isLoadingMore;
   bool get hasMore => _hasMore;
   int get unreadCount => _unreadCount;
+  bool get unreadOnly => _unreadOnly;
   String? get errorMessage => _errorMessage;
 
   Future<void> loadNotifications() async {
@@ -32,17 +34,17 @@ class NotificationProvider extends ChangeNotifier {
     try {
       final newNotifications = await notificationRepository.getNotifications(
         page: 1,
-        limit: 20,
+        limit: 10,
+        unreadOnly: _unreadOnly,
       );
 
       _notifications = newNotifications;
       _currentPage = 2;
-      _hasMore = newNotifications.length == 20;
+      _hasMore = newNotifications.length == 10;
 
       await loadUnreadCount();
     } catch (e) {
       _errorMessage = e.toString();
-      print('Error loading notifications: $e');
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -58,11 +60,12 @@ class NotificationProvider extends ChangeNotifier {
     try {
       final newNotifications = await notificationRepository.getNotifications(
         page: _currentPage,
-        limit: 20,
+        limit: 10,
+        unreadOnly: _unreadOnly,
       );
 
       _notifications.addAll(newNotifications);
-      _hasMore = newNotifications.length == 20;
+      _hasMore = newNotifications.length == 10;
       if (_hasMore) _currentPage++;
     } catch (e) {
       print('Error loading more notifications: $e');
@@ -81,6 +84,14 @@ class NotificationProvider extends ChangeNotifier {
     }
   }
 
+  Future<void> toggleUnreadFilter() async {
+    _unreadOnly = !_unreadOnly;
+    _notifications.clear();
+    _currentPage = 1;
+    _hasMore = true;
+    await loadNotifications();
+  }
+
   Future<void> markAsRead(String notificationId) async {
     try {
       await notificationRepository.markAsRead(notificationId);
@@ -88,16 +99,20 @@ class NotificationProvider extends ChangeNotifier {
       // Update local state
       final index = _notifications.indexWhere((n) => n.id == notificationId);
       if (index != -1) {
-        _notifications[index] = NotificationEntity(
-          id: _notifications[index].id,
-          title: _notifications[index].title,
-          message: _notifications[index].message,
-          type: _notifications[index].type,
-          isRead: true,
-          data: _notifications[index].data,
-          createdAt: _notifications[index].createdAt,
-          readAt: DateTime.now(),
-        );
+        if (_unreadOnly) {
+          _notifications.removeAt(index);
+        } else {
+          _notifications[index] = NotificationEntity(
+            id: _notifications[index].id,
+            title: _notifications[index].title,
+            message: _notifications[index].message,
+            type: _notifications[index].type,
+            isRead: true,
+            data: _notifications[index].data,
+            createdAt: _notifications[index].createdAt,
+            readAt: DateTime.now(),
+          );
+        }
       }
 
       await loadUnreadCount();
@@ -113,25 +128,27 @@ class NotificationProvider extends ChangeNotifier {
       await notificationRepository.markAllAsRead();
 
       // Update local state - mark all as read
-      _notifications = _notifications
-          .map(
-            (n) => NotificationEntity(
-              id: n.id,
-              title: n.title,
-              message: n.message,
-              type: n.type,
-              isRead: true,
-              data: n.data,
-              createdAt: n.createdAt,
-              readAt: DateTime.now(),
-            ),
-          )
-          .toList();
+      if (_unreadOnly) {
+        _notifications.clear();
+      } else {
+        _notifications = _notifications
+            .map(
+              (n) => NotificationEntity(
+                id: n.id,
+                title: n.title,
+                message: n.message,
+                type: n.type,
+                isRead: true,
+                data: n.data,
+                createdAt: n.createdAt,
+                readAt: DateTime.now(),
+              ),
+            )
+            .toList();
+      }
 
       _unreadCount = 0;
       notifyListeners();
-
-      print('All notifications marked as read successfully');
     } catch (e) {
       print('Error marking all as read: $e');
       rethrow;

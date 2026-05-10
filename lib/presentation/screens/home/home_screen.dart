@@ -6,6 +6,7 @@ import 'package:medicare_app/presentation/screens/home/categories_screen.dart';
 import 'package:medicare_app/presentation/screens/profile/profile_screen.dart';
 import 'package:medicare_app/presentation/widgets/home/home_app_bar.dart';
 import 'package:medicare_app/presentation/widgets/home/product_card.dart';
+import 'package:medicare_app/presentation/widgets/common/custom_theme.dart';
 import 'package:badges/badges.dart' as badges;
 import 'trending_screen.dart';
 
@@ -33,58 +34,89 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
     return Scaffold(
       body: _screens[_selectedIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: Colors.white,
-        currentIndex: _selectedIndex,
-        onTap: (index) {
-          setState(() {
-            _selectedIndex = index;
-          });
-        },
-        type: BottomNavigationBarType.fixed,
-        selectedItemColor: Colors.black,
-        unselectedItemColor: Colors.black,
-        items: [
-          const BottomNavigationBarItem(
-            icon: Icon(Icons.home_outlined),
-            activeIcon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          const BottomNavigationBarItem(
-            icon: Icon(Icons.trending_up_outlined),
-            activeIcon: Icon(Icons.trending_up),
-            label: 'Trending',
-          ),
-          const BottomNavigationBarItem(
-            icon: Icon(Icons.category_outlined),
-            activeIcon: Icon(Icons.category),
-            label: 'Categories',
-          ),
-          BottomNavigationBarItem(
-            icon: badges.Badge(
-              showBadge: cartItemCount > 0,
-              badgeContent: Text(
-                cartItemCount > 9 ? '9+' : '$cartItemCount',
-                style: const TextStyle(color: Colors.white, fontSize: 10),
-              ),
-              child: const Icon(Icons.shopping_cart_outlined),
+      bottomNavigationBar: Container(
+        margin: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+        decoration: BoxDecoration(
+          color: CustomTheme.primaryColor,
+          borderRadius: BorderRadius.circular(CustomTheme.radiusXL),
+          boxShadow: [
+            BoxShadow(
+              color: CustomTheme.primaryColor.withOpacity(0.3),
+              blurRadius: 15,
+              offset: const Offset(0, 8),
             ),
-            activeIcon: badges.Badge(
-              showBadge: cartItemCount > 0,
-              badgeContent: Text(
-                cartItemCount > 9 ? '9+' : '$cartItemCount',
-                style: const TextStyle(color: Colors.white, fontSize: 10),
-              ),
-              child: const Icon(Icons.shopping_cart),
+          ],
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            _buildNavItem(0, Icons.home_outlined, Icons.home, 'Home'),
+            _buildNavItem(1, Icons.trending_up_outlined, Icons.trending_up, 'Trending'),
+            _buildNavItem(2, Icons.category_outlined, Icons.category, 'Categories'),
+            _buildNavItem(3, Icons.shopping_cart_outlined, Icons.shopping_cart, 'Cart', badgeCount: cartItemCount),
+            _buildNavItem(4, Icons.person_outline, Icons.person, 'Profile'),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNavItem(int index, IconData icon, IconData activeIcon, String label, {int? badgeCount}) {
+    final isSelected = _selectedIndex == index;
+    
+    return GestureDetector(
+      onTap: () => setState(() => _selectedIndex = index),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 300),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        decoration: BoxDecoration(
+          color: isSelected ? Colors.white : Colors.transparent,
+          borderRadius: BorderRadius.circular(CustomTheme.radiusRound),
+        ),
+        child: Row(
+          children: [
+            Stack(
+              clipBehavior: Clip.none,
+              children: [
+                Icon(
+                  isSelected ? activeIcon : icon,
+                  color: isSelected ? CustomTheme.primaryColor : Colors.white.withOpacity(0.7),
+                  size: 24,
+                ),
+                if (badgeCount != null && badgeCount > 0)
+                  Positioned(
+                    top: -4,
+                    right: -4,
+                    child: Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                        color: CustomTheme.errorColor,
+                        shape: BoxShape.circle,
+                        border: Border.all(color: isSelected ? Colors.white : CustomTheme.primaryColor, width: 1.5),
+                      ),
+                      constraints: const BoxConstraints(minWidth: 16, minHeight: 16),
+                      child: Text(
+                        badgeCount > 9 ? '9+' : badgeCount.toString(),
+                        style: const TextStyle(color: Colors.white, fontSize: 8, fontWeight: FontWeight.bold),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ),
+              ],
             ),
-            label: 'Cart',
-          ),
-          const BottomNavigationBarItem(
-            icon: Icon(Icons.person_outline),
-            activeIcon: Icon(Icons.person),
-            label: 'Profile',
-          ),
-        ],
+            if (isSelected) ...[
+              const SizedBox(width: 8),
+              Text(
+                label,
+                style: CustomTextStyle.bodySmall.copyWith(
+                  color: CustomTheme.primaryColor,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ],
+        ),
       ),
     );
   }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medicare_app/core/providers.dart';
 import 'package:medicare_app/presentation/widgets/common/custom_theme.dart';
+import '../../../domain/entities/address_entity.dart';
 
 class HomeAppBar extends ConsumerStatefulWidget implements PreferredSizeWidget {
   const HomeAppBar({super.key});
@@ -10,152 +11,205 @@ class HomeAppBar extends ConsumerStatefulWidget implements PreferredSizeWidget {
   ConsumerState<HomeAppBar> createState() => _HomeAppBarState();
 
   @override
-  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
+  Size get preferredSize => const Size.fromHeight(70);
 }
 
 class _HomeAppBarState extends ConsumerState<HomeAppBar> {
   @override
   void initState() {
     super.initState();
-    // Load notification counts
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final notificationProvider = ref.read(notificationProviderNotifier);
-      final cartProvider = ref.read(cartProviderNotifier);
-      notificationProvider.loadNotifications();
-      cartProvider.loadCartCount();
+      ref.read(notificationProviderNotifier).loadUnreadCount();
+      ref.read(addressProviderNotifier).loadAddresses();
     });
+  }
+
+  String _getGreeting() {
+    final hour = DateTime.now().hour;
+    if (hour < 12) return 'Good Morning';
+    if (hour < 17) return 'Good Afternoon';
+    return 'Good Evening';
   }
 
   @override
   Widget build(BuildContext context) {
     final user = ref.watch(authProviderNotifier).currentUser;
-    final notificationProvider = ref.watch(notificationProviderNotifier);
-
-    final unreadCount = notificationProvider.unreadCount;
+    final unreadCount = ref.watch(notificationProviderNotifier).unreadCount;
+    final addresses = ref.watch(addressProviderNotifier).addresses;
+    
+    AddressEntity? defaultAddress;
+    try {
+      defaultAddress = addresses.firstWhere((a) => a.isDefault);
+    } catch (_) {
+      if (addresses.isNotEmpty) defaultAddress = addresses.first;
+    }
 
     return AppBar(
       elevation: 0,
+      toolbarHeight: 70,
       backgroundColor: CustomTheme.backgroundColor,
-      foregroundColor: CustomTheme.primaryColor,
-      titleSpacing: CustomTheme.spacingSM,
-      title: Row(
-        children: [
-          // Default Avatar
-          Container(
-            width: 44,
-            height: 44,
-            decoration: BoxDecoration(
-              color: CustomTheme.surfaceColor,
-              shape: BoxShape.circle,
-            ),
-            child: Center(
-              child: Text(
-                user?.name.isNotEmpty == true
-                    ? user!.name[0].toUpperCase()
-                    : 'G',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: CustomTheme.fontWeightSemiBold,
-                  color: CustomTheme.primaryColor,
-                ),
-              ),
-            ),
-          ),
-          SizedBox(width: CustomTheme.spacingMD),
-
-          // Welcome Text
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Hello, ${user?.name ?? "Guest"}',
-                  style: CustomTextStyle.bodyLarge.copyWith(
-                    fontWeight: CustomTheme.fontWeightSemiBold,
-                  ),
-                ),
-                Text('Welcome to MediCare', style: CustomTextStyle.bodySmall),
-              ],
-            ),
-          ),
-        ],
-      ),
-      actions: [
-        // Search Icon
-        Container(
-          decoration: BoxDecoration(
-            color: CustomTheme.surfaceColor,
-            shape: BoxShape.circle,
-          ),
-          child: IconButton(
-            icon: Icon(
-              Icons.search,
-              color: CustomTheme.textSecondary,
-              size: 20,
-            ),
-            onPressed: () {
-              Navigator.pushNamed(context, '/search');
-            },
-            splashRadius: 24,
-          ),
-        ),
-
-        // Spacing between cart and notification icons
-        SizedBox(width: CustomTheme.spacingSM),
-
-        // Notification Icon with Badge
-        Stack(
+      automaticallyImplyLeading: false,
+      title: Padding(
+        padding: const EdgeInsets.only(top: 8.0),
+        child: Row(
           children: [
+            // Premium Avatar with Gradient Border
             Container(
-              margin: EdgeInsets.only(right: CustomTheme.spacingMD),
+              padding: const EdgeInsets.all(2),
               decoration: BoxDecoration(
-                color: CustomTheme.surfaceColor,
                 shape: BoxShape.circle,
-              ),
-              child: IconButton(
-                icon: Icon(
-                  Icons.notifications_outlined,
-                  color: CustomTheme.textSecondary,
-                  size: 20,
+                gradient: LinearGradient(
+                  colors: [
+                    CustomTheme.primaryColor,
+                    CustomTheme.primaryColor.withOpacity(0.4),
+                  ],
                 ),
-                onPressed: () {
-                  Navigator.pushNamed(context, '/notifications');
-                },
-                splashRadius: 24,
+              ),
+              child: Container(
+                width: 42,
+                height: 42,
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  shape: BoxShape.circle,
+                ),
+                child: Center(
+                  child: Text(
+                    user?.name.isNotEmpty == true
+                        ? user!.name[0].toUpperCase()
+                        : 'G',
+                    style: CustomTextStyle.heading3.copyWith(
+                      fontSize: 18,
+                      color: CustomTheme.primaryColor,
+                    ),
+                  ),
+                ),
               ),
             ),
-            if (unreadCount > 0)
-              Positioned(
-                right: 4,
-                top: 4,
-                child: Container(
-                  padding: const EdgeInsets.all(2),
-                  decoration: BoxDecoration(
-                    color: CustomTheme.errorColor,
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: CustomTheme.surfaceColor,
-                      width: 1.5,
+            const SizedBox(width: 12),
+            // User Info & Location
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    children: [
+                      Text(
+                        _getGreeting(),
+                        style: CustomTextStyle.bodySmall.copyWith(
+                          color: CustomTheme.textSecondary,
+                          fontWeight: CustomTheme.fontWeightMedium,
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                      Icon(
+                        _getGreetingIcon(),
+                        size: 14,
+                        color: Colors.orangeAccent,
+                      ),
+                    ],
+                  ),
+                  Text(
+                    user?.name ?? 'Guest User',
+                    style: CustomTextStyle.heading4.copyWith(
+                      fontSize: 16,
+                      height: 1.2,
                     ),
                   ),
-                  constraints: const BoxConstraints(
-                    minWidth: 16,
-                    minHeight: 16,
+                  const SizedBox(height: 2),
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.location_on,
+                        size: 12,
+                        color: CustomTheme.primaryColor.withOpacity(0.7),
+                      ),
+                      const SizedBox(width: 2),
+                      Flexible(
+                        child: Text(
+                          defaultAddress != null 
+                              ? '${defaultAddress.city}, ${defaultAddress.state}'
+                              : 'Add Location',
+                          style: CustomTextStyle.caption.copyWith(
+                            color: CustomTheme.textTertiary,
+                            fontSize: 11,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
                   ),
-                  child: Text(
-                    unreadCount > 9 ? '9+' : '$unreadCount',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 9,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
+                ],
               ),
+            ),
           ],
         ),
+      ),
+      actions: [
+        _buildActionButton(
+          icon: Icons.search_rounded,
+          onTap: () => Navigator.pushNamed(context, '/search'),
+        ),
+        _buildActionButton(
+          icon: Icons.notifications_none_rounded,
+          badgeCount: unreadCount,
+          onTap: () => Navigator.pushNamed(context, '/notifications'),
+        ),
+        const SizedBox(width: 8),
       ],
+    );
+  }
+
+  IconData _getGreetingIcon() {
+    final hour = DateTime.now().hour;
+    if (hour < 12) return Icons.wb_sunny_outlined;
+    if (hour < 17) return Icons.wb_cloudy_outlined;
+    return Icons.nightlight_round_outlined;
+  }
+
+  Widget _buildActionButton({
+    required IconData icon,
+    required VoidCallback onTap,
+    int badgeCount = 0,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.only(right: 8.0),
+      child: Badge(
+        label: Text(badgeCount > 9 ? '9+' : badgeCount.toString()),
+        isLabelVisible: badgeCount > 0,
+        backgroundColor: CustomTheme.errorColor,
+        textColor: Colors.white,
+        padding: const EdgeInsets.symmetric(horizontal: 4),
+        largeSize: 16,
+        child: Container(
+          width: 40,
+          height: 40,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            shape: BoxShape.circle,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.04),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: onTap,
+              customBorder: const CircleBorder(),
+              child: Icon(
+                icon,
+                color: CustomTheme.textPrimary,
+                size: 20,
+              ),
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
