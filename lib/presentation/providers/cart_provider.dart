@@ -101,7 +101,7 @@ class CartProvider extends ChangeNotifier {
       id: oldItem.id,
       quantity: newQuantity,
       product: oldItem.product,
-      itemTotal: oldItem.product.finalPrice * newQuantity,
+      itemTotal: oldItem.product.price * newQuantity, // Use regular price for subtotal
       itemSavings: oldItem.product.discountedPrice != null
           ? (oldItem.product.price - oldItem.product.finalPrice) * newQuantity
           : 0,
@@ -120,7 +120,7 @@ class CartProvider extends ChangeNotifier {
       0.0,
       (sum, item) => sum + item.itemSavings,
     );
-    final newTotal = newSubtotal - newTotalSavings;
+    final newTotal = newSubtotal - newTotalSavings; // This is the final payable
     final newItemCount = updatedItems.fold(
       0,
       (sum, item) => sum + item.quantity,
@@ -144,38 +144,10 @@ class CartProvider extends ChangeNotifier {
 
     try {
       await cartRepository.updateCartItem(itemId, newQuantity);
-      // Don't reload cart - just update count in background
-      _cartItemCount = newItemCount;
       onShowMessage?.call('Quantity updated', isError: false);
     } catch (e) {
-      // Revert to old cart
-      final revertedItems = List<CartItemEntity>.from(updatedItems);
-      revertedItems[itemIndex] = oldItem;
-
-      final revertedSubtotal = revertedItems.fold(
-        0.0,
-        (sum, item) => sum + item.itemTotal,
-      );
-      final revertedTotalSavings = revertedItems.fold(
-        0.0,
-        (sum, item) => sum + item.itemSavings,
-      );
-      final revertedTotal = revertedSubtotal - revertedTotalSavings;
-      final revertedItemCount = revertedItems.fold(
-        0,
-        (sum, item) => sum + item.quantity,
-      );
-
-      _cart = CartEntity(
-        items: revertedItems,
-        subtotal: revertedSubtotal,
-        totalSavings: revertedTotalSavings,
-        total: revertedTotal,
-        itemCount: revertedItemCount,
-      );
-      _cartItemCount = revertedItemCount;
-      notifyListeners();
-
+      // Rollback on failure
+      loadCart(silent: true);
       onShowMessage?.call('Failed to update quantity', isError: true);
     } finally {
       _isUpdating = false;
@@ -189,8 +161,6 @@ class CartProvider extends ChangeNotifier {
     final itemIndex =
         _cart?.items.indexWhere((item) => item.id == itemId) ?? -1;
     if (itemIndex == -1) return;
-
-    final removedItem = _cart!.items[itemIndex];
 
     // Optimistic remove
     final updatedItems = List<CartItemEntity>.from(_cart!.items);
@@ -227,32 +197,7 @@ class CartProvider extends ChangeNotifier {
       await cartRepository.removeFromCart(itemId);
       onShowMessage?.call('Item removed from cart', isError: false);
     } catch (e) {
-      // Revert on failure
-      updatedItems.insert(itemIndex, removedItem);
-      final revertedSubtotal = updatedItems.fold(
-        0.0,
-        (sum, item) => sum + item.itemTotal,
-      );
-      final revertedTotalSavings = updatedItems.fold(
-        0.0,
-        (sum, item) => sum + item.itemSavings,
-      );
-      final revertedTotal = revertedSubtotal - revertedTotalSavings;
-      final revertedItemCount = updatedItems.fold(
-        0,
-        (sum, item) => sum + item.quantity,
-      );
-
-      _cart = CartEntity(
-        items: updatedItems,
-        subtotal: revertedSubtotal,
-        totalSavings: revertedTotalSavings,
-        total: revertedTotal,
-        itemCount: revertedItemCount,
-      );
-      _cartItemCount = revertedItemCount;
-      notifyListeners();
-
+      loadCart(silent: true);
       onShowMessage?.call('Failed to remove item', isError: true);
     } finally {
       _isUpdating = false;
