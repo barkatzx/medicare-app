@@ -1,0 +1,101 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import '../../core/constants/api_constants.dart';
+import '../../domain/entities/address_entity.dart';
+import '../datasources/local/shared_prefs_helper.dart';
+import 'address_repository.dart';
+
+class AddressRepositoryImpl implements AddressRepository {
+  final http.Client client;
+  final SharedPrefsHelper prefsHelper;
+
+  AddressRepositoryImpl({required this.client, required this.prefsHelper});
+
+  @override
+  Future<List<AddressEntity>> getAddresses() async {
+    final token = await prefsHelper.getToken();
+    if (token == null) throw Exception('User not authenticated');
+
+    final response = await client.get(
+      Uri.parse(ApiConstants.addresses),
+      headers: ApiConstants.getHeaders(token: token),
+    ).timeout(ApiConstants.connectionTimeout);
+
+    print('getAddresses status: ${response.statusCode}');
+    print('getAddresses body: ${response.body}');
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      final List list = data['data'] ?? [];
+      return list.map((item) => AddressEntity.fromJson(item)).toList();
+    }
+    throw Exception('Failed to fetch addresses: ${response.statusCode}');
+  }
+
+  @override
+  Future<AddressEntity> addAddress(AddressEntity address) async {
+    final token = await prefsHelper.getToken();
+    if (token == null) throw Exception('User not authenticated');
+
+    final response = await client.post(
+      Uri.parse(ApiConstants.addresses),
+      headers: ApiConstants.getHeaders(token: token),
+      body: json.encode(address.toJson()),
+    ).timeout(ApiConstants.connectionTimeout);
+
+    if (response.statusCode >= 200 && response.statusCode < 300) {
+      final data = json.decode(response.body);
+      return AddressEntity.fromJson(data['data'] ?? data);
+    }
+    throw Exception('Failed to add address');
+  }
+
+  @override
+  Future<AddressEntity> updateAddress(String id, Map<String, dynamic> data) async {
+    final token = await prefsHelper.getToken();
+    if (token == null) throw Exception('User not authenticated');
+
+    final response = await client.put(
+      Uri.parse(ApiConstants.addressDetail(id)),
+      headers: ApiConstants.getHeaders(token: token),
+      body: json.encode(data),
+    ).timeout(ApiConstants.connectionTimeout);
+
+    if (response.statusCode >= 200 && response.statusCode < 300) {
+      final responseData = json.decode(response.body);
+      return AddressEntity.fromJson(responseData['data'] ?? responseData);
+    }
+    throw Exception('Failed to update address');
+  }
+
+  @override
+  Future<void> setDefaultAddress(String id) async {
+    final token = await prefsHelper.getToken();
+    if (token == null) throw Exception('User not authenticated');
+
+    final response = await client.put(
+      Uri.parse(ApiConstants.addressDetail(id)),
+      headers: ApiConstants.getHeaders(token: token),
+      body: json.encode({'isDefault': true}),
+    ).timeout(ApiConstants.connectionTimeout);
+
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      throw Exception('Failed to set default address');
+    }
+  }
+
+  @override
+  Future<void> deleteAddress(String id) async {
+    final token = await prefsHelper.getToken();
+    if (token == null) throw Exception('User not authenticated');
+
+    final response = await client.delete(
+      Uri.parse(ApiConstants.addressDetail(id)),
+      headers: ApiConstants.getHeaders(token: token),
+    ).timeout(ApiConstants.connectionTimeout);
+
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      throw Exception('Failed to delete address');
+    }
+  }
+}

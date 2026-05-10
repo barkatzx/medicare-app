@@ -17,9 +17,7 @@ class ApiConstants {
   static String get changePassword => '$baseUrl/users/change-password';
 
   // ==================== ADDRESS ROUTES ====================
-  static String get addresses => '$baseUrl/users/addresses';
-  static String addressDefault(String addressId) =>
-      '$baseUrl/users/addresses/$addressId/default';
+  static String get addresses => '$baseUrl/users/addresses/';
   static String addressDetail(String addressId) =>
       '$baseUrl/users/addresses/$addressId';
 

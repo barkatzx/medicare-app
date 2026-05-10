@@ -12,6 +12,8 @@ import '../data/repositories/product_repository.dart';
 import '../data/repositories/product_repository_impl.dart';
 import '../data/repositories/category_repository.dart';
 import '../data/repositories/category_repository_impl.dart';
+import '../data/repositories/address_repository.dart';
+import '../data/repositories/address_repository_impl.dart';
 import '../domain/usecases/auth/login_usecase.dart';
 import '../domain/usecases/auth/register_usecase.dart';
 import '../domain/usecases/auth/verify_auth_usecase.dart';
@@ -22,6 +24,7 @@ import '../presentation/providers/product_provider.dart';
 import '../presentation/providers/category_provider.dart';
 import '../presentation/providers/category_products_provider.dart';
 import '../presentation/providers/special_products_provider.dart';
+import '../presentation/providers/address_provider.dart';
 
 // Core
 final sharedPreferencesProvider = Provider<SharedPreferences>((ref) {
@@ -67,6 +70,13 @@ final notificationRepositoryProvider = Provider<NotificationRepository>((ref) {
 
 final categoryRepositoryProvider = Provider<CategoryRepository>((ref) {
   return CategoryRepositoryImpl(
+    client: ref.watch(httpClientProvider),
+    prefsHelper: ref.watch(sharedPrefsHelperProvider),
+  );
+});
+
+final addressRepositoryProvider = Provider<AddressRepository>((ref) {
+  return AddressRepositoryImpl(
     client: ref.watch(httpClientProvider),
     prefsHelper: ref.watch(sharedPrefsHelperProvider),
   );
@@ -128,5 +138,11 @@ final categoryProductsProviderFamily = ChangeNotifierProvider.autoDispose.family
 final specialProductsProviderNotifier = ChangeNotifierProvider<SpecialProductsProvider>((ref) {
   return SpecialProductsProvider(
     productRepository: ref.watch(productRepositoryProvider),
+  );
+});
+
+final addressProviderNotifier = ChangeNotifierProvider<AddressProvider>((ref) {
+  return AddressProvider(
+    addressRepository: ref.watch(addressRepositoryProvider),
   );
 });
