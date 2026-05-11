@@ -143,6 +143,34 @@ class ProductRepositoryImpl implements ProductRepository {
     );
   }
 
+  @override
+  Future<ProductEntity> getProductDetail(String id) async {
+    try {
+      final token = await prefsHelper.getToken();
+      final response = await client
+          .get(
+            Uri.parse(ApiConstants.productDetail(id)),
+            headers: ApiConstants.getHeaders(token: token),
+          )
+          .timeout(ApiConstants.connectionTimeout);
+
+      final responseData = json.decode(response.body);
+
+      if (response.statusCode == 200) {
+        if (responseData['success'] == true && responseData['data'] != null) {
+          return ProductEntity.fromJson(responseData['data']);
+        } else {
+          throw Exception(responseData['message'] ?? 'Failed to load product detail');
+        }
+      } else {
+        throw Exception(responseData['message'] ?? 'Error: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Get product detail error: $e');
+      rethrow;
+    }
+  }
+
   Future<PaginatedProductResponse> _getPaginatedProducts(String url, String errorMessagePrefix, {bool useToken = true}) async {
     try {
       final token = useToken ? await prefsHelper.getToken() : null;

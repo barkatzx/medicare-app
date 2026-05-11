@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import 'package:medicare_app/core/providers.dart';
 import 'package:medicare_app/presentation/widgets/common/custom_theme.dart';
-import 'package:medicare_app/presentation/widgets/common/custom_button.dart';
 import '../../../routes/app_routes.dart';
 
 class ProfileScreen extends ConsumerWidget {
@@ -15,187 +16,112 @@ class ProfileScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: CustomTheme.backgroundColor,
-      appBar: _buildAppBar(),
+      appBar: AppBar(
+        title: Text('My Profile', style: CustomTextStyle.heading3),
+        centerTitle: true,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        scrolledUnderElevation: 0,
+        systemOverlayStyle: SystemUiOverlayStyle.dark,
+      ),
       body: SingleChildScrollView(
         child: Column(
           children: [
-            _buildProfileHeader(user),
-            SizedBox(height: CustomTheme.spacingMD),
-            _buildStatsSection(user),
-            SizedBox(height: CustomTheme.spacingMD),
+            _buildProfileCard(user),
+            const SizedBox(height: 24),
             _buildMenuSection(context, ref),
+            const SizedBox(height: 40),
           ],
         ),
       ),
     );
   }
 
-  PreferredSizeWidget _buildAppBar() {
-    return AppBar(
-      elevation: 0,
-      backgroundColor: CustomTheme.backgroundColor,
-      scrolledUnderElevation: 0,
-      title: Text(
-        'Profile',
-        style: CustomTextStyle.heading2,
-      ),
-      centerTitle: false,
-    );
-  }
-
-  Widget _buildProfileHeader(user) {
+  Widget _buildProfileCard(user) {
     return Container(
-      margin: EdgeInsets.all(CustomTheme.spacingMD),
-      padding: EdgeInsets.all(CustomTheme.spacingLG),
+      width: double.infinity,
+      margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            CustomTheme.primaryColor,
-            CustomTheme.primaryColor.withOpacity(0.85),
-          ],
-        ),
-        borderRadius: BorderRadius.circular(CustomTheme.radiusLG),
-        boxShadow: CustomTheme.boxShadowMedium,
+        color: CustomTheme.surfaceColor,
+        borderRadius: BorderRadius.circular(CustomTheme.radiusXL),
       ),
       child: Row(
         children: [
-          // Avatar
+          // Initials Image Box (Left)
           Container(
+            padding: const EdgeInsets.all(4),
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               border: Border.all(
-                color: Colors.white.withOpacity(0.3),
-                width: 2,
+                color: CustomTheme.primaryColor.withOpacity(0.1),
+                width: 1,
               ),
             ),
-            child: CircleAvatar(
-              radius: 42,
-              backgroundColor: CustomTheme.surfaceColor,
-              child: Text(
-                user?.name?.isNotEmpty == true
-                    ? user!.name[0].toUpperCase()
-                    : 'G',
-                style: TextStyle(
-                  fontSize: 32,
-                  fontWeight: CustomTheme.fontWeightBold,
-                  color: CustomTheme.primaryColor,
+            child: Container(
+              width: 80,
+              height: 80,
+              decoration: BoxDecoration(
+                color: CustomTheme.backgroundColor,
+                shape: BoxShape.circle,
+              ),
+              child: Center(
+                child: Text(
+                  user?.name?.isNotEmpty == true ? user!.name[0].toUpperCase() : 'G',
+                  style: CustomTextStyle.heading1.copyWith(
+                    color: CustomTheme.primaryColor,
+                    fontSize: 32,
+                    fontWeight: CustomTheme.fontWeightBold,
+                  ),
                 ),
               ),
             ),
           ),
-          SizedBox(width: CustomTheme.spacingLG),
-          
-          // User Info
+          const SizedBox(width: 20),
+          // User Info (Right)
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  user?.name ?? 'Guest',
-                  style: TextStyle(
-                    fontSize: 20,
+                  user?.name ?? 'Guest User',
+                  style: CustomTextStyle.heading3.copyWith(
                     fontWeight: CustomTheme.fontWeightBold,
-                    color: Colors.white,
-                    letterSpacing: -0.3,
+                    letterSpacing: -0.5,
                   ),
                 ),
-                SizedBox(height: CustomTheme.spacingXS),
-                Row(
-                  children: [
-                    Icon(
-                      Icons.email_outlined,
-                      size: 14,
-                      color: Colors.white.withOpacity(0.8),
-                    ),
-                    SizedBox(width: CustomTheme.spacingXS),
-                    Expanded(
-                      child: Text(
-                        user?.email ?? 'No email',
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: Colors.white.withOpacity(0.9),
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                  ],
+                const SizedBox(height: 4),
+                Text(
+                  user?.phoneNumber ?? 'Join our community',
+                  style: CustomTextStyle.bodyMedium.copyWith(
+                    color: CustomTheme.textSecondary,
+                  ),
                 ),
-                SizedBox(height: CustomTheme.spacingXS),
-                Row(
-                  children: [
-                    Icon(
-                      Icons.phone_outlined,
-                      size: 14,
-                      color: Colors.white.withOpacity(0.8),
-                    ),
-                    SizedBox(width: CustomTheme.spacingXS),
-                    Text(
-                      user?.phoneNumber ?? 'No phone',
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: Colors.white.withOpacity(0.9),
-                      ),
-                    ),
-                  ],
+                const SizedBox(height: 4),
+                Text(
+                  user?.email ?? 'Join our community',
+                  style: CustomTextStyle.bodyMedium.copyWith(
+                    color: CustomTheme.textSecondary,
+                  ),
                 ),
-                if (user?.pharmacyName != null) ...[
-                  SizedBox(height: CustomTheme.spacingXS),
+                if (user?.pharmacyName != null && user!.pharmacyName!.isNotEmpty) ...[
+                  const SizedBox(height: 8),
                   Container(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: CustomTheme.spacingSM,
-                      vertical: CustomTheme.spacingXS,
-                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.2),
-                      borderRadius: BorderRadius.circular(CustomTheme.radiusRound),
+                      color: CustomTheme.primaryColor.withOpacity(0.08),
+                      borderRadius: BorderRadius.circular(CustomTheme.radiusSM),
                     ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.local_pharmacy,
-                          size: 12,
-                          color: Colors.white,
-                        ),
-                        SizedBox(width: CustomTheme.spacingXS),
-                        Text(
-                          user!.pharmacyName!,
-                          style: TextStyle(
-                            fontSize: 11,
-                            color: Colors.white,
-                            fontWeight: CustomTheme.fontWeightMedium,
-                          ),
-                        ),
-                      ],
+                    child: Text(
+                      user!.pharmacyName!,
+                      style: CustomTextStyle.caption.copyWith(
+                        color: CustomTheme.primaryColor,
+                        fontWeight: CustomTheme.fontWeightSemiBold,
+                        fontSize: 11,
+                      ),
                     ),
                   ),
                 ],
-                SizedBox(height: CustomTheme.spacingSM),
-                Wrap(
-                  spacing: CustomTheme.spacingXS,
-                  runSpacing: CustomTheme.spacingXS,
-                  children: [
-                    if (user != null)
-                      _buildStatusChip(
-                        user.role.toUpperCase(),
-                        Icons.admin_panel_settings_outlined,
-                      ),
-                    if (user != null)
-                      _buildStatusChip(
-                        user.isApproved ? 'Approved' : 'Pending',
-                        user.isApproved ? Icons.check_circle_outline : Icons.hourglass_empty,
-                        color: user.isApproved ? Colors.green.shade400 : Colors.orange.shade400,
-                      ),
-                    if (user != null)
-                      _buildStatusChip(
-                        'Joined ${user.createdAt.year}',
-                        Icons.calendar_today_outlined,
-                      ),
-                  ],
-                ),
               ],
             ),
           ),
@@ -204,429 +130,140 @@ class ProfileScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildStatusChip(String label, IconData icon, {Color? color}) {
-    return Container(
-      padding: EdgeInsets.symmetric(
-        horizontal: CustomTheme.spacingSM,
-        vertical: 4,
-      ),
-      decoration: BoxDecoration(
-        color: (color ?? Colors.white).withOpacity(0.15),
-        borderRadius: BorderRadius.circular(CustomTheme.radiusSM),
-        border: Border.all(
-          color: (color ?? Colors.white).withOpacity(0.3),
-          width: 0.5,
-        ),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            icon,
-            size: 12,
-            color: color ?? Colors.white,
-          ),
-          SizedBox(width: 4),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 10,
-              color: color ?? Colors.white,
-              fontWeight: CustomTheme.fontWeightSemiBold,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildStatsSection(user) {
-    return Container(
-      margin: EdgeInsets.symmetric(horizontal: CustomTheme.spacingMD),
-      padding: EdgeInsets.all(CustomTheme.spacingLG),
-      decoration: BoxDecoration(
-        color: CustomTheme.surfaceColor,
-        borderRadius: BorderRadius.circular(CustomTheme.radiusLG),
-        boxShadow: CustomTheme.boxShadowLight,
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          _buildStatItem(
-            icon: Icons.shopping_bag_outlined,
-            value: '0',
-            label: 'Orders',
-          ),
-          Container(
-            width: 1,
-            height: 40,
-            color: CustomTheme.borderLight,
-          ),
-          _buildStatItem(
-            icon: Icons.favorite_border,
-            value: '0',
-            label: 'Wishlist',
-          ),
-          Container(
-            width: 1,
-            height: 40,
-            color: CustomTheme.borderLight,
-          ),
-          _buildStatItem(
-            icon: Icons.star_border,
-            value: '0',
-            label: 'Reviews',
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildStatItem({
-    required IconData icon,
-    required String value,
-    required String label,
-  }) {
-    return Column(
-      children: [
-        Icon(
-          icon,
-          size: 24,
-          color: CustomTheme.primaryColor,
-        ),
-        SizedBox(height: CustomTheme.spacingSM),
-        Text(
-          value,
-          style: CustomTextStyle.heading3.copyWith(
-            fontWeight: CustomTheme.fontWeightBold,
-          ),
-        ),
-        SizedBox(height: CustomTheme.spacingXS),
-        Text(
-          label,
-          style: CustomTextStyle.caption,
-        ),
-      ],
-    );
-  }
-
   Widget _buildMenuSection(BuildContext context, WidgetRef ref) {
-    final authProvider = ref.watch(authProviderNotifier);
-    final user = authProvider.currentUser;
-
-    return Container(
-      margin: EdgeInsets.all(CustomTheme.spacingMD),
-      decoration: BoxDecoration(
-        color: CustomTheme.surfaceColor,
-        borderRadius: BorderRadius.circular(CustomTheme.radiusLG),
-        boxShadow: CustomTheme.boxShadowLight,
-      ),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildMenuItem(
-            context,
-            icon: Icons.person_outline,
-            title: 'Edit Profile',
-            subtitle: 'Update your personal information',
-            onTap: () {
-              Navigator.pushNamed(context, AppRoutes.editProfile);
-            },
+          Text('GENERAL SETTINGS', style: CustomTextStyle.bodySmall.copyWith(color: CustomTheme.textTertiary, letterSpacing: 1.2, fontWeight: CustomTheme.fontWeightBold)),
+          const SizedBox(height: 16),
+          Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(CustomTheme.radiusLG),
+              
+            ),
+            child: Column(
+              children: [
+                _buildMenuItem(
+                  icon: Icons.person_outline_rounded,
+                  title: 'Edit Profile',
+                  color: Colors.blue,
+                  onTap: () => Navigator.pushNamed(context, AppRoutes.editProfile),
+                ),
+                _buildDivider(),
+                _buildMenuItem(
+                  icon: Icons.location_on_outlined,
+                  title: 'My Addresses',
+                  color: Colors.green,
+                  onTap: () => Navigator.pushNamed(context, AppRoutes.addresses),
+                ),
+                _buildDivider(),
+                _buildMenuItem(
+                  icon: Icons.history_rounded,
+                  title: 'Order History',
+                  color: Colors.purple,
+                  onTap: () => Navigator.pushNamed(context, AppRoutes.myOrders),
+                ),
+              ],
+            ),
           ),
-          _buildDivider(),
-          _buildMenuItem(
-            context,
-            icon: Icons.location_on_outlined,
-            title: 'My Addresses',
-            subtitle: '${user?.addresses.length ?? 0} saved addresses',
-            onTap: () {
-              Navigator.pushNamed(context, AppRoutes.addresses);
-            },
+          const SizedBox(height: 24),
+          Text('PREFERENCES', style: CustomTextStyle.bodySmall.copyWith(color: CustomTheme.textTertiary, letterSpacing: 1.2, fontWeight: CustomTheme.fontWeightBold)),
+          const SizedBox(height: 16),
+          Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(CustomTheme.radiusLG),
+            ),
+            child: Column(
+              children: [
+                _buildMenuItem(
+                  icon: Icons.notifications_none_rounded,
+                  title: 'Notifications',
+                  color: Colors.amber,
+                  onTap: () => Navigator.pushNamed(context, AppRoutes.notifications),
+                ),
+                _buildDivider(),
+                _buildMenuItem(
+                  icon: Icons.security_rounded,
+                  title: 'Privacy & Security',
+                  color: Colors.teal,
+                  onTap: () => Navigator.pushNamed(context, AppRoutes.changePassword),
+                ),
+              ],
+            ),
           ),
-          _buildDivider(),
-          _buildMenuItem(
-            context,
-            icon: Icons.shopping_bag_outlined,
-            title: 'My Orders',
-            subtitle: 'Track your orders',
-            onTap: () {
-              Navigator.pushNamed(context, AppRoutes.myOrders);
-            },
-          ),
-          _buildDivider(),
-          _buildMenuItem(
-            context,
-            icon: Icons.lock_outline,
-            title: 'Change Password',
-            subtitle: 'Update your password',
-            onTap: () {
-              Navigator.pushNamed(context, AppRoutes.changePassword);
-            },
-          ),
-          _buildDivider(),
-          _buildMenuItem(
-            context,
-            icon: Icons.notifications_outlined,
-            title: 'Notifications',
-            subtitle: 'Manage notifications',
-            onTap: () {
-              Navigator.pushNamed(context, AppRoutes.notifications);
-            },
-            showBadge: true,
-            badgeCount: user?.notifications.length ?? 0,
-          ),
-          _buildDivider(),
-          _buildLogoutMenuItem(context, ref),
+          const SizedBox(height: 24),
+          _buildLogoutButton(context, ref),
         ],
       ),
     );
   }
 
-  Widget _buildMenuItem(
-    BuildContext context, {
-    required IconData icon,
-    required String title,
-    required String subtitle,
-    required VoidCallback onTap,
-    bool showBadge = false,
-    int badgeCount = 0,
-  }) {
-    return GestureDetector(
+  Widget _buildMenuItem({required IconData icon, required String title, required Color color, required VoidCallback onTap}) {
+    return ListTile(
       onTap: onTap,
-      child: Container(
-        padding: EdgeInsets.all(CustomTheme.spacingMD),
-        child: Row(
-          children: [
-            // Icon Container
-            Container(
-              width: 48,
-              height: 48,
-              decoration: BoxDecoration(
-                color: CustomTheme.primaryColor.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(CustomTheme.radiusMD),
-              ),
-              child: Icon(
-                icon,
-                size: 24,
-                color: CustomTheme.primaryColor,
-              ),
-            ),
-            SizedBox(width: CustomTheme.spacingMD),
-            
-            // Title and Subtitle
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: CustomTextStyle.bodyMedium.copyWith(
-                      fontWeight: CustomTheme.fontWeightSemiBold,
-                    ),
-                  ),
-                  SizedBox(height: CustomTheme.spacingXS),
-                  Text(
-                    subtitle,
-                    style: CustomTextStyle.caption,
-                  ),
-                ],
-              ),
-            ),
-            
-            // Badge (if any)
-            if (showBadge && badgeCount > 0)
-              Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: CustomTheme.spacingSM,
-                  vertical: CustomTheme.spacingXS,
-                ),
-                decoration: BoxDecoration(
-                  color: CustomTheme.errorColor,
-                  borderRadius: BorderRadius.circular(CustomTheme.radiusRound),
-                ),
-                child: Text(
-                  '$badgeCount',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 11,
-                    fontWeight: CustomTheme.fontWeightBold,
-                  ),
-                ),
-              ),
-            
-            SizedBox(width: CustomTheme.spacingSM),
-            
-            // Chevron Icon
-            Icon(
-              Icons.chevron_right,
-              color: CustomTheme.textTertiary,
-              size: 20,
-            ),
-          ],
-        ),
+      leading: Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(color: color.withOpacity(0.1), borderRadius: BorderRadius.circular(10)),
+        child: Icon(icon, size: 20, color: color),
       ),
+      title: Text(title, style: CustomTextStyle.bodyMedium.copyWith(fontWeight: CustomTheme.fontWeightSemiBold)),
+      trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 14, color: CustomTheme.textTertiary),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
     );
   }
 
-  Widget _buildLogoutMenuItem(BuildContext context, WidgetRef ref) {
-    return GestureDetector(
-      onTap: () {
-        _showLogoutDialog(context, ref);
-      },
-      child: Container(
-        padding: EdgeInsets.all(CustomTheme.spacingMD),
-        child: Row(
-          children: [
-            // Icon Container
-            Container(
-              width: 48,
-              height: 48,
-              decoration: BoxDecoration(
-                color: CustomTheme.errorColor.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(CustomTheme.radiusMD),
-              ),
-              child: Icon(
-                Icons.logout,
-                size: 24,
-                color: CustomTheme.errorColor,
-              ),
-            ),
-            SizedBox(width: CustomTheme.spacingMD),
-            
-            // Title
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Logout',
-                    style: CustomTextStyle.bodyMedium.copyWith(
-                      fontWeight: CustomTheme.fontWeightSemiBold,
-                      color: CustomTheme.errorColor,
-                    ),
-                  ),
-                  SizedBox(height: CustomTheme.spacingXS),
-                  Text(
-                    'Sign out from your account',
-                    style: CustomTextStyle.caption,
-                  ),
-                ],
-              ),
-            ),
-            
-            // Chevron Icon
-            Icon(
-              Icons.chevron_right,
-              color: CustomTheme.textTertiary,
-              size: 20,
-            ),
-          ],
+  Widget _buildLogoutButton(BuildContext context, WidgetRef ref) {
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(CustomTheme.radiusLG),
+      ),
+      child: ListTile(
+        onTap: () => _showLogoutDialog(context, ref),
+        leading: Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(color: Colors.red.withOpacity(0.1), borderRadius: BorderRadius.circular(10)),
+          child: const Icon(Icons.logout_rounded, size: 20, color: Colors.red),
         ),
+        title: Text('Logout', style: CustomTextStyle.bodyMedium.copyWith(fontWeight: CustomTheme.fontWeightSemiBold, color: Colors.red)),
+        trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 14, color: Colors.red),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       ),
     );
   }
 
   Widget _buildDivider() {
-    return Container(
-      height: 1,
-      color: CustomTheme.borderLight,
-      margin: EdgeInsets.symmetric(horizontal: CustomTheme.spacingMD),
-    );
+    return Divider(height: 1, color: CustomTheme.borderLight, indent: 64, endIndent: 16);
   }
 
   void _showLogoutDialog(BuildContext context, WidgetRef ref) {
     showDialog(
       context: context,
-      builder: (context) => Dialog(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        child: Container(
-          margin: EdgeInsets.all(CustomTheme.spacingMD),
-          padding: EdgeInsets.all(CustomTheme.spacingXL),
-          decoration: BoxDecoration(
-            color: CustomTheme.surfaceColor,
-            borderRadius: BorderRadius.circular(CustomTheme.radiusXL),
-            boxShadow: CustomTheme.boxShadowHeavy,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(CustomTheme.radiusXL)),
+        title: const Text('Logout'),
+        content: const Text('Are you sure you want to logout from your account?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('Cancel', style: TextStyle(color: CustomTheme.textTertiary)),
           ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                padding: EdgeInsets.all(CustomTheme.spacingLG),
-                decoration: BoxDecoration(
-                  color: CustomTheme.errorColor.withOpacity(0.1),
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  Icons.logout,
-                  size: 50,
-                  color: CustomTheme.errorColor,
-                ),
-              ),
-              SizedBox(height: CustomTheme.spacingLG),
-              Text(
-                'Logout',
-                style: CustomTextStyle.heading2,
-              ),
-              SizedBox(height: CustomTheme.spacingSM),
-              Text(
-                'Are you sure you want to logout?',
-                style: CustomTextStyle.bodyMedium,
-                textAlign: TextAlign.center,
-              ),
-              SizedBox(height: CustomTheme.spacingXL),
-              Row(
-                children: [
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () => Navigator.pop(context),
-                      child: Container(
-                        padding: EdgeInsets.symmetric(vertical: CustomTheme.spacingMD),
-                        decoration: BoxDecoration(
-                          color: Colors.transparent,
-                          borderRadius: BorderRadius.circular(CustomTheme.radiusMD),
-                          border: Border.all(color: CustomTheme.borderMedium),
-                        ),
-                        child: Center(
-                          child: Text(
-                            'Cancel',
-                            style: CustomTextStyle.bodyMedium.copyWith(
-                              color: CustomTheme.textSecondary,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  SizedBox(width: CustomTheme.spacingMD),
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () async {
-                        Navigator.pop(context);
-                        await ref.read(authProviderNotifier).logout();
-                        if (context.mounted) {
-                          Navigator.pushReplacementNamed(context, AppRoutes.login);
-                        }
-                      },
-                      child: Container(
-                        padding: EdgeInsets.symmetric(vertical: CustomTheme.spacingMD),
-                        decoration: BoxDecoration(
-                          color: CustomTheme.errorColor,
-                          borderRadius: BorderRadius.circular(CustomTheme.radiusMD),
-                        ),
-                        child: Center(
-                          child: Text(
-                            'Logout',
-                            style: CustomTextStyle.button,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
+          TextButton(
+            onPressed: () async {
+              Navigator.pop(context);
+              await ref.read(authProviderNotifier).logout();
+              if (context.mounted) {
+                Navigator.pushReplacementNamed(context, AppRoutes.login);
+              }
+            },
+            child: const Text('Logout', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
           ),
-        ),
+        ],
       ),
     );
   }

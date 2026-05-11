@@ -177,8 +177,6 @@ class AuthRepositoryImpl implements AuthRepository {
         throw Exception('No token found');
       }
 
-      print('Verifying auth token...');
-
       final response = await client
           .get(
             Uri.parse(ApiConstants.verifyAuth),
@@ -187,48 +185,42 @@ class AuthRepositoryImpl implements AuthRepository {
           .timeout(
             ApiConstants.connectionTimeout,
             onTimeout: () {
-              throw Exception(
-                'Connection timeout. Please check your internet connection.',
-              );
+              throw Exception('Connection timeout. Working in offline mode.');
             },
           );
 
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);
-
-        if (responseData['data'] != null &&
-            responseData['data']['user'] != null) {
+        if (responseData['data'] != null && responseData['data']['user'] != null) {
           final user = UserEntity.fromJson(responseData['data']['user']);
-
-          // Check if user is approved
           if (user.role.toLowerCase() == 'customer') {
             if (!user.isApproved) {
-              await clearToken();
-              await sharedPreferencesHelper.clearUser();
-              throw Exception(
-                'Your account is pending approval. Please wait for admin approval.',
-              );
+              await logout();
+              throw Exception('Your account is pending approval.');
             }
-
             await sharedPreferencesHelper.saveUser(user);
             return user;
           } else {
-            await clearToken();
-            await sharedPreferencesHelper.clearUser();
-            throw Exception(
-              'Access denied. Only customer accounts can use this app.',
-            );
+            await logout();
+            throw Exception('Access denied. Customer only.');
           }
         } else {
           throw Exception('Invalid user data');
         }
-      } else {
-        await clearToken();
-        await sharedPreferencesHelper.clearUser();
+      } else if (response.statusCode == 401 || response.statusCode == 403) {
+        await logout();
         throw Exception('Session expired. Please login again.');
+      } else {
+        // For other errors (500, etc.), try to use cached user if available
+        final cachedUser = await sharedPreferencesHelper.getUser();
+        if (cachedUser != null) return cachedUser;
+        throw Exception('Server error and no cached user found.');
       }
     } catch (e) {
-      throw Exception('Verification failed: $e');
+      // On network errors or other exceptions, try to return cached user
+      final cachedUser = await sharedPreferencesHelper.getUser();
+      if (cachedUser != null) return cachedUser;
+      rethrow;
     }
   }
 
@@ -268,5 +260,112 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<UserEntity?> getUser() async {
     return await sharedPreferencesHelper.getUser();
+  }
+
+  @override
+  Future<UserEntity> getProfile() async {
+    try {
+      final token = await sharedPreferencesHelper.getToken();
+      if (token == null) throw Exception('Authentication token not found');
+
+      final response = await client
+          .get(
+            Uri.parse(ApiConstants.profile),
+            headers: ApiConstants.getHeaders(token: token),
+          )
+          .timeout(ApiConstants.connectionTimeout);
+
+      if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+        if (responseData['data'] != null) {
+          final user = UserEntity.fromJson(responseData['data']);
+          await sharedPreferencesHelper.saveUser(user);
+          return user;
+        } else {
+          throw Exception('Profile data not found in response');
+        }
+      } else {
+        final errorBody = json.decode(response.body);
+        throw Exception(errorBody['message'] ?? 'Failed to fetch profile');
+      }
+    } catch (e) {
+      print('Get profile error: $e');
+      throw Exception('$e');
+    }
+  }
+
+  @override
+  Future<UserEntity> updateProfile({
+    required String name,
+    required String pharmacyName,
+    required String phoneNumber,
+  }) async {
+    try {
+      final token = await sharedPreferencesHelper.getToken();
+      if (token == null) throw Exception('Authentication token not found');
+
+      final requestBody = {
+        'name': name,
+        'pharmacy_name': pharmacyName,
+        'phone_number': phoneNumber,
+      };
+
+      final response = await client
+          .put(
+            Uri.parse(ApiConstants.updateprofile),
+            headers: ApiConstants.getHeaders(token: token),
+            body: json.encode(requestBody),
+          )
+          .timeout(ApiConstants.connectionTimeout);
+
+      if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+        if (responseData['data'] != null) {
+          final user = UserEntity.fromJson(responseData['data']);
+          await sharedPreferencesHelper.saveUser(user);
+          return user;
+        } else {
+          throw Exception('Updated profile data not found in response');
+        }
+      } else {
+        final errorBody = json.decode(response.body);
+        throw Exception(errorBody['message'] ?? 'Failed to update profile');
+      }
+    } catch (e) {
+      print('Update profile error: $e');
+      throw Exception('$e');
+    }
+  }
+
+  @override
+  Future<void> changePassword({
+    required String oldPassword,
+    required String newPassword,
+  }) async {
+    try {
+      final token = await sharedPreferencesHelper.getToken();
+      if (token == null) throw Exception('Authentication token not found');
+
+      final requestBody = {
+        'oldPassword': oldPassword,
+        'newPassword': newPassword,
+      };
+
+      final response = await client
+          .post(
+            Uri.parse(ApiConstants.changePassword),
+            headers: ApiConstants.getHeaders(token: token),
+            body: json.encode(requestBody),
+          )
+          .timeout(ApiConstants.connectionTimeout);
+
+      final responseData = json.decode(response.body);
+      if (response.statusCode != 200 && response.statusCode != 201) {
+        throw Exception(responseData['message'] ?? 'Failed to change password');
+      }
+    } catch (e) {
+      print('Change password error: $e');
+      throw Exception('$e');
+    }
   }
 }

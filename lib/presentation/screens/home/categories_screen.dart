@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medicare_app/core/providers.dart';
 import 'package:medicare_app/presentation/widgets/common/custom_theme.dart';
@@ -12,6 +13,8 @@ class CategoriesScreen extends ConsumerStatefulWidget {
 }
 
 class _CategoriesScreenState extends ConsumerState<CategoriesScreen> {
+  final TextEditingController _searchController = TextEditingController();
+
   @override
   void initState() {
     super.initState();
@@ -24,100 +27,148 @@ class _CategoriesScreenState extends ConsumerState<CategoriesScreen> {
   }
 
   @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final provider = ref.watch(categoryProviderNotifier);
 
     return Scaffold(
       backgroundColor: CustomTheme.backgroundColor,
       appBar: AppBar(
-        title: Text(
-          'Company',
-          style: CustomTextStyle.heading2,
-        ),
-        backgroundColor: CustomTheme.backgroundColor,
-        foregroundColor: CustomTheme.textPrimary,
+        title: Text('Companies', style: CustomTextStyle.heading3),
+        centerTitle: true,
+        backgroundColor: Colors.transparent,
         elevation: 0,
+        scrolledUnderElevation: 0,
+        systemOverlayStyle: SystemUiOverlayStyle.dark,
+        leading: Padding(
+          padding: const EdgeInsets.only(left: 12.0),
+          child: Center(
+            child: GestureDetector(
+              onTap: () => Navigator.pop(context),
+              child: Container(
+                width: 36,
+                height: 36,
+                decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+                child: const Icon(Icons.arrow_back_ios_new_rounded, color: CustomTheme.textPrimary, size: 16),
+              ),
+            ),
+          ),
+        ),
       ),
-      body: _buildBody(provider),
+      body: Column(
+        children: [
+          _buildSearchField(provider),
+          Expanded(child: _buildBody(provider)),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSearchField(provider) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 10, 20, 20),
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(CustomTheme.radiusLG),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.04),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: TextField(
+          controller: _searchController,
+          onChanged: (value) => provider.searchCategories(value),
+          style: CustomTextStyle.bodyMedium,
+          decoration: InputDecoration(
+            hintText: 'Square, Incepta, Renata...',
+            hintStyle: CustomTextStyle.bodyMedium.copyWith(color: CustomTheme.textTertiary),
+            prefixIcon: const Icon(Icons.search_rounded, color: CustomTheme.primaryColor, size: 22),
+            suffixIcon: _searchController.text.isNotEmpty
+                ? IconButton(
+                    icon: const Icon(Icons.close_rounded, size: 18, color: CustomTheme.textTertiary),
+                    onPressed: () {
+                      _searchController.clear();
+                      provider.searchCategories('');
+                    },
+                  )
+                : null,
+            border: InputBorder.none,
+            contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+          ),
+        ),
+      ),
     );
   }
 
   Widget _buildBody(provider) {
     if (provider.isLoading && provider.categories.isEmpty) {
+      return const Center(child: CircularProgressIndicator(color: CustomTheme.primaryColor, strokeWidth: 2));
+    }
+
+    if (provider.errorMessage != null && provider.categories.isEmpty) {
       return Center(
-        child: CircularProgressIndicator(
-          color: CustomTheme.primaryColor,
+        child: Padding(
+          padding: const EdgeInsets.all(40.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.error_outline_rounded, size: 64, color: CustomTheme.errorColor),
+              const SizedBox(height: 24),
+              Text('Oops! Something went wrong', style: CustomTextStyle.heading3),
+              const SizedBox(height: 8),
+              Text(
+                provider.errorMessage!,
+                textAlign: TextAlign.center,
+                style: CustomTextStyle.bodySmall.copyWith(color: CustomTheme.textSecondary),
+              ),
+              const SizedBox(height: 32),
+              SizedBox(
+                width: 150,
+                child: ElevatedButton(
+                  onPressed: () => provider.fetchCategories(),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: CustomTheme.primaryColor,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(CustomTheme.radiusRound)),
+                  ),
+                  child: const Text('Retry', style: TextStyle(color: Colors.white)),
+                ),
+              ),
+            ],
+          ),
         ),
       );
     }
 
-    if (provider.errorMessage != null && provider.categories.isEmpty) {
+    final categories = provider.categories;
+
+    if (categories.isEmpty) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              width: 80,
-              height: 80,
+              padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: CustomTheme.errorColor.withOpacity(0.1),
+                color: CustomTheme.backgroundColor,
                 shape: BoxShape.circle,
               ),
-              child: Icon(
-                Icons.error_outline,
-                size: 40,
-                color: CustomTheme.errorColor,
-              ),
+              child: Icon(Icons.search_off_rounded, size: 48, color: CustomTheme.textTertiary.withOpacity(0.5)),
             ),
-            SizedBox(height: CustomTheme.spacingLG),
+            const SizedBox(height: 20),
+            Text('No companies found', style: CustomTextStyle.heading3),
+            const SizedBox(height: 8),
             Text(
-              provider.errorMessage!,
-              style: CustomTextStyle.bodyMedium.copyWith(
-                color: CustomTheme.errorColor,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            SizedBox(height: CustomTheme.spacingLG),
-            ElevatedButton(
-              onPressed: () {
-                provider.fetchCategories();
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: CustomTheme.primaryColor,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(CustomTheme.radiusRound),
-                ),
-                padding: EdgeInsets.symmetric(
-                  horizontal: CustomTheme.spacingXL,
-                  vertical: CustomTheme.spacingMD,
-                ),
-              ),
-              child: Text(
-                'Retry',
-                style: CustomTextStyle.button,
-              ),
-            ),
-          ],
-        ),
-      );
-    }
-
-    if (provider.categories.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.category_outlined,
-              size: 64,
-              color: CustomTheme.textTertiary,
-            ),
-            SizedBox(height: CustomTheme.spacingMD),
-            Text(
-              'No categories found',
-              style: CustomTextStyle.bodyLarge.copyWith(
-                color: CustomTheme.textSecondary,
-              ),
+              'Try searching with a different name',
+              style: CustomTextStyle.bodySmall.copyWith(color: CustomTheme.textTertiary),
             ),
           ],
         ),
@@ -126,91 +177,90 @@ class _CategoriesScreenState extends ConsumerState<CategoriesScreen> {
 
     return RefreshIndicator(
       onRefresh: () => provider.fetchCategories(),
-      color: CustomTheme.primaryColor,
-      child: GridView.builder(
-        padding: EdgeInsets.all(CustomTheme.spacingMD),
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          crossAxisSpacing: 16,
-          mainAxisSpacing: 16,
-          childAspectRatio: 0.9,
-        ),
-        itemCount: provider.categories.length,
+      child: ListView.separated(
+        padding: const EdgeInsets.fromLTRB(20, 0, 20, 40),
+        itemCount: categories.length,
+        separatorBuilder: (context, index) => const SizedBox(height: 12),
         itemBuilder: (context, index) {
-          final category = provider.categories[index];
-          return Container(
-            decoration: BoxDecoration(
-              color: CustomTheme.surfaceColor,
-              borderRadius: BorderRadius.circular(CustomTheme.radiusLG),
-              boxShadow: CustomTheme.boxShadowLight,
+          final category = categories[index];
+          return _buildCategoryCard(category);
+        },
+      ),
+    );
+  }
+
+  Widget _buildCategoryCard(category) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.pushNamed(
+          context,
+          AppRoutes.categoryProducts,
+          arguments: {
+            'id': category.id,
+            'name': category.name.trim(),
+          },
+        );
+      },
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(CustomTheme.radiusLG),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.03),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
             ),
-            child: Material(
-              color: Colors.transparent,
-              child: InkWell(
-                borderRadius: BorderRadius.circular(CustomTheme.radiusLG),
-                onTap: () {
-                  Navigator.pushNamed(
-                    context, 
-                    AppRoutes.categoryProducts, 
-                    arguments: {
-                      'id': category.id,
-                      'name': category.name.trim(),
-                    },
-                  );
-                },
-                child: Padding(
-                  padding: EdgeInsets.all(CustomTheme.spacingSM),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                        height: 60,
-                        width: 60,
-                        decoration: BoxDecoration(
-                          color: CustomTheme.primaryColor.withOpacity(0.1),
-                          shape: BoxShape.circle,
-                        ),
-                        child: Icon(
-                          Icons.medical_services_outlined,
-                          size: 30,
-                          color: CustomTheme.primaryColor,
-                        ),
-                      ),
-                      SizedBox(height: CustomTheme.spacingMD),
-                      Text(
-                        category.name.trim(),
-                        style: CustomTextStyle.bodyMedium.copyWith(
-                          fontWeight: CustomTheme.fontWeightSemiBold,
-                        ),
-                        textAlign: TextAlign.center,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      SizedBox(height: CustomTheme.spacingXS),
-                      Container(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: CustomTheme.spacingSM,
-                          vertical: 2,
-                        ),
-                        decoration: BoxDecoration(
-                          color: CustomTheme.secondaryColor.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(CustomTheme.radiusSM),
-                        ),
-                        child: Text(
-                          '${category.productCount} Products',
-                          style: CustomTextStyle.caption.copyWith(
-                            color: CustomTheme.primaryColor,
-                            fontWeight: CustomTheme.fontWeightMedium,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 56,
+              height: 56,
+              decoration: BoxDecoration(
+                color: CustomTheme.primaryColor.withOpacity(0.08),
+                borderRadius: BorderRadius.circular(CustomTheme.radiusMD),
+              ),
+              child: const Icon(
+                Icons.medical_services_outlined,
+                color: CustomTheme.primaryColor,
+                size: 24,
               ),
             ),
-          );
-        },
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    category.name.trim(),
+                    style: CustomTextStyle.bodyLarge.copyWith(
+                      fontWeight: CustomTheme.fontWeightBold,
+                      color: CustomTheme.textPrimary,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    '${category.productCount} Products Available',
+                    style: CustomTextStyle.caption.copyWith(
+                      color: CustomTheme.textTertiary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const Icon(
+              Icons.arrow_forward_ios_rounded,
+              size: 14,
+              color: CustomTheme.textTertiary,
+            ),
+          ],
+        ),
       ),
     );
   }

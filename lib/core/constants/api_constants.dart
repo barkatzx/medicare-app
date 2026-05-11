@@ -14,6 +14,7 @@ class ApiConstants {
 
   // ==================== USER PROFILE ROUTES ====================
   static String get profile => '$baseUrl/users/profile';
+  static String get updateprofile => '$baseUrl/users/profile';
   static String get changePassword => '$baseUrl/users/change-password';
 
   // ==================== ADDRESS ROUTES ====================

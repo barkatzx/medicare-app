@@ -35,7 +35,7 @@ class MyApp extends ConsumerWidget {
     final authProvider = ref.watch(authProviderNotifier);
 
     return MaterialApp(
-      title: 'MediCare App',
+      title: 'MediCare PLC',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         useMaterial3: false,

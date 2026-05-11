@@ -173,18 +173,12 @@ class _HomeAppBarState extends ConsumerState<HomeAppBar> {
     required VoidCallback onTap,
     int badgeCount = 0,
   }) {
-    return Padding(
-      padding: const EdgeInsets.only(right: 8.0),
-      child: Badge(
-        label: Text(badgeCount > 9 ? '9+' : badgeCount.toString()),
-        isLabelVisible: badgeCount > 0,
-        backgroundColor: CustomTheme.errorColor,
-        textColor: Colors.white,
-        padding: const EdgeInsets.symmetric(horizontal: 4),
-        largeSize: 16,
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.only(right: 12.0),
         child: Container(
-          width: 40,
-          height: 40,
+          width: 42,
+          height: 42,
           decoration: BoxDecoration(
             color: Colors.white,
             shape: BoxShape.circle,
@@ -195,16 +189,48 @@ class _HomeAppBarState extends ConsumerState<HomeAppBar> {
                 offset: const Offset(0, 4),
               ),
             ],
+            border: Border.all(color: CustomTheme.borderLight.withOpacity(0.5)),
           ),
           child: Material(
             color: Colors.transparent,
             child: InkWell(
               onTap: onTap,
               customBorder: const CircleBorder(),
-              child: Icon(
-                icon,
-                color: CustomTheme.textPrimary,
-                size: 20,
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  Icon(
+                    icon,
+                    color: CustomTheme.textPrimary,
+                    size: 22,
+                  ),
+                  if (badgeCount > 0)
+                    Positioned(
+                      top: 8,
+                      right: 8,
+                      child: Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: BoxDecoration(
+                          color: CustomTheme.errorColor,
+                          shape: BoxShape.circle,
+                          border: Border.all(color: Colors.white, width: 1.5),
+                        ),
+                        constraints: const BoxConstraints(
+                          minWidth: 16,
+                          minHeight: 16,
+                        ),
+                        child: Text(
+                          badgeCount > 9 ? '9+' : badgeCount.toString(),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 8,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ),
+                ],
               ),
             ),
           ),

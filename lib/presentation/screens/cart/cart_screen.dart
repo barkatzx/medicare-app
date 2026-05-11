@@ -233,13 +233,29 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                         '৳${item.finalPrice.toStringAsFixed(0)}',
                         style: CustomTextStyle.heading4.copyWith(color: CustomTheme.primaryColor),
                       ),
-                      if (item.discountedPrice != null) ...[
+                      if (item.price > item.finalPrice) ...[
                         const SizedBox(width: 8),
                         Text(
                           '৳${item.price.toStringAsFixed(0)}',
                           style: CustomTextStyle.caption.copyWith(
                             decoration: TextDecoration.lineThrough,
                             color: CustomTheme.textTertiary,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: CustomTheme.successColor,
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: Text(
+                            'You save ৳${(item.price - item.finalPrice).toStringAsFixed(0)}',
+                            style: CustomTextStyle.caption.copyWith(
+                              color: Colors.white,
+                              fontSize: 10,
+                              fontWeight: CustomTheme.fontWeightBold,
+                            ),
                           ),
                         ),
                       ],

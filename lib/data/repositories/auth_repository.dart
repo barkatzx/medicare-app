@@ -29,4 +29,17 @@ abstract class AuthRepository {
   Future<void> saveUser(UserEntity user);
 
   Future<UserEntity?> getUser();
+
+  Future<UserEntity> getProfile();
+
+  Future<UserEntity> updateProfile({
+    required String name,
+    required String pharmacyName,
+    required String phoneNumber,
+  });
+
+  Future<void> changePassword({
+    required String oldPassword,
+    required String newPassword,
+  });
 }

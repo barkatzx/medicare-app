@@ -7,7 +7,6 @@ import 'package:medicare_app/presentation/screens/profile/profile_screen.dart';
 import 'package:medicare_app/presentation/widgets/home/home_app_bar.dart';
 import 'package:medicare_app/presentation/widgets/home/product_card.dart';
 import 'package:medicare_app/presentation/widgets/common/custom_theme.dart';
-import 'package:badges/badges.dart' as badges;
 import 'trending_screen.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {

@@ -11,6 +11,7 @@ class CustomTextField extends StatefulWidget {
   final TextInputType keyboardType;
   final String? Function(String?)? validator;
   final bool enabled;
+  final double? fontSize;
 
   const CustomTextField({
     super.key,
@@ -23,6 +24,7 @@ class CustomTextField extends StatefulWidget {
     this.keyboardType = TextInputType.text,
     this.validator,
     this.enabled = true,
+    this.fontSize,
   });
 
   @override
@@ -105,13 +107,13 @@ class _CustomTextFieldState extends State<CustomTextField> {
                   keyboardType: widget.keyboardType,
                   enabled: widget.enabled,
                   style: TextStyle(
-                    fontSize: CustomTheme.fontSizeMD,
+                    fontSize: widget.fontSize ?? CustomTheme.fontSizeMD,
                     color: CustomTheme.textSecondary,
                   ),
                   decoration: InputDecoration(
                     hintText: widget.hintText,
                     hintStyle: TextStyle(
-                      fontSize: CustomTheme.fontSizeMD,
+                      fontSize: widget.fontSize ?? CustomTheme.fontSizeMD,
                       color: CustomTheme.textTertiary,
                     ),
                     border: InputBorder.none,

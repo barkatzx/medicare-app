@@ -10,10 +10,22 @@ class CategoryProvider extends ChangeNotifier {
   List<CategoryEntity> _categories = [];
   bool _isLoading = false;
   String? _errorMessage;
+  String _searchQuery = '';
 
-  List<CategoryEntity> get categories => _categories;
+  List<CategoryEntity> get categories {
+    if (_searchQuery.isEmpty) return _categories;
+    return _categories.where((cat) => 
+      cat.name.toLowerCase().contains(_searchQuery.toLowerCase())).toList();
+  }
+  
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
+  String get searchQuery => _searchQuery;
+
+  void searchCategories(String query) {
+    _searchQuery = query;
+    notifyListeners();
+  }
 
   Future<void> fetchCategories() async {
     _isLoading = true;

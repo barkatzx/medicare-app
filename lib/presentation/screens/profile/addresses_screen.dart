@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/providers.dart';
 import '../../../domain/entities/address_entity.dart';
 import '../../providers/address_provider.dart';
 import '../../widgets/common/custom_theme.dart';
-import '../../widgets/common/loading_widget.dart';
 
 class AddressesScreen extends ConsumerStatefulWidget {
   const AddressesScreen({super.key});
@@ -31,62 +31,59 @@ class _AddressesScreenState extends ConsumerState<AddressesScreen> {
     return Scaffold(
       backgroundColor: CustomTheme.backgroundColor,
       appBar: AppBar(
+        title: Text('My Addresses', style: CustomTextStyle.heading3),
+        centerTitle: true,
+        backgroundColor: Colors.transparent,
         elevation: 0,
-        backgroundColor: CustomTheme.backgroundColor,
         scrolledUnderElevation: 0,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: CustomTheme.textPrimary),
-          onPressed: () => Navigator.pop(context),
+        systemOverlayStyle: SystemUiOverlayStyle.dark,
+        leading: Padding(
+          padding: const EdgeInsets.only(left: 12.0),
+          child: Center(
+            child: GestureDetector(
+              onTap: () => Navigator.pop(context),
+              child: Container(
+                width: 36,
+                height: 36,
+                decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+                child: const Icon(Icons.arrow_back_ios_new_rounded, color: CustomTheme.textPrimary, size: 16),
+              ),
+            ),
+          ),
         ),
-        title: Text('My Addresses', style: CustomTextStyle.heading2),
       ),
-      body: Stack(
-        children: [
-          _buildBody(isLoading, addresses, addressProvider),
-          if (isLoading)
-            const LoadingWidget(message: 'Processing...'),
+      body: _buildBody(isLoading, addresses, addressProvider),
+      bottomNavigationBar: _buildBottomAction(),
+    );
+  }
+
+  Widget _buildBottomAction() {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(20, 20, 20, 40),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 20, offset: const Offset(0, -5)),
         ],
       ),
-      floatingActionButton: FloatingActionButton.extended(
+      child: ElevatedButton.icon(
         onPressed: () => _showAddressForm(context),
-        backgroundColor: CustomTheme.primaryColor,
-        icon: const Icon(Icons.add, color: Colors.white),
+        icon: const Icon(Icons.add_rounded, color: Colors.white),
         label: Text('Add New Address', style: CustomTextStyle.button),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: CustomTheme.primaryColor,
+          foregroundColor: Colors.white,
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(CustomTheme.radiusRound)),
+          elevation: 0,
+        ),
       ),
     );
   }
 
   Widget _buildBody(bool isLoading, List<AddressEntity> addresses, AddressProvider addressProvider) {
     if (isLoading && addresses.isEmpty) {
-      return const LoadingWidget(isOverlay: false);
-    }
-
-    if (addressProvider.error != null && addresses.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.error_outline, size: 80, color: CustomTheme.errorColor),
-            const SizedBox(height: 16),
-            Text('Failed to load addresses', style: CustomTextStyle.heading3),
-            const SizedBox(height: 8),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 32),
-              child: Text(
-                addressProvider.error!,
-                textAlign: TextAlign.center,
-                style: CustomTextStyle.bodyMedium,
-              ),
-            ),
-            const SizedBox(height: 24),
-            ElevatedButton(
-              onPressed: () => ref.read(addressProviderNotifier).loadAddresses(),
-              style: ElevatedButton.styleFrom(backgroundColor: CustomTheme.primaryColor),
-              child: const Text('Try Again', style: TextStyle(color: Colors.white)),
-            ),
-          ],
-        ),
-      );
+      return const Center(child: CircularProgressIndicator());
     }
 
     if (addresses.isEmpty) {
@@ -94,11 +91,15 @@ class _AddressesScreenState extends ConsumerState<AddressesScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.location_off_outlined, size: 80, color: CustomTheme.textTertiary),
-            const SizedBox(height: 16),
-            Text('No addresses found', style: CustomTextStyle.heading3),
+            Container(
+              padding: const EdgeInsets.all(32),
+              decoration: BoxDecoration(color: CustomTheme.primaryColor.withOpacity(0.05), shape: BoxShape.circle),
+              child: Icon(Icons.location_on_outlined, size: 64, color: CustomTheme.primaryColor.withOpacity(0.5)),
+            ),
+            const SizedBox(height: 24),
+            Text('No Addresses Saved', style: CustomTextStyle.heading3),
             const SizedBox(height: 8),
-            Text('Add your first shipping address to get started', style: CustomTextStyle.bodyMedium),
+            Text('Add your shipping addresses for a faster checkout', style: CustomTextStyle.bodySmall.copyWith(color: CustomTheme.textTertiary)),
           ],
         ),
       );
@@ -107,11 +108,10 @@ class _AddressesScreenState extends ConsumerState<AddressesScreen> {
     return RefreshIndicator(
       onRefresh: () => ref.read(addressProviderNotifier).loadAddresses(),
       child: ListView.builder(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(20),
         itemCount: addresses.length,
         itemBuilder: (context, index) {
-          final address = addresses[index];
-          return _buildAddressCard(address, addressProvider);
+          return _buildAddressCard(addresses[index], addressProvider);
         },
       ),
     );
@@ -121,12 +121,12 @@ class _AddressesScreenState extends ConsumerState<AddressesScreen> {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
-        color: CustomTheme.surfaceColor,
+        color: Colors.white,
         borderRadius: BorderRadius.circular(CustomTheme.radiusLG),
-        boxShadow: CustomTheme.boxShadowLight,
-        border: address.isDefault 
-          ? Border.all(color: CustomTheme.primaryColor, width: 2) 
-          : Border.all(color: CustomTheme.borderLight),
+        boxShadow: [
+          BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 10, offset: const Offset(0, 4)),
+        ],
+        border: address.isDefault ? Border.all(color: CustomTheme.primaryColor.withOpacity(0.5), width: 1.5) : null,
       ),
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -134,67 +134,81 @@ class _AddressesScreenState extends ConsumerState<AddressesScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                if (address.isDefault)
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: CustomTheme.primaryColor,
-                      borderRadius: BorderRadius.circular(CustomTheme.radiusSM),
-                    ),
-                    child: const Text(
-                      'DEFAULT',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 10,
-                        fontWeight: FontWeight.bold,
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: (address.isDefault ? CustomTheme.primaryColor : CustomTheme.backgroundColor).withOpacity(0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    address.isDefault ? Icons.home_rounded : Icons.location_on_rounded,
+                    size: 18,
+                    color: address.isDefault ? CustomTheme.primaryColor : CustomTheme.textTertiary,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        address.isDefault ? 'Default Address' : 'Shipping Address',
+                        style: CustomTextStyle.bodySmall.copyWith(fontWeight: CustomTheme.fontWeightBold, color: address.isDefault ? CustomTheme.primaryColor : CustomTheme.textSecondary),
                       ),
-                    ),
-                  )
-                else
-                  const SizedBox(),
+                    ],
+                  ),
+                ),
                 Row(
                   children: [
-                    IconButton(
-                      icon: const Icon(Icons.edit_outlined, size: 20),
-                      onPressed: () => _showAddressForm(context, address: address),
-                    ),
-                    IconButton(
-                      icon: Icon(Icons.delete_outline, size: 20, color: CustomTheme.errorColor),
-                      onPressed: () => _showDeleteConfirmation(address),
-                    ),
+                    _buildActionButton(Icons.edit_outlined, Colors.blue, () => _showAddressForm(context, address: address)),
+                    const SizedBox(width: 8),
+                    _buildActionButton(Icons.delete_outline_rounded, Colors.red, () => _showDeleteConfirmation(address)),
                   ],
                 ),
               ],
             ),
-            const SizedBox(height: 8),
-            Text(address.street, style: CustomTextStyle.bodyLarge.copyWith(fontWeight: FontWeight.w600)),
-            const SizedBox(height: 4),
-            Text('${address.city}, ${address.state} ${address.postalCode}', style: CustomTextStyle.bodyMedium),
-            Text(address.country, style: CustomTextStyle.bodyMedium),
+            const SizedBox(height: 16),
+            Padding(
+              padding: const EdgeInsets.only(left: 40),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(address.street, style: CustomTextStyle.bodyLarge.copyWith(fontWeight: CustomTheme.fontWeightSemiBold)),
+                  const SizedBox(height: 4),
+                  Text('${address.city}, ${address.state} ${address.postalCode}', style: CustomTextStyle.bodyMedium.copyWith(color: CustomTheme.textSecondary)),
+                  Text(address.country, style: CustomTextStyle.bodyMedium.copyWith(color: CustomTheme.textSecondary)),
+                ],
+              ),
+            ),
             if (!address.isDefault) ...[
               const SizedBox(height: 16),
-              SizedBox(
-                width: double.infinity,
-                child: OutlinedButton(
-                  onPressed: () async {
-                    final success = await addressProvider.setDefaultAddress(address.id);
-                    if (!success && mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text(addressProvider.error ?? 'Failed to set default address')),
-                      );
-                    }
-                  },
-                  style: OutlinedButton.styleFrom(
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(CustomTheme.radiusMD)),
+              Padding(
+                padding: const EdgeInsets.only(left: 40),
+                child: TextButton(
+                  onPressed: () => addressProvider.setDefaultAddress(address.id),
+                  style: TextButton.styleFrom(
+                    padding: EdgeInsets.zero,
+                    minimumSize: Size.zero,
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   ),
-                  child: Text('Set as Default', style: CustomTextStyle.bodyMedium.copyWith(color: CustomTheme.primaryColor)),
+                  child: Text('Set as Default', style: CustomTextStyle.bodySmall.copyWith(color: CustomTheme.primaryColor, fontWeight: CustomTheme.fontWeightBold)),
                 ),
               ),
             ],
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildActionButton(IconData icon, Color color, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(6),
+        decoration: BoxDecoration(color: color.withOpacity(0.05), shape: BoxShape.circle),
+        child: Icon(icon, size: 18, color: color),
       ),
     );
   }
@@ -212,32 +226,18 @@ class _AddressesScreenState extends ConsumerState<AddressesScreen> {
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(CustomTheme.radiusXL)),
         title: const Text('Delete Address'),
-        content: const Text('Are you sure you want to delete this address?'),
+        content: const Text('Are you sure you want to delete this address? This action cannot be undone.'),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Cancel'),
-          ),
+          TextButton(onPressed: () => Navigator.pop(dialogContext), child: Text('Cancel', style: TextStyle(color: CustomTheme.textTertiary))),
           TextButton(
             onPressed: () async {
               final provider = ref.read(addressProviderNotifier);
-              final success = await provider.deleteAddress(address.id);
-              
-              if (dialogContext.mounted) {
-                Navigator.pop(dialogContext);
-              }
-              
-              if (!success && mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(provider.error ?? 'Failed to delete address'),
-                    backgroundColor: CustomTheme.errorColor,
-                  ),
-                );
-              }
+              await provider.deleteAddress(address.id);
+              if (dialogContext.mounted) Navigator.pop(dialogContext);
             },
-            child: Text('Delete', style: TextStyle(color: CustomTheme.errorColor)),
+            child: const Text('Delete', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
           ),
         ],
       ),
@@ -287,131 +287,100 @@ class _AddressFormSheetState extends ConsumerState<AddressFormSheet> {
   Widget build(BuildContext context) {
     final isLoading = ref.watch(addressProviderNotifier).isLoading;
 
-    return Stack(
-      children: [
-        Container(
-          padding: EdgeInsets.only(
-            bottom: MediaQuery.of(context).viewInsets.bottom,
-            top: 24,
-            left: 24,
-            right: 24,
-          ),
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-          ),
-          child: SingleChildScrollView(
-            child: Form(
-              key: _formKey,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    widget.address == null ? 'Add New Address' : 'Edit Address',
-                    style: CustomTextStyle.heading2,
-                  ),
-                  const SizedBox(height: 24),
-                  _buildField('Street Address', _streetController),
-                  const SizedBox(height: 16),
-                  Row(
-                    children: [
-                      Expanded(child: _buildField('City', _cityController)),
-                      const SizedBox(width: 16),
-                      Expanded(child: _buildField('Postal Code', _zipController)),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  _buildField('State/Division', _stateController),
-                  const SizedBox(height: 16),
-                  _buildField('Country', _countryController),
-                  const SizedBox(height: 16),
-                  SwitchListTile(
-                    contentPadding: EdgeInsets.zero,
-                    title: Text('Set as default address', style: CustomTextStyle.bodyMedium),
-                    value: _isDefault,
-                    onChanged: (val) => setState(() => _isDefault = val),
-                    activeTrackColor: CustomTheme.primaryColor.withOpacity(0.5),
-                    activeColor: CustomTheme.primaryColor,
-                  ),
-                  const SizedBox(height: 24),
-                  SizedBox(
-                    width: double.infinity,
-                    height: 50,
-                    child: ElevatedButton(
-                      onPressed: isLoading ? null : _submit,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: CustomTheme.primaryColor,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(CustomTheme.radiusMD)),
-                      ),
-                      child: Text(
-                        widget.address == null ? 'Add Address' : 'Update Address',
-                        style: CustomTextStyle.button,
+    return Container(
+      decoration: const BoxDecoration(color: Colors.white, borderRadius: BorderRadius.vertical(top: Radius.circular(32))),
+      padding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
+      child: SingleChildScrollView(
+        child: Padding(
+          padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom + 40),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(width: 40, height: 4, decoration: BoxDecoration(color: CustomTheme.borderLight, borderRadius: BorderRadius.circular(2))),
+              const SizedBox(height: 24),
+              Text(widget.address == null ? 'Add New Address' : 'Update Address', style: CustomTextStyle.heading3),
+              const SizedBox(height: 32),
+              Form(
+                key: _formKey,
+                child: Column(
+                  children: [
+                    _buildField('Street Address', _streetController, Icons.location_on_outlined),
+                    const SizedBox(height: 16),
+                    Row(
+                      children: [
+                        Expanded(child: _buildField('City', _cityController, Icons.location_city_outlined)),
+                        const SizedBox(width: 16),
+                        Expanded(child: _buildField('Postal Code', _zipController, Icons.markunread_mailbox_outlined)),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    _buildField('State/Division', _stateController, Icons.map_outlined),
+                    const SizedBox(height: 16),
+                    _buildField('Country', _countryController, Icons.public_outlined),
+                    const SizedBox(height: 16),
+                    SwitchListTile(
+                      contentPadding: EdgeInsets.zero,
+                      title: Text('Set as default address', style: CustomTextStyle.bodyMedium.copyWith(fontWeight: CustomTheme.fontWeightSemiBold)),
+                      value: _isDefault,
+                      onChanged: (val) => setState(() => _isDefault = val),
+                      activeColor: CustomTheme.primaryColor,
+                    ),
+                    const SizedBox(height: 32),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: isLoading ? null : _submit,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: CustomTheme.primaryColor,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(CustomTheme.radiusRound)),
+                          elevation: 0,
+                        ),
+                        child: isLoading
+                            ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                            : Text(widget.address == null ? 'Save Address' : 'Update Changes', style: CustomTextStyle.button),
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 32),
-                ],
+                  ],
+                ),
               ),
-            ),
+            ],
           ),
         ),
-        if (isLoading)
-          const Positioned.fill(
-            child: LoadingWidget(message: 'Saving address...'),
-          ),
-      ],
+      ),
     );
   }
 
-  Widget _buildField(String label, TextEditingController controller) {
-    return TextFormField(
-      controller: controller,
-      decoration: InputDecoration(
-        labelText: label,
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(CustomTheme.radiusMD)),
-      ),
-      validator: (val) => val == null || val.isEmpty ? 'Required' : null,
+  Widget _buildField(String label, TextEditingController controller, IconData icon) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label, style: CustomTextStyle.bodySmall.copyWith(fontWeight: CustomTheme.fontWeightSemiBold, color: CustomTheme.textSecondary)),
+        const SizedBox(height: 8),
+        TextFormField(
+          controller: controller,
+          validator: (val) => val == null || val.isEmpty ? 'Required' : null,
+          style: CustomTextStyle.bodyMedium.copyWith(fontWeight: CustomTheme.fontWeightSemiBold),
+          decoration: InputDecoration(
+            prefixIcon: Icon(icon, size: 18, color: CustomTheme.primaryColor),
+            filled: true,
+            fillColor: CustomTheme.backgroundColor,
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(CustomTheme.radiusMD), borderSide: BorderSide.none),
+            focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(CustomTheme.radiusMD), borderSide: const BorderSide(color: CustomTheme.primaryColor, width: 1.5)),
+          ),
+        ),
+      ],
     );
   }
 
   void _submit() async {
     if (!_formKey.currentState!.validate()) return;
-
     final provider = ref.read(addressProviderNotifier);
-    bool success;
-
-    if (widget.address == null) {
-      success = await provider.addAddress(AddressEntity(
-        id: '',
-        userId: '',
-        street: _streetController.text,
-        city: _cityController.text,
-        state: _stateController.text,
-        postalCode: _zipController.text,
-        country: _countryController.text,
-        isDefault: _isDefault,
-      ));
-    } else {
-      success = await provider.updateAddress(widget.address!.id, {
-        'street': _streetController.text,
-        'city': _cityController.text,
-        'state': _stateController.text,
-        'postalCode': _zipController.text,
-        'country': _countryController.text,
-        'isDefault': _isDefault,
-      });
-    }
-
-    if (success && mounted) {
-      Navigator.of(context).pop();
-    } else if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(provider.error ?? 'An error occurred'),
-          backgroundColor: CustomTheme.errorColor,
-        ),
-      );
-    }
+    final success = widget.address == null
+        ? await provider.addAddress(AddressEntity(id: '', userId: '', street: _streetController.text, city: _cityController.text, state: _stateController.text, postalCode: _zipController.text, country: _countryController.text, isDefault: _isDefault))
+        : await provider.updateAddress(widget.address!.id, {'street': _streetController.text, 'city': _cityController.text, 'state': _stateController.text, 'postalCode': _zipController.text, 'country': _countryController.text, 'isDefault': _isDefault});
+    if (success && mounted) Navigator.of(context).pop();
   }
 }

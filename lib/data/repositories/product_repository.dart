@@ -17,4 +17,5 @@ abstract class ProductRepository {
   Future<PaginatedProductResponse> getTrendingProducts({int page = 1, int limit = 20});
   Future<PaginatedProductResponse> getFeaturedProducts({int page = 1, int limit = 20});
   Future<PaginatedProductResponse> getNewProducts({int page = 1, int limit = 20});
+  Future<ProductEntity> getProductDetail(String id);
 }

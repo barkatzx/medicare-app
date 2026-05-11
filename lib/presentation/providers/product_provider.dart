@@ -28,6 +28,29 @@ class ProductProvider extends ChangeNotifier {
   String get searchQuery => _searchQuery;
   bool get hasNextPage => _searchQuery.isEmpty ? _hasNextPage : _searchHasNextPage;
 
+  ProductEntity? _selectedProduct;
+  ProductEntity? get selectedProduct => _selectedProduct;
+
+  Future<void> loadProductDetail(String id) async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      _selectedProduct = await productRepository.getProductDetail(id);
+    } catch (e) {
+      _errorMessage = e.toString();
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  void clearSelectedProduct() {
+    _selectedProduct = null;
+    notifyListeners();
+  }
+
   Future<void> loadProducts({bool refresh = false}) async {
     if (refresh) {
       _currentPage = 1;

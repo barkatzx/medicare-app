@@ -76,30 +76,37 @@ class RouteGenerator {
       case AppRoutes.myOrders:
         return MaterialPageRoute(
           builder: (_) => AuthGuard.protectRoute(const MyOrdersScreen()),
+          settings: settings,
         );
       case AppRoutes.orderDetail:
         return MaterialPageRoute(
           builder: (_) => AuthGuard.protectRoute(const OrderDetailScreen()),
+          settings: settings,
         );
       case AppRoutes.profile:
         return MaterialPageRoute(
           builder: (_) => AuthGuard.protectRoute(const ProfileScreen()),
+          settings: settings,
         );
       case AppRoutes.editProfile:
         return MaterialPageRoute(
           builder: (_) => AuthGuard.protectRoute(const EditProfileScreen()),
+          settings: settings,
         );
       case AppRoutes.changePassword:
         return MaterialPageRoute(
           builder: (_) => AuthGuard.protectRoute(const ChangePasswordScreen()),
+          settings: settings,
         );
       case AppRoutes.addresses:
         return MaterialPageRoute(
           builder: (_) => AuthGuard.protectRoute(const AddressesScreen()),
+          settings: settings,
         );
       case AppRoutes.notifications:
         return MaterialPageRoute(
           builder: (_) => AuthGuard.protectRoute(const NotificationsScreen()),
+          settings: settings,
         );
 
       default:

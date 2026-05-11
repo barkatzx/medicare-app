@@ -657,13 +657,6 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                       style: CustomTextStyle.bodySmall.copyWith(color: CustomTheme.successColor)),
                 ],
               ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text('Shipping', style: CustomTextStyle.bodySmall),
-                Text('Free', style: CustomTextStyle.bodySmall.copyWith(color: CustomTheme.successColor)),
-              ],
-            ),
             Divider(height: CustomTheme.spacingLG, color: CustomTheme.borderLight),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
