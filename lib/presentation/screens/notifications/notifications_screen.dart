@@ -90,18 +90,6 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
             icon: const Icon(Icons.done_all, size: 18),
             label: const Text('Mark all read'),
             style: TextButton.styleFrom(foregroundColor: CustomTheme.primaryColor),
-          ),
-        IconButton(
-          onPressed: () {
-            LocalNotificationService.showNotification(
-              id: 999,
-              title: 'Test Notification',
-              body: 'This is a test notification from MediCare PLC',
-            );
-          },
-          icon: const Icon(Icons.notification_add_outlined),
-          tooltip: 'Test local notification',
-          color: CustomTheme.primaryColor,
         ),
         const SizedBox(width: 8),
       ],

@@ -12,6 +12,8 @@ import 'dart:convert';
 import 'routes/app_routes.dart';
 import 'routes/route_generator.dart';
 
+import 'package:medicare_app/core/constants/api_constants.dart';
+
 // Background task for notifications
 @pragma('vm:entry-point')
 void callbackDispatcher() {
@@ -22,34 +24,43 @@ void callbackDispatcher() {
       
       if (token == null) return true;
 
-      // Simple fetch for new notifications
+      // Use production API constants and headers
+      final uri = Uri.parse(ApiConstants.notifications).replace(
+        queryParameters: {'unreadOnly': 'true', 'limit': '1'},
+      );
+      
       final response = await http.get(
-        Uri.parse('https://medicare-server-9je0.onrender.com/v1/users/notifications?unreadOnly=true'),
-        headers: {
-          'Authorization': 'Bearer $token',
-          'Accept': 'application/json',
-        },
+        uri,
+        headers: ApiConstants.getHeaders(token: token),
       );
 
       if (response.statusCode == 200) {
-        final List data = json.decode(response.body);
-        if (data.isNotEmpty) {
-          final latest = data.first;
-          // Only show if it's new (could store last seen id in prefs)
-          final lastId = prefs.getString('last_notif_id');
-          if (latest['id'] != lastId) {
-            await LocalNotificationService.initialize();
-            await LocalNotificationService.showNotification(
-              id: latest['id'].hashCode,
-              title: latest['title'] ?? 'New Notification',
-              body: latest['message'] ?? 'You have a new update from MediCare.',
-            );
-            await prefs.setString('last_notif_id', latest['id']);
+        final responseData = json.decode(response.body);
+        
+        // Correctly parse the "data" -> "notifications" structure
+        if (responseData['data'] != null && responseData['data']['notifications'] != null) {
+          final List notifications = responseData['data']['notifications'];
+          
+          if (notifications.isNotEmpty) {
+            final latest = notifications.first;
+            final lastId = prefs.getString('last_notif_id');
+            
+            // Only show if it's a new unread notification
+            if (latest['id'] != lastId) {
+              await LocalNotificationService.initialize();
+              await LocalNotificationService.showNotification(
+                id: latest['id'].hashCode,
+                title: latest['title'] ?? 'New Notification',
+                body: latest['message'] ?? 'You have a new update from MediCare PLC.',
+              );
+              // Store the ID so we don't notify for the same one again
+              await prefs.setString('last_notif_id', latest['id']);
+            }
           }
         }
       }
     } catch (e) {
-      debugPrint('Background Task Error: $e');
+      debugPrint('Background Notification Task Error: $e');
     }
     return true;
   });

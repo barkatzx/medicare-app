@@ -675,15 +675,24 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: CustomTheme.primaryColor,
                 disabledBackgroundColor: CustomTheme.primaryColor.withOpacity(0.6),
-                padding: EdgeInsets.symmetric(vertical: CustomTheme.spacingMD),
+                padding: const EdgeInsets.symmetric(vertical: 15), // Increased from MD
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(CustomTheme.radiusRound)),
+                elevation: 4,
+                shadowColor: CustomTheme.primaryColor.withOpacity(0.3),
               ),
               child: _isPlacingOrder
-                  ? SizedBox(width: 22, height: 22,
-                      child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                  ? const SizedBox(
+                      width: 28,
+                      height: 28,
+                      child: CircularProgressIndicator(strokeWidth: 2.5, color: Colors.white),
+                    )
                   : Text(
                       _currentStep == 0 ? 'Continue to Review' : 'Place Order  •  ${total.toStringAsFixed(2)}৳',
-                      style: CustomTextStyle.button,
+                      style: CustomTextStyle.button.copyWith(
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 0.5,
+                      ),
                     ),
             ),
           ),
