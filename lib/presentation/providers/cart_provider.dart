@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:medicare_app/data/repositories/cart_repository.dart';
+import 'package:medicare_app/core/utils/logger.dart';
 import '../../domain/entities/cart_entity.dart';
 
 class CartProvider extends ChangeNotifier {
@@ -34,9 +35,9 @@ class CartProvider extends ChangeNotifier {
     try {
       _cart = await cartRepository.getCart();
       _cartItemCount = _cart?.itemCount ?? 0;
-      print('Cart loaded: ${_cart?.items.length} items');
+      Logger.log('Cart loaded: ${_cart?.items.length} items');
     } catch (e) {
-      print('Error loading cart: $e');
+      Logger.error('Error loading cart', e);
       _cart = null;
       _cartItemCount = 0;
     } finally {
@@ -80,7 +81,7 @@ class CartProvider extends ChangeNotifier {
       _cartItemCount -= quantity;
       notifyListeners();
       
-      print('Error adding to cart: $e');
+      Logger.error('Error adding to cart', e);
       onShowMessage?.call('Failed to add product to cart', isError: true);
       return false;
     }
