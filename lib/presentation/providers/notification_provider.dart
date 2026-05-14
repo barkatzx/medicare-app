@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:medicare_app/core/services/notification_service.dart';
 import 'package:medicare_app/data/repositories/notification_repository.dart';
 import '../../domain/entities/notification_entity.dart';
 
@@ -43,6 +44,18 @@ class NotificationProvider extends ChangeNotifier {
       _hasMore = newNotifications.length == 10;
 
       await loadUnreadCount();
+
+      // Show local notification for the latest unread if any
+      if (newNotifications.isNotEmpty) {
+        final latest = newNotifications.first;
+        if (!latest.isRead) {
+          await LocalNotificationService.showNotification(
+            id: latest.id.hashCode,
+            title: latest.title,
+            body: latest.message,
+          );
+        }
+      }
     } catch (e) {
       _errorMessage = e.toString();
     } finally {

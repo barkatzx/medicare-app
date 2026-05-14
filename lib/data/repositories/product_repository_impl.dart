@@ -66,9 +66,12 @@ class ProductRepositoryImpl implements ProductRepository {
   Future<PaginatedProductResponse> searchProducts(String query, {int page = 1, int limit = 20}) async {
     try {
       final token = await prefsHelper.getToken();
+      final encodedQuery = Uri.encodeComponent(query.trim());
+      final url = '${ApiConstants.searchProducts}?q=$encodedQuery&page=$page&limit=$limit';
+      
       final response = await client
           .get(
-            Uri.parse('${ApiConstants.searchProducts}?q=$query&page=$page&limit=$limit'),
+            Uri.parse(url),
             headers: ApiConstants.getHeaders(token: token),
           )
           .timeout(

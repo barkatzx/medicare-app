@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medicare_app/core/providers.dart';
+import 'package:medicare_app/core/services/notification_service.dart';
 import 'package:medicare_app/presentation/providers/notification_provider.dart';
 import 'package:medicare_app/presentation/widgets/common/custom_theme.dart';
 import 'package:medicare_app/presentation/widgets/common/loading_widget.dart';
@@ -90,6 +91,18 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
             label: const Text('Mark all read'),
             style: TextButton.styleFrom(foregroundColor: CustomTheme.primaryColor),
           ),
+        IconButton(
+          onPressed: () {
+            LocalNotificationService.showNotification(
+              id: 999,
+              title: 'Test Notification',
+              body: 'This is a test notification from MediCare PLC',
+            );
+          },
+          icon: const Icon(Icons.notification_add_outlined),
+          tooltip: 'Test local notification',
+          color: CustomTheme.primaryColor,
+        ),
         const SizedBox(width: 8),
       ],
     );

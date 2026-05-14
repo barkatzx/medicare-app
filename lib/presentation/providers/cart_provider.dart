@@ -114,13 +114,13 @@ class CartProvider extends ChangeNotifier {
     // Recalculate totals
     final newSubtotal = updatedItems.fold(
       0.0,
-      (sum, item) => sum + item.itemTotal,
+      (sum, item) => sum + (item.product.price * item.quantity),
     );
     final newTotalSavings = updatedItems.fold(
       0.0,
-      (sum, item) => sum + item.itemSavings,
+      (sum, item) => sum + ((item.product.price - item.product.finalPrice) * item.quantity),
     );
-    final newTotal = newSubtotal - newTotalSavings; // This is the final payable
+    final newTotal = newSubtotal - newTotalSavings;
     final newItemCount = updatedItems.fold(
       0,
       (sum, item) => sum + item.quantity,
@@ -168,11 +168,11 @@ class CartProvider extends ChangeNotifier {
 
     final newSubtotal = updatedItems.fold(
       0.0,
-      (sum, item) => sum + item.itemTotal,
+      (sum, item) => sum + (item.product.price * item.quantity),
     );
     final newTotalSavings = updatedItems.fold(
       0.0,
-      (sum, item) => sum + item.itemSavings,
+      (sum, item) => sum + ((item.product.price - item.product.finalPrice) * item.quantity),
     );
     final newTotal = newSubtotal - newTotalSavings;
     final newItemCount = updatedItems.fold(

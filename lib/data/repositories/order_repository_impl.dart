@@ -94,4 +94,49 @@ class OrderRepositoryImpl implements OrderRepository {
       return false;
     }
   }
+  @override
+  Future<String> createOrder({
+    required String shippingAddressId,
+    required String paymentMethod,
+    String? notes,
+  }) async {
+    try {
+      final token = await prefsHelper.getToken();
+      final body = {
+        'shippingAddressId': shippingAddressId,
+        'paymentMethod': paymentMethod,
+        if (notes != null && notes.isNotEmpty) 'notes': notes,
+      };
+
+      final response = await client
+          .post(
+            Uri.parse(ApiConstants.createOrder),
+            headers: ApiConstants.getHeaders(token: token),
+            body: json.encode(body),
+          )
+          .timeout(ApiConstants.connectionTimeout);
+
+      final responseData = json.decode(response.body);
+
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        if (responseData['success'] == true && responseData['data'] != null) {
+          final id = responseData['data']['id']?.toString() ??
+              responseData['data']['_id']?.toString();
+          if (id == null) throw Exception('Order created but ID not returned');
+          return id;
+        } else {
+          throw Exception(responseData['message'] ?? 'Failed to place order');
+        }
+      } else {
+        throw Exception(
+            responseData['message'] ?? 'Server error (${response.statusCode})');
+      }
+    } catch (e) {
+      print('Create order error: $e');
+      if (e is http.ClientException) {
+        throw Exception('Network error: Please check your internet connection');
+      }
+      rethrow;
+    }
+  }
 }

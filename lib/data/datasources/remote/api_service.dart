@@ -56,7 +56,7 @@ class ApiService {
     final response = await client.get(
       Uri.parse(url),
       headers: ApiConstants.getHeaders(token: token),
-    );
+    ).timeout(ApiConstants.connectionTimeout);
     return response;
   }
 
@@ -67,7 +67,7 @@ class ApiService {
       Uri.parse(url),
       headers: ApiConstants.getHeaders(token: token),
       body: jsonEncode(body),
-    );
+    ).timeout(ApiConstants.connectionTimeout);
     return response;
   }
 
@@ -78,7 +78,7 @@ class ApiService {
       Uri.parse(url),
       headers: ApiConstants.getHeaders(token: token),
       body: jsonEncode(body),
-    );
+    ).timeout(ApiConstants.connectionTimeout);
     return response;
   }
 
@@ -88,7 +88,7 @@ class ApiService {
     final response = await client.delete(
       Uri.parse(url),
       headers: ApiConstants.getHeaders(token: token),
-    );
+    ).timeout(ApiConstants.connectionTimeout);
     return response;
   }
 }

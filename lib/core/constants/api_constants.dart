@@ -1,8 +1,8 @@
 class ApiConstants {
   ApiConstants._();
 
-  // ✅ Single Railway URL for all platforms since it's deployed
-  static const String baseUrl = 'https://medicare-server-black.vercel.app/v1';
+  // ✅ Single Render URL for all platforms since it's deployed
+  static const String baseUrl = 'https://medicare-server-9je0.onrender.com/v1';
 
   static const Duration connectionTimeout = Duration(seconds: 30);
   static const Duration receiveTimeout = Duration(seconds: 30);
@@ -76,6 +76,7 @@ class ApiConstants {
   // ==================== HEADERS ====================
   static Map<String, String> getHeaders({String? token, bool includeContentType = true}) {
     return {
+      'User-Agent': 'MediCare/1.0.0 (Flutter; Android/iOS)',
       if (includeContentType) 'Content-Type': 'application/json',
       'Accept': 'application/json',
       if (token != null) ...{

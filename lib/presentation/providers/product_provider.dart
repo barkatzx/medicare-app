@@ -109,8 +109,9 @@ class ProductProvider extends ChangeNotifier {
   }
 
   Future<void> searchProducts(String query, {bool refresh = false}) async {
-    if (query != _searchQuery) {
-      _searchQuery = query;
+    final trimmedQuery = query.trim();
+    if (trimmedQuery != _searchQuery) {
+      _searchQuery = trimmedQuery;
       refresh = true;
     }
 

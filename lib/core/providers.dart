@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -31,6 +32,19 @@ import '../presentation/providers/category_products_provider.dart';
 import '../presentation/providers/special_products_provider.dart';
 import '../presentation/providers/address_provider.dart';
 import '../presentation/providers/order_provider.dart';
+
+// Navigation Provider
+class NavigationProvider extends ChangeNotifier {
+  int _selectedIndex = 0;
+  int get selectedIndex => _selectedIndex;
+
+  void setIndex(int index) {
+    _selectedIndex = index;
+    notifyListeners();
+  }
+}
+
+final navigationProvider = ChangeNotifierProvider<NavigationProvider>((ref) => NavigationProvider());
 
 // Core
 final sharedPreferencesProvider = Provider<SharedPreferences>((ref) {

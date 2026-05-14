@@ -45,20 +45,7 @@ class _CategoriesScreenState extends ConsumerState<CategoriesScreen> {
         elevation: 0,
         scrolledUnderElevation: 0,
         systemOverlayStyle: SystemUiOverlayStyle.dark,
-        leading: Padding(
-          padding: const EdgeInsets.only(left: 12.0),
-          child: Center(
-            child: GestureDetector(
-              onTap: () => Navigator.pop(context),
-              child: Container(
-                width: 36,
-                height: 36,
-                decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
-                child: const Icon(Icons.arrow_back_ios_new_rounded, color: CustomTheme.textPrimary, size: 16),
-              ),
-            ),
-          ),
-        ),
+        automaticallyImplyLeading: false,
       ),
       body: Column(
         children: [

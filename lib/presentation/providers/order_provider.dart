@@ -82,4 +82,28 @@ class OrderProvider extends ChangeNotifier {
       notifyListeners();
     }
   }
+  Future<String> placeOrder({
+    required String shippingAddressId,
+    required String paymentMethod,
+    String? notes,
+  }) async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      final orderId = await orderRepository.createOrder(
+        shippingAddressId: shippingAddressId,
+        paymentMethod: paymentMethod,
+        notes: notes,
+      );
+      return orderId;
+    } catch (e) {
+      _errorMessage = e.toString().replaceAll('Exception: ', '');
+      rethrow;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
 }

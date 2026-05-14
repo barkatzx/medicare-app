@@ -17,7 +17,13 @@ class HomeScreen extends ConsumerStatefulWidget {
 }
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
-  int _selectedIndex = 0;
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(cartProviderNotifier).loadCart(silent: true);
+    });
+  }
 
   final List<Widget> _screens = [
     const HomeContentScreen(),
@@ -30,9 +36,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final cartItemCount = ref.watch(cartProviderNotifier).cartItemCount;
+    final selectedIndex = ref.watch(navigationProvider).selectedIndex;
 
     return Scaffold(
-      body: _screens[_selectedIndex],
+      body: _screens[selectedIndex],
       bottomNavigationBar: Container(
         margin: const EdgeInsets.fromLTRB(16, 0, 16, 24),
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
@@ -62,10 +69,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   Widget _buildNavItem(int index, IconData icon, IconData activeIcon, String label, {int? badgeCount}) {
-    final isSelected = _selectedIndex == index;
+    final selectedIndex = ref.watch(navigationProvider).selectedIndex;
+    final isSelected = selectedIndex == index;
     
     return GestureDetector(
-      onTap: () => setState(() => _selectedIndex = index),
+      onTap: () => ref.read(navigationProvider).setIndex(index),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 300),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),

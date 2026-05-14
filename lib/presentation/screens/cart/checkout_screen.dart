@@ -733,10 +733,6 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
     setState(() => _isPlacingOrder = true);
 
     try {
-      final prefsHelper = ref.read(sharedPrefsHelperProvider);
-      final token = await prefsHelper.getToken();
-      if (token == null) throw Exception('Not authenticated');
-
       final addressProvider = ref.read(addressProviderNotifier);
       final defaultAddress = addressProvider.addresses.where((a) => a.isDefault).firstOrNull ??
           (addressProvider.addresses.isNotEmpty ? addressProvider.addresses.first : null);
@@ -745,46 +741,38 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
         throw Exception('Please select or add a shipping address first');
       }
 
-      final body = {
-        'shippingAddressId': defaultAddress.id,
-        'paymentMethod': _selectedPayment == 'cash_on_delivery' ? 'cod' : _selectedPayment,
-        if (_notesController.text.trim().isNotEmpty) 'notes': _notesController.text.trim(),
-      };
+      final orderProvider = ref.read(orderProviderNotifier);
+      final orderId = await orderProvider.placeOrder(
+        shippingAddressId: defaultAddress.id,
+        paymentMethod: _selectedPayment == 'cash_on_delivery' ? 'cod' : _selectedPayment,
+        notes: _notesController.text.trim().isNotEmpty ? _notesController.text.trim() : null,
+      );
+      
+      // Clear cart after successful order
+      await cartProvider.clearCart();
 
-      final response = await http.Client()
-          .post(
-            Uri.parse(ApiConstants.createOrder),
-            headers: ApiConstants.getHeaders(token: token),
-            body: json.encode(body),
-          )
-          .timeout(ApiConstants.connectionTimeout);
-
-      if (response.statusCode >= 200 && response.statusCode < 300) {
-        final respData = json.decode(response.body);
-        final orderId = respData['data']?['id']?.toString() ?? respData['data']?['_id']?.toString();
-        
-        // Clear cart after successful order
-        await cartProvider.clearCart();
-
-        if (mounted) {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => OrderConfirmScreen(orderId: orderId),
-            ),
-          );
-        }
-      } else {
-        final errData = json.decode(response.body);
-        throw Exception(errData['error'] ?? errData['message'] ?? 'Failed to place order');
+      if (mounted) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => OrderConfirmScreen(orderId: orderId),
+          ),
+        );
       }
     } catch (e) {
       if (mounted) {
+        final errorMessage = e.toString().replaceAll('Exception: ', '');
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Failed to place order: ${e.toString().replaceAll('Exception: ', '')}'),
+            content: Text('Failed to place order: $errorMessage'),
             backgroundColor: CustomTheme.errorColor,
             behavior: SnackBarBehavior.floating,
+            duration: const Duration(seconds: 4),
+            action: SnackBarAction(
+              label: 'Retry',
+              textColor: Colors.white,
+              onPressed: () => _placeOrder(cartProvider),
+            ),
           ),
         );
       }

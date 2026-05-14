@@ -149,25 +149,35 @@ class ProductCard extends StatelessWidget {
   }
 }
 
-class _AddToCartButton extends ConsumerWidget {
+class _AddToCartButton extends ConsumerStatefulWidget {
   final ProductEntity product;
 
   const _AddToCartButton({required this.product});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<_AddToCartButton> createState() => _AddToCartButtonState();
+}
+
+class _AddToCartButtonState extends ConsumerState<_AddToCartButton> {
+  bool _isPressed = false;
+
+  @override
+  Widget build(BuildContext context) {
     return GestureDetector(
+      onTapDown: (_) => setState(() => _isPressed = true),
+      onTapUp: (_) => setState(() => _isPressed = false),
+      onTapCancel: () => setState(() => _isPressed = false),
       onTap: () {
         final cartProvider = ref.read(cartProviderNotifier);
         
         // Optimistic UI, instantaneous add to cart without blocking
-        cartProvider.addToCart(product.id, 1).then((success) {
+        cartProvider.addToCart(widget.product.id, 1).then((success) {
           if (context.mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(
                   success
-                      ? '${product.name} added to cart'
+                      ? '${widget.product.name} added to cart'
                       : 'Failed to add to cart',
                   style: const TextStyle(color: Colors.white, fontSize: 12),
                 ),
@@ -184,12 +194,19 @@ class _AddToCartButton extends ConsumerWidget {
           }
         });
       },
-      child: Container(
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 100),
         width: 40,
         height: 40,
         decoration: BoxDecoration(
-          color: CustomTheme.backgroundColor,
+          color: _isPressed 
+              ? CustomTheme.primaryColor.withOpacity(0.2) 
+              : CustomTheme.backgroundColor,
           borderRadius: BorderRadius.circular(CustomTheme.radiusSM),
+          border: Border.all(
+            color: _isPressed ? CustomTheme.primaryColor : Colors.transparent,
+            width: 1,
+          ),
         ),
         child: Icon(
           Icons.add,

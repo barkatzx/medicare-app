@@ -1,4 +1,6 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:medicare_app/core/services/notification_service.dart';
 import 'package:medicare_app/presentation/widgets/common/custom_theme.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medicare_app/core/providers.dart';
@@ -8,6 +10,12 @@ import 'routes/route_generator.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Handle network issues on Wi-Fi/Broadband
+  HttpOverrides.global = MyHttpOverrides();
+
+  // Initialize Local Notifications
+  await LocalNotificationService.initialize();
 
   final prefs = await SharedPreferences.getInstance();
   final container = ProviderContainer(
@@ -133,5 +141,14 @@ class MyApp extends ConsumerWidget {
                 : AppRoutes.login,
         onGenerateRoute: RouteGenerator.generateRoute,
       );
+  }
+}
+
+class MyHttpOverrides extends HttpOverrides {
+  @override
+  HttpClient createHttpClient(SecurityContext? context) {
+    return super.createHttpClient(context)
+      ..badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
   }
 }
