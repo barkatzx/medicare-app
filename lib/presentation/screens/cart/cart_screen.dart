@@ -4,6 +4,7 @@ import 'package:medicare_app/core/providers.dart';
 import 'package:medicare_app/domain/entities/cart_entity.dart';
 import 'package:medicare_app/presentation/providers/cart_provider.dart';
 import 'package:medicare_app/presentation/widgets/common/custom_theme.dart';
+import 'package:medicare_app/routes/app_routes.dart';
 
 class CartScreen extends ConsumerStatefulWidget {
   const CartScreen({super.key});
@@ -32,7 +33,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
 
     return Scaffold(
       backgroundColor: CustomTheme.backgroundColor,
-      appBar: _buildAppBar(provider, cartItems.length),
+      appBar: _buildAppBar(provider, provider.cartItemCount),
       body: _buildBody(
         provider,
         cartItems,
@@ -55,7 +56,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
         centerTitle: false,
         titleSpacing: 20,
         title: Text(
-          'My Shopping Bag',
+          itemCount > 0 ? 'My Shopping Bag ($itemCount)' : 'My Shopping Bag',
           style: CustomTextStyle.heading3.copyWith(
             fontWeight: CustomTheme.fontWeightBold,
             color: CustomTheme.textPrimary,
@@ -172,7 +173,10 @@ class _CartScreenState extends ConsumerState<CartScreen> {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: () => Navigator.pop(context),
+                onPressed: () {
+                  ref.read(navigationProvider).setIndex(0);
+                  Navigator.pushNamedAndRemoveUntil(context, AppRoutes.home, (route) => false);
+                },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: CustomTheme.primaryColor,
                   foregroundColor: Colors.white,
@@ -201,8 +205,8 @@ class _CartScreenState extends ConsumerState<CartScreen> {
           children: [
             // Image
             Container(
-              width: 50,
-              height: 50,
+              width: 80,
+              height: 80,
               decoration: BoxDecoration(
                 color: CustomTheme.backgroundColor,
                 borderRadius: BorderRadius.circular(CustomTheme.radiusMD),
@@ -250,7 +254,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                             borderRadius: BorderRadius.circular(4),
                           ),
                           child: Text(
-                            'You save ৳${(item.price - item.finalPrice).toStringAsFixed(0)}',
+                            'Your save ৳${(item.price - item.finalPrice).toStringAsFixed(0)}',
                             style: CustomTextStyle.caption.copyWith(
                               color: Colors.white,
                               fontSize: 10,

@@ -54,32 +54,35 @@ class _HomeAppBarState extends ConsumerState<HomeAppBar> {
         child: Row(
           children: [
             // Premium Avatar with Gradient Border
-            Container(
-              padding: const EdgeInsets.all(2),
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: LinearGradient(
-                  colors: [
-                    CustomTheme.primaryColor,
-                    CustomTheme.primaryColor.withOpacity(0.4),
-                  ],
-                ),
-              ),
+            GestureDetector(
+              onTap: () => Navigator.pushNamed(context, '/profile'),
               child: Container(
-                width: 42,
-                height: 42,
-                decoration: const BoxDecoration(
-                  color: Colors.white,
+                padding: const EdgeInsets.all(2),
+                decoration: BoxDecoration(
                   shape: BoxShape.circle,
+                  gradient: LinearGradient(
+                    colors: [
+                      CustomTheme.primaryColor,
+                      CustomTheme.primaryColor.withOpacity(0.4),
+                    ],
+                  ),
                 ),
-                child: Center(
-                  child: Text(
-                    user?.name.isNotEmpty == true
-                        ? user!.name[0].toUpperCase()
-                        : 'G',
-                    style: CustomTextStyle.heading3.copyWith(
-                      fontSize: 18,
-                      color: CustomTheme.primaryColor,
+                child: Container(
+                  width: 42,
+                  height: 42,
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Center(
+                    child: Text(
+                      user?.name.isNotEmpty == true
+                          ? user!.name[0].toUpperCase()
+                          : 'G',
+                      style: CustomTextStyle.heading3.copyWith(
+                        fontSize: 18,
+                        color: CustomTheme.primaryColor,
+                      ),
                     ),
                   ),
                 ),

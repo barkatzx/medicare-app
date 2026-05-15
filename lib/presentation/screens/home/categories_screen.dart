@@ -39,58 +39,44 @@ class _CategoriesScreenState extends ConsumerState<CategoriesScreen> {
     return Scaffold(
       backgroundColor: CustomTheme.backgroundColor,
       appBar: AppBar(
-        title: Text('Companies', style: CustomTextStyle.heading3),
-        centerTitle: true,
-        backgroundColor: Colors.transparent,
+        title: _buildSearchField(provider),
+        titleSpacing: 20,
+        backgroundColor: CustomTheme.backgroundColor,
         elevation: 0,
         scrolledUnderElevation: 0,
         systemOverlayStyle: SystemUiOverlayStyle.dark,
         automaticallyImplyLeading: false,
       ),
-      body: Column(
-        children: [
-          _buildSearchField(provider),
-          Expanded(child: _buildBody(provider)),
-        ],
-      ),
+      body: _buildBody(provider),
     );
   }
 
   Widget _buildSearchField(provider) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 10, 20, 20),
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(CustomTheme.radiusLG),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.04),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: TextField(
-          controller: _searchController,
-          onChanged: (value) => provider.searchCategories(value),
-          style: CustomTextStyle.bodyMedium,
-          decoration: InputDecoration(
-            hintText: 'Square, Incepta, Renata...',
-            hintStyle: CustomTextStyle.bodyMedium.copyWith(color: CustomTheme.textTertiary),
-            prefixIcon: const Icon(Icons.search_rounded, color: CustomTheme.primaryColor, size: 22),
-            suffixIcon: _searchController.text.isNotEmpty
-                ? IconButton(
-                    icon: const Icon(Icons.close_rounded, size: 18, color: CustomTheme.textTertiary),
-                    onPressed: () {
-                      _searchController.clear();
-                      provider.searchCategories('');
-                    },
-                  )
-                : null,
-            border: InputBorder.none,
-            contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
-          ),
+    return Container(
+      height: 46,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(CustomTheme.radiusMD),
+      ),
+      child: TextField(
+        controller: _searchController,
+        onChanged: (value) => provider.searchCategories(value),
+        style: CustomTextStyle.bodyMedium,
+        decoration: InputDecoration(
+          hintText: 'Square, Beximco, Incepta ...',
+          hintStyle: CustomTextStyle.bodyMedium.copyWith(color: CustomTheme.textTertiary),
+          prefixIcon: const Icon(Icons.search_rounded, color: CustomTheme.primaryColor, size: 22),
+          suffixIcon: _searchController.text.isNotEmpty
+              ? IconButton(
+                  icon: const Icon(Icons.close_rounded, size: 18, color: CustomTheme.textTertiary),
+                  onPressed: () {
+                    _searchController.clear();
+                    provider.searchCategories('');
+                  },
+                )
+              : null,
+          border: InputBorder.none,
+          contentPadding: const EdgeInsets.symmetric(vertical: 12),
         ),
       ),
     );
@@ -165,9 +151,9 @@ class _CategoriesScreenState extends ConsumerState<CategoriesScreen> {
     return RefreshIndicator(
       onRefresh: () => provider.fetchCategories(),
       child: ListView.separated(
-        padding: const EdgeInsets.fromLTRB(20, 0, 20, 40),
+        padding: const EdgeInsets.fromLTRB(20, 16, 20, 40),
         itemCount: categories.length,
-        separatorBuilder: (context, index) => const SizedBox(height: 12),
+        separatorBuilder: (context, index) => const SizedBox(height: 5),
         itemBuilder: (context, index) {
           final category = categories[index];
           return _buildCategoryCard(category);
@@ -192,31 +178,24 @@ class _CategoriesScreenState extends ConsumerState<CategoriesScreen> {
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(CustomTheme.radiusLG),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.03),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            ),
-          ],
+          borderRadius: BorderRadius.circular(CustomTheme.radiusMD),
         ),
         child: Row(
           children: [
             Container(
-              width: 56,
-              height: 56,
+              width: 30,
+              height: 30,
               decoration: BoxDecoration(
                 color: CustomTheme.primaryColor.withOpacity(0.08),
-                borderRadius: BorderRadius.circular(CustomTheme.radiusMD),
+                borderRadius: BorderRadius.circular(CustomTheme.radiusSM),
               ),
               child: const Icon(
                 Icons.medical_services_outlined,
                 color: CustomTheme.primaryColor,
-                size: 24,
+                size: 14,
               ),
             ),
-            const SizedBox(width: 16),
+            const SizedBox(width: 15),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,

@@ -127,78 +127,58 @@ class _MyOrdersScreenState extends ConsumerState<MyOrdersScreen> {
     final statusColor = _getStatusColor(order.status);
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 16),
+      margin: const EdgeInsets.only(bottom: 6),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(CustomTheme.radiusLG),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.03),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        borderRadius: BorderRadius.circular(CustomTheme.radiusMD),
       ),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
           onTap: () => Navigator.pushNamed(context, AppRoutes.orderDetail, arguments: order.id),
-          borderRadius: BorderRadius.circular(CustomTheme.radiusLG),
+          borderRadius: BorderRadius.circular(CustomTheme.radiusMD),
           child: Padding(
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Order #${order.id.substring(0, 8).toUpperCase()}',
-                          style: CustomTextStyle.bodyMedium.copyWith(fontWeight: CustomTheme.fontWeightBold),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          formattedDate,
-                          style: CustomTextStyle.caption.copyWith(color: CustomTheme.textTertiary),
-                        ),
-                      ],
+                    Text(
+                      '#${order.id.substring(0, 8).toUpperCase()}',
+                      style: CustomTextStyle.bodyMedium.copyWith(
+                        fontWeight: CustomTheme.fontWeightBold,
+                        color: CustomTheme.textPrimary,
+                      ),
                     ),
                     _buildStatusChip(order.status, statusColor),
                   ],
                 ),
-                const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 16),
-                  child: Divider(height: 1, color: CustomTheme.borderLight),
-                ),
+                const SizedBox(height: 12),
                 Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    _buildItemsPreview(order),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            '${order.items.length} ${order.items.length == 1 ? 'Item' : 'Items'}',
-                            style: CustomTextStyle.bodySmall.copyWith(
-                              fontWeight: CustomTheme.fontWeightSemiBold,
-                              color: CustomTheme.textPrimary,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            'Total Amount',
-                            style: CustomTextStyle.caption.copyWith(color: CustomTheme.textTertiary),
-                          ),
-                        ],
-                      ),
+                    Row(
+                      children: [
+                        Text(
+                          formattedDate,
+                          style: CustomTextStyle.bodySmall.copyWith(color: CustomTheme.textSecondary),
+                        ),
+                        Container(
+                          margin: const EdgeInsets.symmetric(horizontal: 8),
+                          width: 3,
+                          height: 3,
+                          decoration: const BoxDecoration(color: CustomTheme.textTertiary, shape: BoxShape.circle),
+                        ),
+                        Text(
+                          '${order.items.length} ${order.items.length == 1 ? 'Item' : 'Items'}',
+                          style: CustomTextStyle.bodySmall.copyWith(color: CustomTheme.textSecondary),
+                        ),
+                      ],
                     ),
                     Text(
                       '৳${order.totalAmount.toStringAsFixed(0)}',
-                      style: CustomTextStyle.heading4.copyWith(
+                      style: CustomTextStyle.bodyLarge.copyWith(
                         color: CustomTheme.primaryColor,
                         fontWeight: CustomTheme.fontWeightBold,
                       ),
@@ -215,17 +195,18 @@ class _MyOrdersScreenState extends ConsumerState<MyOrdersScreen> {
 
   Widget _buildStatusChip(String status, Color color) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
         color: color.withOpacity(0.08),
-        borderRadius: BorderRadius.circular(CustomTheme.radiusSM),
+        borderRadius: BorderRadius.circular(CustomTheme.radiusRound),
+        border: Border.all(color: color.withOpacity(0.1), width: 1),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Container(
-            width: 6,
-            height: 6,
+            width: 5,
+            height: 5,
             decoration: BoxDecoration(color: color, shape: BoxShape.circle),
           ),
           const SizedBox(width: 6),
@@ -234,34 +215,12 @@ class _MyOrdersScreenState extends ConsumerState<MyOrdersScreen> {
             style: CustomTextStyle.caption.copyWith(
               color: color,
               fontWeight: CustomTheme.fontWeightBold,
-              fontSize: 10,
-              letterSpacing: 0.5,
+              fontSize: 9,
+              letterSpacing: 0.3,
             ),
           ),
         ],
       ),
-    );
-  }
-
-  Widget _buildItemsPreview(OrderEntity order) {
-    if (order.items.isEmpty) return const SizedBox.shrink();
-    
-    final firstItemImage = order.items.first.product?.images.first.url;
-
-    return Container(
-      width: 50,
-      height: 50,
-      decoration: BoxDecoration(
-        color: CustomTheme.backgroundColor,
-        borderRadius: BorderRadius.circular(CustomTheme.radiusMD),
-        border: Border.all(color: CustomTheme.borderLight, width: 0.5),
-      ),
-      child: firstItemImage != null
-          ? ClipRRect(
-              borderRadius: BorderRadius.circular(CustomTheme.radiusMD - 1),
-              child: Image.network(firstItemImage, fit: BoxFit.cover),
-            )
-          : const Icon(Icons.shopping_bag_outlined, color: CustomTheme.textTertiary, size: 24),
     );
   }
 
@@ -274,11 +233,11 @@ class _MyOrdersScreenState extends ConsumerState<MyOrdersScreen> {
       case 'shipped':
         return Colors.purple.shade700;
       case 'delivered':
-        return Colors.green.shade700;
+        return CustomTheme.successColor;
       case 'cancelled':
-        return Colors.red.shade700;
+        return CustomTheme.errorColor;
       default:
-        return Colors.grey.shade700;
+        return CustomTheme.textTertiary;
     }
   }
 }

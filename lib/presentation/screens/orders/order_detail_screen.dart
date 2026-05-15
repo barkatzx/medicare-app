@@ -127,21 +127,18 @@ class _OrderDetailScreenState extends ConsumerState<OrderDetailScreen> {
     }
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.fromLTRB(20, 10, 20, 40),
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 40),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildOrderHeader(order),
-          const SizedBox(height: 24),
+          const SizedBox(height: 20),
           _buildSectionTitle('Order Items'),
           _buildItemsList(order),
-          const SizedBox(height: 24),
-          _buildSectionTitle('Shipping Address'),
-          _buildShippingInfo(order),
-          const SizedBox(height: 24),
-          _buildSectionTitle('Payment Details'),
-          _buildPaymentInfo(order),
-          const SizedBox(height: 24),
+          const SizedBox(height: 20),
+          _buildSectionTitle('Shipping & Payment'),
+          _buildInfoSection(order),
+          const SizedBox(height: 20),
           _buildSectionTitle('Order Summary'),
           _buildOrderSummary(order),
         ],
@@ -151,7 +148,7 @@ class _OrderDetailScreenState extends ConsumerState<OrderDetailScreen> {
 
   Widget _buildSectionTitle(String title) {
     return Padding(
-      padding: const EdgeInsets.only(left: 4, bottom: 12),
+      padding: const EdgeInsets.only(left: 4, bottom:10),
       child: Text(
         title.toUpperCase(),
         style: CustomTextStyle.caption.copyWith(
@@ -164,21 +161,14 @@ class _OrderDetailScreenState extends ConsumerState<OrderDetailScreen> {
   }
 
   Widget _buildOrderHeader(OrderEntity order) {
-    final formattedDate = DateFormat('MMMM dd, yyyy • hh:mm a').format(order.createdAt);
+    final formattedDate = DateFormat('MMM dd, yyyy • hh:mm a').format(order.createdAt);
     final statusColor = _getStatusColor(order.status);
     
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(CustomTheme.radiusLG),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.03),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        borderRadius: BorderRadius.circular(CustomTheme.radiusMD),
       ),
       child: Column(
         children: [
@@ -189,8 +179,13 @@ class _OrderDetailScreenState extends ConsumerState<OrderDetailScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Order ID',
-                    style: CustomTextStyle.caption.copyWith(color: CustomTheme.textTertiary),
+                    'ORDER ID',
+                    style: CustomTextStyle.caption.copyWith(
+                      color: CustomTheme.textTertiary,
+                      letterSpacing: 1.0,
+                      fontSize: 9,
+                      fontWeight: CustomTheme.fontWeightBold,
+                    ),
                   ),
                   const SizedBox(height: 4),
                   Text(
@@ -203,12 +198,12 @@ class _OrderDetailScreenState extends ConsumerState<OrderDetailScreen> {
             ],
           ),
           const Padding(
-            padding: EdgeInsets.symmetric(vertical: 16),
+            padding: EdgeInsets.symmetric(vertical: 12),
             child: Divider(height: 1, color: CustomTheme.borderLight),
           ),
           Row(
             children: [
-              const Icon(Icons.calendar_today_rounded, size: 16, color: CustomTheme.textTertiary),
+              Icon(Icons.calendar_today_rounded, size: 14, color: CustomTheme.textTertiary),
               const SizedBox(width: 8),
               Text(
                 formattedDate,
@@ -223,17 +218,18 @@ class _OrderDetailScreenState extends ConsumerState<OrderDetailScreen> {
 
   Widget _buildStatusChip(String status, Color color) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
         color: color.withOpacity(0.08),
-        borderRadius: BorderRadius.circular(CustomTheme.radiusSM),
+        borderRadius: BorderRadius.circular(CustomTheme.radiusRound),
+        border: Border.all(color: color.withOpacity(0.1), width: 1),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Container(
-            width: 6,
-            height: 6,
+            width: 5,
+            height: 5,
             decoration: BoxDecoration(color: color, shape: BoxShape.circle),
           ),
           const SizedBox(width: 6),
@@ -242,8 +238,8 @@ class _OrderDetailScreenState extends ConsumerState<OrderDetailScreen> {
             style: CustomTextStyle.caption.copyWith(
               color: color,
               fontWeight: CustomTheme.fontWeightBold,
-              fontSize: 10,
-              letterSpacing: 0.5,
+              fontSize: 9,
+              letterSpacing: 0.3,
             ),
           ),
         ],
@@ -255,14 +251,7 @@ class _OrderDetailScreenState extends ConsumerState<OrderDetailScreen> {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(CustomTheme.radiusLG),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.03),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        borderRadius: BorderRadius.circular(CustomTheme.radiusMD),
       ),
       child: ListView.separated(
         shrinkWrap: true,
@@ -272,46 +261,46 @@ class _OrderDetailScreenState extends ConsumerState<OrderDetailScreen> {
         itemBuilder: (context, index) {
           final item = order.items[index];
           return Padding(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(12),
             child: Row(
               children: [
                 Container(
-                  width: 60,
-                  height: 60,
+                  width: 30,
+                  height: 30,
                   decoration: BoxDecoration(
                     color: CustomTheme.backgroundColor,
-                    borderRadius: BorderRadius.circular(CustomTheme.radiusMD),
+                    borderRadius: BorderRadius.circular(CustomTheme.radiusSM),
                     border: Border.all(color: CustomTheme.borderLight, width: 0.5),
                   ),
                   child: item.product?.images.isNotEmpty == true
                       ? ClipRRect(
-                          borderRadius: BorderRadius.circular(CustomTheme.radiusMD - 1),
+                          borderRadius: BorderRadius.circular(CustomTheme.radiusSM - 1),
                           child: Image.network(item.product!.images.first.url, fit: BoxFit.cover),
                         )
-                      : const Icon(Icons.shopping_bag_outlined, color: CustomTheme.textTertiary),
+                      : const Icon(Icons.shopping_bag_outlined, color: CustomTheme.textTertiary, size: 20),
                 ),
-                const SizedBox(width: 16),
+                const SizedBox(width: 20),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         item.product?.name ?? 'Unknown Product',
-                        style: CustomTextStyle.bodySmall.copyWith(fontWeight: CustomTheme.fontWeightBold),
-                        maxLines: 2,
+                        style: CustomTextStyle.bodySmall.copyWith(fontWeight: CustomTheme.fontWeightBold, color: CustomTheme.textPrimary),
+                        maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
                       const SizedBox(height: 4),
                       Text(
                         'Qty: ${item.quantity}',
-                        style: CustomTextStyle.caption.copyWith(color: CustomTheme.textTertiary),
+                        style: CustomTextStyle.bodySmall.copyWith(color: CustomTheme.textTertiary),
                       ),
                     ],
                   ),
                 ),
                 Text(
                   '৳${item.price.toStringAsFixed(0)}',
-                  style: CustomTextStyle.bodyMedium.copyWith(
+                  style: CustomTextStyle.bodySmall.copyWith(
                     fontWeight: CustomTheme.fontWeightBold,
                     color: CustomTheme.textPrimary,
                   ),
@@ -324,128 +313,71 @@ class _OrderDetailScreenState extends ConsumerState<OrderDetailScreen> {
     );
   }
 
-  Widget _buildShippingInfo(OrderEntity order) {
+  Widget _buildInfoSection(OrderEntity order) {
     final addr = order.shippingAddress;
-    if (addr == null) return const SizedBox.shrink();
-
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(CustomTheme.radiusLG),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.03),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: CustomTheme.primaryColor.withOpacity(0.08),
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(Icons.location_on_rounded, size: 20, color: CustomTheme.primaryColor),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  addr.street,
-                  style: CustomTextStyle.bodyMedium.copyWith(fontWeight: CustomTheme.fontWeightSemiBold),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  '${addr.city}, ${addr.state} ${addr.postalCode}',
-                  style: CustomTextStyle.bodySmall.copyWith(color: CustomTheme.textSecondary),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  addr.country,
-                  style: CustomTextStyle.bodySmall.copyWith(color: CustomTheme.textSecondary),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildPaymentInfo(OrderEntity order) {
     final pay = order.payment;
-    if (pay == null) return const SizedBox.shrink();
-
+    
     return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(CustomTheme.radiusLG),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.03),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        borderRadius: BorderRadius.circular(CustomTheme.radiusMD),
       ),
-      child: Row(
+      child: Column(
         children: [
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: CustomTheme.primaryColor.withOpacity(0.08),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(
-              pay.method.toLowerCase() == 'cod' ? Icons.payments_rounded : Icons.credit_card_rounded,
-              size: 20,
-              color: CustomTheme.primaryColor,
-            ),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  pay.method.toUpperCase(),
-                  style: CustomTextStyle.bodyMedium.copyWith(fontWeight: CustomTheme.fontWeightSemiBold),
-                ),
-                const SizedBox(height: 4),
-                Row(
-                  children: [
-                    Container(
-                      width: 6,
-                      height: 6,
-                      decoration: BoxDecoration(
-                        color: _getStatusColor(pay.status),
-                        shape: BoxShape.circle,
-                      ),
+          if (addr != null) ...[
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Icon(Icons.location_on_rounded, size: 18, color: CustomTheme.primaryColor.withOpacity(0.5)),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          addr.street,
+                          style: CustomTextStyle.bodySmall.copyWith(fontWeight: CustomTheme.fontWeightSemiBold, color: CustomTheme.textPrimary),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          '${addr.city}, ${addr.state} ${addr.postalCode}',
+                          style: CustomTextStyle.caption.copyWith(color: CustomTheme.textSecondary),
+                        ),
+                      ],
                     ),
-                    const SizedBox(width: 6),
-                    Text(
-                      pay.status.toUpperCase(),
-                      style: CustomTextStyle.caption.copyWith(
-                        color: _getStatusColor(pay.status),
-                        fontWeight: CustomTheme.fontWeightBold,
-                        fontSize: 10,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
+                  ),
+                ],
+              ),
             ),
-          ),
+          ],
+          if (addr != null && pay != null) const Divider(height: 1, color: CustomTheme.borderLight),
+          if (pay != null) ...[
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      Icon(
+                        pay.method.toLowerCase() == 'cod' ? Icons.payments_rounded : Icons.credit_card_rounded,
+                        size: 18,
+                        color: CustomTheme.primaryColor.withOpacity(0.5),
+                      ),
+                      const SizedBox(width: 12),
+                      Text(
+                        pay.method.toUpperCase(),
+                        style: CustomTextStyle.bodySmall.copyWith(fontWeight: CustomTheme.fontWeightSemiBold, color: CustomTheme.textPrimary),
+                      ),
+                    ],
+                  ),
+                  _buildStatusChip(pay.status, _getStatusColor(pay.status)),
+                ],
+              ),
+            ),
+          ],
         ],
       ),
     );
@@ -453,27 +385,20 @@ class _OrderDetailScreenState extends ConsumerState<OrderDetailScreen> {
 
   Widget _buildOrderSummary(OrderEntity order) {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(CustomTheme.radiusLG),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.03),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        borderRadius: BorderRadius.circular(CustomTheme.radiusMD),
       ),
       child: Column(
         children: [
           _buildSummaryRow('Subtotal', '৳${order.totalAmount.toStringAsFixed(0)}'),
           const Padding(
-            padding: EdgeInsets.symmetric(vertical: 16),
+            padding: EdgeInsets.symmetric(vertical: 12),
             child: Divider(height: 1, color: CustomTheme.borderLight),
           ),
           _buildSummaryRow(
-            'Total Amount',
+            'Grand Total',
             '৳${order.totalAmount.toStringAsFixed(0)}',
             isTotal: true,
           ),
@@ -489,14 +414,14 @@ class _OrderDetailScreenState extends ConsumerState<OrderDetailScreen> {
         Text(
           label,
           style: isTotal 
-              ? CustomTextStyle.bodyMedium.copyWith(fontWeight: CustomTheme.fontWeightBold)
+              ? CustomTextStyle.bodyLarge.copyWith(fontWeight: CustomTheme.fontWeightBold, color: CustomTheme.textPrimary)
               : CustomTextStyle.bodySmall.copyWith(color: CustomTheme.textSecondary),
         ),
         Text(
           value,
           style: isTotal 
-              ? CustomTextStyle.heading3.copyWith(color: CustomTheme.primaryColor)
-              : CustomTextStyle.bodySmall.copyWith(fontWeight: CustomTheme.fontWeightSemiBold),
+              ? CustomTextStyle.heading4.copyWith(color: CustomTheme.primaryColor, fontWeight: CustomTheme.fontWeightBold)
+              : CustomTextStyle.bodySmall.copyWith(fontWeight: CustomTheme.fontWeightBold, color: CustomTheme.textPrimary),
         ),
       ],
     );
@@ -511,11 +436,11 @@ class _OrderDetailScreenState extends ConsumerState<OrderDetailScreen> {
       case 'shipped':
         return Colors.purple.shade700;
       case 'delivered':
-        return Colors.green.shade700;
+        return CustomTheme.successColor;
       case 'cancelled':
-        return Colors.red.shade700;
+        return CustomTheme.errorColor;
       default:
-        return Colors.grey.shade700;
+        return CustomTheme.textTertiary;
     }
   }
 }

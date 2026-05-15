@@ -4,8 +4,8 @@ class ApiConstants {
   // ✅ Single Render URL for all platforms since it's deployed
   static const String baseUrl = 'https://medicare-server-9je0.onrender.com/v1';
 
-  static const Duration connectionTimeout = Duration(seconds: 30);
-  static const Duration receiveTimeout = Duration(seconds: 30);
+  static const Duration connectionTimeout = Duration(seconds: 120);
+  static const Duration receiveTimeout = Duration(seconds: 120);
 
   // ==================== AUTHENTICATION ROUTES ====================
   static String get register => '$baseUrl/users/register';

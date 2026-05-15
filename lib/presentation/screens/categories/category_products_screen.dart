@@ -51,6 +51,28 @@ class _CategoryProductsScreenState extends ConsumerState<CategoryProductsScreen>
     return Scaffold(
       backgroundColor: CustomTheme.backgroundColor,
       appBar: AppBar(
+        leadingWidth: 60,
+        leading: Padding(
+          padding: const EdgeInsets.only(left: 16),
+          child: Center(
+            child: GestureDetector(
+              onTap: () => Navigator.pop(context),
+              child: Container(
+                width: 36,
+                height: 36,
+                decoration: const BoxDecoration(
+                  color: CustomTheme.surfaceColor,
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.chevron_left_rounded,
+                  color: CustomTheme.textPrimary,
+                  size: 20,
+                ),
+              ),
+            ),
+          ),
+        ),
         title: Text(
           widget.categoryName,
           style: CustomTextStyle.heading2,
@@ -58,6 +80,7 @@ class _CategoryProductsScreenState extends ConsumerState<CategoryProductsScreen>
         backgroundColor: CustomTheme.backgroundColor,
         foregroundColor: CustomTheme.textPrimary,
         elevation: 0,
+        scrolledUnderElevation: 0,
       ),
       body: _buildBody(provider),
     );

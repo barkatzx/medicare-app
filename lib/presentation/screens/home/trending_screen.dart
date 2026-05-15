@@ -102,7 +102,7 @@ class _TrendingScreenState extends ConsumerState<TrendingScreen> with SingleTick
                       children: [
                         Icon(Icons.local_fire_department_rounded, size: 14),
                         SizedBox(width: 4),
-                        Text('Trending'),
+                        Text('Most Discount'),
                       ],
                     ),
                   ),
@@ -112,7 +112,7 @@ class _TrendingScreenState extends ConsumerState<TrendingScreen> with SingleTick
                       children: [
                         Icon(Icons.verified_rounded, size: 14),
                         SizedBox(width: 4),
-                        Text('Featured'),
+                        Text('Flash Sales'),
                       ],
                     ),
                   ),
