@@ -142,6 +142,24 @@ class ProductCard extends StatelessWidget {
             ),
           ),
         ],
+        if (product.stock <= 0) ...[
+          const SizedBox(width: 5),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+            decoration: BoxDecoration(
+              color: CustomTheme.errorColor.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Text(
+              'Stock Out',
+              style: TextStyle(
+                color: CustomTheme.errorColor,
+                fontSize: 15,
+                fontWeight: CustomTheme.fontWeightBold,
+              ),
+            ),
+          ),
+        ],
       ],
     );
   }
@@ -166,6 +184,51 @@ class _AddToCartButtonState extends ConsumerState<_AddToCartButton> {
       onTapUp: (_) => setState(() => _isPressed = false),
       onTapCancel: () => setState(() => _isPressed = false),
       onTap: () {
+        // Fix: Ensure product has at least one valid price before adding to cart
+        final bool hasPrice = widget.product.price > 0 || 
+                             (widget.product.discountedPrice != null && widget.product.discountedPrice! > 0);
+        
+        if (!hasPrice) {
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: const Text(
+                  'Failed to add to cart: Product has no price',
+                  style: TextStyle(color: Colors.white, fontSize: 12),
+                ),
+                backgroundColor: CustomTheme.errorColor,
+                behavior: SnackBarBehavior.floating,
+                duration: const Duration(milliseconds: 1500),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(CustomTheme.radiusMD),
+                ),
+              ),
+            );
+          }
+          return;
+        }
+
+        // Fix: Check for stock before adding to cart
+        if (widget.product.stock <= 0) {
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: const Text(
+                  'Failed to add to cart: Stock Out',
+                  style: TextStyle(color: Colors.white, fontSize: 12),
+                ),
+                backgroundColor: CustomTheme.errorColor,
+                behavior: SnackBarBehavior.floating,
+                duration: const Duration(milliseconds: 1500),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(CustomTheme.radiusMD),
+                ),
+              ),
+            );
+          }
+          return;
+        }
+
         final cartProvider = ref.read(cartProviderNotifier);
         
         // Optimistic UI, instantaneous add to cart without blocking
@@ -176,7 +239,7 @@ class _AddToCartButtonState extends ConsumerState<_AddToCartButton> {
                 content: Text(
                   success
                       ? '${widget.product.name} added to cart'
-                      : 'Failed to add to cart',
+                      : 'Stock Out',
                   style: const TextStyle(color: Colors.white, fontSize: 12),
                 ),
                 backgroundColor: success
@@ -207,9 +270,11 @@ class _AddToCartButtonState extends ConsumerState<_AddToCartButton> {
           ),
         ),
         child: Icon(
-          Icons.add,
+          widget.product.stock <= 0 ? Icons.close : Icons.add,
           size: 20,
-          color: CustomTheme.primaryColor,
+          color: widget.product.stock <= 0 
+              ? CustomTheme.textTertiary 
+              : CustomTheme.primaryColor,
         ),
       ),
     );

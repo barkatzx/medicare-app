@@ -207,6 +207,21 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                       Text('IN STOCK', style: CustomTextStyle.caption.copyWith(color: Colors.green, fontWeight: CustomTheme.fontWeightBold)),
                     ],
                   ),
+                )
+              else
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: CustomTheme.errorColor.withOpacity(0.08),
+                    borderRadius: BorderRadius.circular(CustomTheme.radiusSM),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(width: 6, height: 6, decoration: const BoxDecoration(color: CustomTheme.errorColor, shape: BoxShape.circle)),
+                      const SizedBox(width: 8),
+                      Text('STOCK OUT', style: CustomTextStyle.caption.copyWith(color: CustomTheme.errorColor, fontWeight: CustomTheme.fontWeightBold)),
+                    ],
+                  ),
                 ),
             ],
           ),
@@ -435,15 +450,20 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
             Expanded(
               flex: 2,
               child: ElevatedButton(
-                onPressed: () => _addToCart(product),
+                onPressed: product.stock > 0 ? () => _addToCart(product) : null,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: CustomTheme.primaryColor,
+                  backgroundColor: product.stock > 0 
+                      ? CustomTheme.primaryColor 
+                      : CustomTheme.textTertiary.withOpacity(0.3),
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(vertical: 18),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(CustomTheme.radiusRound)),
                   elevation: 0,
                 ),
-                child: Text('Add to Bag', style: CustomTextStyle.button),
+                child: Text(
+                  product.stock > 0 ? 'Add to Bag' : 'Stock Out', 
+                  style: CustomTextStyle.button,
+                ),
               ),
             ),
           ],
@@ -453,6 +473,53 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
   }
 
   void _addToCart(product) async {
+    // Fix: Ensure product has at least one valid price before adding to cart
+    final bool hasPrice = product.price > 0 || 
+                         (product.discountedPrice != null && product.discountedPrice! > 0);
+    
+    if (!hasPrice) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: const [
+                Icon(Icons.error_outline, color: Colors.white),
+                SizedBox(width: 12),
+                Text('Failed to add: Product has no price', style: TextStyle(color: Colors.white)),
+              ],
+            ),
+            backgroundColor: CustomTheme.errorColor,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(CustomTheme.radiusMD)),
+            margin: const EdgeInsets.all(20),
+          ),
+        );
+      }
+      return;
+    }
+
+    // Fix: Check for stock before adding to cart
+    if (product.stock <= 0) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: const [
+                Icon(Icons.error_outline, color: Colors.white),
+                SizedBox(width: 12),
+                Text('Stock Out', style: TextStyle(color: Colors.white)),
+              ],
+            ),
+            backgroundColor: CustomTheme.errorColor,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(CustomTheme.radiusMD)),
+            margin: const EdgeInsets.all(20),
+          ),
+        );
+      }
+      return;
+    }
+
     final cartProvider = ref.read(cartProviderNotifier);
     final success = await cartProvider.addToCart(product.id, _quantity);
     
@@ -463,7 +530,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
             children: [
               Icon(success ? Icons.check_circle_outline : Icons.error_outline, color: Colors.white),
               const SizedBox(width: 12),
-              Text(success ? 'Added to bag successfully!' : 'Failed to add to bag', style: const TextStyle(color: Colors.white)),
+              Text(success ? 'Added to bag successfully!' : 'Stock Out', style: const TextStyle(color: Colors.white)),
             ],
           ),
           backgroundColor: success ? CustomTheme.successColor : CustomTheme.errorColor,
