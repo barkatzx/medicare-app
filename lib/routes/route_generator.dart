@@ -17,6 +17,7 @@ import '../presentation/screens/profile/profile_screen.dart';
 import '../presentation/screens/profile/edit_profile_screen.dart';
 import '../presentation/screens/profile/change_password_screen.dart';
 import '../presentation/screens/profile/addresses_screen.dart';
+import '../presentation/screens/profile/about_screen.dart';
 import '../presentation/screens/notifications/notifications_screen.dart';
 import 'app_routes.dart';
 import 'auth_guard.dart';
@@ -101,6 +102,11 @@ class RouteGenerator {
       case AppRoutes.addresses:
         return MaterialPageRoute(
           builder: (_) => AuthGuard.protectRoute(const AddressesScreen()),
+          settings: settings,
+        );
+      case AppRoutes.about:
+        return MaterialPageRoute(
+          builder: (_) => AuthGuard.protectRoute(const AboutScreen()),
           settings: settings,
         );
       case AppRoutes.notifications:

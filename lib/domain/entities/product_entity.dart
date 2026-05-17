@@ -56,7 +56,9 @@ class ProductEntity {
       description: json['description'] ?? '',
       price: price,
       discountedPrice: discountedPrice,
-      discountPercent: json['discountPercent'] ?? 0,
+      discountPercent: (price > 0 && finalPrice < price) 
+          ? ((price - finalPrice) / price * 100).round() 
+          : (json['discountPercent'] ?? 0),
       stock: json['stock'] ?? 0,
       categoryId: json['categoryId'] ?? '',
       categoryName: json['category']?['name'] ?? 'Uncategorized',

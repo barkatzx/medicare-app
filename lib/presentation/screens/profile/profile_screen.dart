@@ -192,6 +192,13 @@ class ProfileScreen extends ConsumerWidget {
                   color: Colors.teal,
                   onTap: () => Navigator.pushNamed(context, AppRoutes.changePassword),
                 ),
+                _buildDivider(),
+                _buildMenuItem(
+                  icon: Icons.info_outline_rounded,
+                  title: 'About',
+                  color: Colors.indigo,
+                  onTap: () => Navigator.pushNamed(context, AppRoutes.about),
+                ),
               ],
             ),
           ),
