@@ -82,6 +82,7 @@ class CartItemEntity {
   }
 
   String get productName => product.name;
+  String get categoryName => product.categoryName ?? 'Uncategorized';
   String get productImage =>
       product.images.isNotEmpty ? product.images.first.url : '';
   double get price => product.price;
@@ -98,6 +99,7 @@ class CartProductEntity {
   final int discountPercent;
   final int stock;
   final String categoryId;
+  final String? categoryName;
   final List<CartProductImage> images;
   final double finalPrice;
 
@@ -110,6 +112,7 @@ class CartProductEntity {
     required this.discountPercent,
     required this.stock,
     required this.categoryId,
+    this.categoryName,
     required this.images,
     required this.finalPrice,
   });
@@ -126,6 +129,7 @@ class CartProductEntity {
       discountPercent: json['discountPercent'] ?? 0,
       stock: json['stock'] ?? 0,
       categoryId: json['categoryId'] ?? '',
+      categoryName: json['category']?['name'] ?? json['categoryName'] ?? 'Uncategorized',
       images: (json['images'] as List? ?? [])
           .map((img) => CartProductImage.fromJson(img))
           .toList(),
@@ -143,6 +147,7 @@ class CartProductEntity {
       'discountPercent': discountPercent,
       'stock': stock,
       'categoryId': categoryId,
+      'categoryName': categoryName,
       'images': images.map((img) => img.toJson()).toList(),
       'finalPrice': finalPrice,
     };
