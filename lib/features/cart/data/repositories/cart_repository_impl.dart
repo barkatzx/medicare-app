@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:medicare_app/features/cart/domain/repositories/cart_repository.dart';
 import '../../../../core/constants/api_constants.dart';
@@ -23,7 +24,7 @@ class CartRepositoryImpl implements CartRepository {
         )
         .timeout(ApiConstants.connectionTimeout);
 
-    print('getCart status: ${response.statusCode}');
+    debugPrint('getCart status: ${response.statusCode}');
 
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
@@ -55,7 +56,7 @@ class CartRepositoryImpl implements CartRepository {
       }
       return 0;
     } catch (e) {
-      print('getCartCount error: $e');
+      debugPrint('getCartCount error: $e');
       return 0;
     }
   }
@@ -66,7 +67,7 @@ class CartRepositoryImpl implements CartRepository {
     if (token == null) throw Exception('User not authenticated');
 
     final body = {'productId': productId, 'quantity': quantity};
-    print('addToCart body: $body');
+    debugPrint('addToCart body: $body');
 
     final response = await client
         .post(
@@ -76,7 +77,7 @@ class CartRepositoryImpl implements CartRepository {
         )
         .timeout(ApiConstants.connectionTimeout);
 
-    print('addToCart status: ${response.statusCode}, body: ${response.body}');
+    debugPrint('addToCart status: ${response.statusCode}, body: ${response.body}');
 
     if (response.statusCode >= 200 && response.statusCode < 300) return;
 
@@ -90,7 +91,7 @@ class CartRepositoryImpl implements CartRepository {
     if (token == null) throw Exception('User not authenticated');
 
     final url = ApiConstants.cartItem(itemId);
-    print('updateCartItem PUT: $url, quantity: $quantity');
+    debugPrint('updateCartItem PUT: $url, quantity: $quantity');
 
     final response = await client
         .put(
@@ -100,7 +101,7 @@ class CartRepositoryImpl implements CartRepository {
         )
         .timeout(ApiConstants.connectionTimeout);
 
-    print('updateCartItem status: ${response.statusCode}');
+    debugPrint('updateCartItem status: ${response.statusCode}');
 
     if (response.statusCode >= 200 && response.statusCode < 300) return;
 
@@ -114,7 +115,7 @@ class CartRepositoryImpl implements CartRepository {
     if (token == null) throw Exception('User not authenticated');
 
     final url = ApiConstants.removeFromCart(itemId);
-    print('removeFromCart DELETE: $url');
+    debugPrint('removeFromCart DELETE: $url');
 
     final response = await client
         .delete(
@@ -123,7 +124,7 @@ class CartRepositoryImpl implements CartRepository {
         )
         .timeout(ApiConstants.connectionTimeout);
 
-    print('removeFromCart status: ${response.statusCode}');
+    debugPrint('removeFromCart status: ${response.statusCode}');
 
     if (response.statusCode >= 200 && response.statusCode < 300) return;
 
@@ -143,7 +144,7 @@ class CartRepositoryImpl implements CartRepository {
         )
         .timeout(ApiConstants.connectionTimeout);
 
-    print('clearCart status: ${response.statusCode}');
+    debugPrint('clearCart status: ${response.statusCode}');
 
     if (response.statusCode >= 200 && response.statusCode < 300) return;
 

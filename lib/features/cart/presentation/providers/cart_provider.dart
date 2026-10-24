@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:medicare_app/features/cart/domain/repositories/cart_repository.dart';
 import 'package:medicare_app/core/utils/logger.dart';
 import '../../domain/entities/cart_entity.dart';
@@ -53,14 +54,14 @@ class CartProvider extends ChangeNotifier {
       _cartItemCount = await cartRepository.getCartCount();
       notifyListeners();
     } catch (e) {
-      print('Error loading cart count: $e');
+      debugPrint('Error loading cart count: $e');
       _cartItemCount = 0;
     }
   }
 
   Future<bool> addToCart(String productId, int quantity) async {
     try {
-      print('Adding to cart: productId=$productId, quantity=$quantity');
+      debugPrint('Adding to cart: productId=$productId, quantity=$quantity');
 
       // Optimistic increment
       _cartItemCount += quantity;

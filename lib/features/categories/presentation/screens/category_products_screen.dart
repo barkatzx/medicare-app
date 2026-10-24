@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medicare_app/core/di/providers.dart';
 import 'package:medicare_app/core/theme/custom_theme.dart';
 import 'package:medicare_app/features/products/presentation/widgets/product_card.dart';
+import 'package:medicare_app/features/categories/presentation/providers/category_products_provider.dart';
 
 class CategoryProductsScreen extends ConsumerStatefulWidget {
   final String categoryId;
@@ -94,7 +95,7 @@ class _CategoryProductsScreenState
     );
   }
 
-  Widget _buildBody(provider) {
+  Widget _buildBody(CategoryProductsProvider provider) {
     if (provider.isLoading && provider.products.isEmpty) {
       return Center(
         child: CircularProgressIndicator(color: CustomTheme.primaryColor),

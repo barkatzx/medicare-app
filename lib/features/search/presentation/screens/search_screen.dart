@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medicare_app/core/di/providers.dart';
 import 'package:medicare_app/core/theme/custom_theme.dart';
 import 'package:medicare_app/features/products/presentation/widgets/product_card.dart';
+import 'package:medicare_app/features/products/presentation/providers/product_provider.dart';
 import 'package:shimmer/shimmer.dart';
 
 class SearchScreen extends ConsumerStatefulWidget {
@@ -65,10 +66,11 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   Widget build(BuildContext context) {
     final productProvider = ref.watch(productProviderNotifier);
 
-    return WillPopScope(
-      onWillPop: () async {
-        ref.read(productProviderNotifier).clearSearch();
-        return true;
+    return PopScope(
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) {
+          ref.read(productProviderNotifier).clearSearch();
+        }
       },
       child: Scaffold(
         backgroundColor: CustomTheme.backgroundColor,
@@ -133,7 +135,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     );
   }
 
-  Widget _buildBody(productProvider) {
+  Widget _buildBody(ProductProvider productProvider) {
     if (productProvider.searchQuery.isEmpty && _searchController.text.isEmpty) {
       return _buildInitialState();
     }
@@ -288,7 +290,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     );
   }
 
-  Widget _buildResultsList(productProvider) {
+  Widget _buildResultsList(ProductProvider productProvider) {
     return ListView.builder(
       controller: _scrollController,
       padding: const EdgeInsets.all(16),

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import '../../../../core/constants/api_constants.dart';
 import '../../domain/entities/address_entity.dart';
@@ -21,8 +22,8 @@ class AddressRepositoryImpl implements AddressRepository {
       headers: ApiConstants.getHeaders(token: token),
     ).timeout(ApiConstants.connectionTimeout);
 
-    print('getAddresses status: ${response.statusCode}');
-    print('getAddresses body: ${response.body}');
+    debugPrint('getAddresses status: ${response.statusCode}');
+    debugPrint('getAddresses body: ${response.body}');
 
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
@@ -73,8 +74,8 @@ class AddressRepositoryImpl implements AddressRepository {
       body: json.encode(data),
     ).timeout(ApiConstants.connectionTimeout);
     
-    print('updateAddress status: ${response.statusCode}');
-    print('updateAddress body: ${response.body}');
+    debugPrint('updateAddress status: ${response.statusCode}');
+    debugPrint('updateAddress body: ${response.body}');
 
     if (response.statusCode >= 200 && response.statusCode < 300) {
       final responseData = json.decode(response.body);
@@ -117,22 +118,22 @@ class AddressRepositoryImpl implements AddressRepository {
 
     try {
       final url = ApiConstants.deleteAddress(id);
-      print('DEBUG: Calling DELETE: $url');
+      debugPrint('DEBUG: Calling DELETE: $url');
       
       final response = await client.delete(
         Uri.parse(url),
         headers: ApiConstants.getHeaders(token: token, includeContentType: false),
       ).timeout(ApiConstants.connectionTimeout);
 
-      print('DEBUG: deleteAddress status: ${response.statusCode}');
-      print('DEBUG: deleteAddress body: ${response.body}');
+      debugPrint('DEBUG: deleteAddress status: ${response.statusCode}');
+      debugPrint('DEBUG: deleteAddress body: ${response.body}');
 
       if (response.statusCode < 200 || response.statusCode >= 300) {
         final data = json.decode(response.body);
         throw Exception(data['error'] ?? data['message'] ?? 'Failed to delete address: ${response.statusCode}');
       }
     } catch (e) {
-      print('DEBUG: Error in deleteAddress: $e');
+      debugPrint('DEBUG: Error in deleteAddress: $e');
       if (e is Exception) rethrow;
       throw Exception(e.toString());
     }

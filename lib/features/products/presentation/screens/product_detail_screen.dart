@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medicare_app/core/di/providers.dart';
 import 'package:medicare_app/core/theme/custom_theme.dart';
+import 'package:medicare_app/features/products/domain/entities/product_entity.dart';
 
 class ProductDetailScreen extends ConsumerStatefulWidget {
   const ProductDetailScreen({super.key});
@@ -181,7 +182,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
     );
   }
 
-  Widget _buildImageCarousel(product) {
+  Widget _buildImageCarousel(ProductEntity product) {
     return Container(
       height: MediaQuery.of(context).size.height * 0.48,
       width: double.infinity,
@@ -242,7 +243,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
     );
   }
 
-  Widget _buildProductHeader(product) {
+  Widget _buildProductHeader(ProductEntity product) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Column(
@@ -352,7 +353,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
     );
   }
 
-  Widget _buildPriceSection(product) {
+  Widget _buildPriceSection(ProductEntity product) {
     final hasDiscount = product.discountPercent > 0;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -465,7 +466,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
     );
   }
 
-  Widget _buildDescription(product) {
+  Widget _buildDescription(ProductEntity product) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Container(
@@ -574,7 +575,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
     );
   }
 
-  Widget _buildBottomAction(product) {
+  Widget _buildBottomAction(ProductEntity product) {
     return Positioned(
       bottom: 0,
       left: 0,
@@ -676,7 +677,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
     );
   }
 
-  void _addToCart(product) async {
+  void _addToCart(ProductEntity product) async {
     final bool hasPrice =
         product.price > 0 ||
         (product.discountedPrice != null && product.discountedPrice! > 0);

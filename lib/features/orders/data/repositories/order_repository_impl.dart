@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:medicare_app/core/constants/api_constants.dart';
 import 'package:medicare_app/features/orders/domain/repositories/order_repository.dart';
@@ -35,7 +36,7 @@ class OrderRepositoryImpl implements OrderRepository {
         throw Exception(responseData['message'] ?? 'Failed to load orders');
       }
     } catch (e) {
-      print('Get my orders error: $e');
+      debugPrint('Get my orders error: $e');
       rethrow;
     }
   }
@@ -71,7 +72,7 @@ class OrderRepositoryImpl implements OrderRepository {
         throw Exception('Server Error: ${response.statusCode} - ${responseData['message'] ?? 'Unable to fetch details'}');
       }
     } catch (e) {
-      print('Get order detail error: $e');
+      debugPrint('Get order detail error: $e');
       throw Exception('Network or Data Error: $e');
     }
   }
@@ -90,7 +91,7 @@ class OrderRepositoryImpl implements OrderRepository {
       final responseData = json.decode(response.body);
       return response.statusCode == 200 && responseData['success'] == true;
     } catch (e) {
-      print('Cancel order error: $e');
+      debugPrint('Cancel order error: $e');
       return false;
     }
   }
@@ -132,7 +133,7 @@ class OrderRepositoryImpl implements OrderRepository {
             responseData['message'] ?? 'Server error (${response.statusCode})');
       }
     } catch (e) {
-      print('Create order error: $e');
+      debugPrint('Create order error: $e');
       if (e is http.ClientException) {
         throw Exception('Network error: Please check your internet connection');
       }

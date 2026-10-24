@@ -134,7 +134,7 @@ class _PendingApprovalScreenState extends ConsumerState<PendingApprovalScreen> {
                     final currentAuthProvider = ref.read(authProviderNotifier);
                     if (currentAuthProvider.isLoggedIn &&
                         currentAuthProvider.isCustomer) {
-                      if (mounted) {
+                      if (context.mounted) {
                         Navigator.pushReplacementNamed(context, AppRoutes.home);
                       }
                     }
@@ -148,7 +148,7 @@ class _PendingApprovalScreenState extends ConsumerState<PendingApprovalScreen> {
                 GestureDetector(
                   onTap: () async {
                     await ref.read(authProviderNotifier).logout();
-                    if (mounted) {
+                    if (context.mounted) {
                       Navigator.pushReplacementNamed(context, AppRoutes.login);
                     }
                   },

@@ -29,13 +29,13 @@ class _CartScreenState extends ConsumerState<CartScreen>
       ref.read(cartProviderNotifier).loadCart();
       final categoryProv = ref.read(categoryProviderNotifier);
       if (categoryProv.categories.isEmpty) {
-        print('CartScreen DEBUG: Fetching categories...');
+        debugPrint('CartScreen DEBUG: Fetching categories...');
         await categoryProv.fetchCategories();
-        print(
+        debugPrint(
           'CartScreen DEBUG: Fetching categories complete. Error: ${categoryProv.errorMessage}. Count: ${categoryProv.categories.length}',
         );
       } else {
-        print(
+        debugPrint(
           'CartScreen DEBUG: Categories already loaded. Count: ${categoryProv.categories.length}',
         );
       }

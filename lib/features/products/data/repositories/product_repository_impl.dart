@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:medicare_app/features/products/domain/repositories/product_repository.dart';
 import '../../../../core/constants/api_constants.dart';
@@ -18,7 +19,7 @@ class ProductRepositoryImpl implements ProductRepository {
   }) async {
     try {
       final url = '${ApiConstants.products}?page=$page&limit=$limit';
-      print('getProducts URL: $url');
+      debugPrint('getProducts URL: $url');
       final token = await prefsHelper.getToken();
       final response = await client
           .get(
@@ -32,7 +33,7 @@ class ProductRepositoryImpl implements ProductRepository {
             },
           );
 
-      print('getProducts response status: ${response.statusCode}');
+      debugPrint('getProducts response status: ${response.statusCode}');
 
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);
@@ -53,11 +54,11 @@ class ProductRepositoryImpl implements ProductRepository {
         }
       } else {
         final responseData = json.decode(response.body);
-        print('getProducts error response: ${response.body}');
+        debugPrint('getProducts error response: ${response.body}');
         throw Exception(responseData['message'] ?? 'Failed to load products (${response.statusCode})');
       }
     } catch (e) {
-      print('Get products error: $e');
+      debugPrint('Get products error: $e');
       rethrow;
     }
   }
@@ -109,7 +110,7 @@ class ProductRepositoryImpl implements ProductRepository {
         return PaginatedProductResponse(products: [], hasNextPage: false);
       }
     } catch (e) {
-      print('Search products error: $e');
+      debugPrint('Search products error: $e');
       return PaginatedProductResponse(products: [], hasNextPage: false);
     }
   }
@@ -169,7 +170,7 @@ class ProductRepositoryImpl implements ProductRepository {
         throw Exception(responseData['message'] ?? 'Error: ${response.statusCode}');
       }
     } catch (e) {
-      print('Get product detail error: $e');
+      debugPrint('Get product detail error: $e');
       rethrow;
     }
   }
@@ -228,7 +229,7 @@ class ProductRepositoryImpl implements ProductRepository {
         throw Exception(responseData['message'] ?? 'Request failed with status: ${response.statusCode}');
       }
     } catch (e) {
-      print('$errorMessagePrefix error: $e');
+      debugPrint('$errorMessagePrefix error: $e');
       rethrow;
     }
   }

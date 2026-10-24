@@ -1,3 +1,5 @@
+import 'dart:developer' show log;
+
 class CartEntity {
   final List<CartItemEntity> items;
   final double subtotal;
@@ -14,7 +16,7 @@ class CartEntity {
   });
 
   factory CartEntity.fromJson(Map<String, dynamic> json) {
-    print('Parsing cart JSON: $json');
+    log('Parsing cart JSON: $json');
 
     List<CartItemEntity> itemsList = [];
 
@@ -60,7 +62,7 @@ class CartItemEntity {
   });
 
   factory CartItemEntity.fromJson(Map<String, dynamic> json) {
-    print('Parsing cart item: $json');
+    log('Parsing cart item: $json');
 
     return CartItemEntity(
       id: json['id'] ?? '',

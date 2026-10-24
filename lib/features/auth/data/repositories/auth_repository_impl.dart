@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:medicare_app/features/auth/domain/repositories/auth_repository.dart';
 import '../../../../core/constants/api_constants.dart';
@@ -139,7 +140,7 @@ class AuthRepositoryImpl implements AuthRepository {
         if (user != null) {
           // Save user data (no token yet since account needs approval)
           await sharedPreferencesHelper.saveUser(user);
-          print('User registered successfully: ${user.email}');
+          debugPrint('User registered successfully: ${user.email}');
           return user;
         } else {
           // Return a pending user object for approval
@@ -153,7 +154,7 @@ class AuthRepositoryImpl implements AuthRepository {
             createdAt: DateTime.now(),
           );
           await sharedPreferencesHelper.saveUser(pendingUser);
-          print('Registration successful but pending approval');
+          debugPrint('Registration successful but pending approval');
           return pendingUser;
         }
       } else {
@@ -164,7 +165,7 @@ class AuthRepositoryImpl implements AuthRepository {
         );
       }
     } catch (e) {
-      print('Registration error: $e');
+      debugPrint('Registration error: $e');
       throw Exception('Registration Error: $e');
     }
   }
@@ -289,7 +290,7 @@ class AuthRepositoryImpl implements AuthRepository {
         throw Exception(errorBody['message'] ?? 'Failed to fetch profile');
       }
     } catch (e) {
-      print('Get profile error: $e');
+      debugPrint('Get profile error: $e');
       throw Exception('$e');
     }
   }
@@ -332,7 +333,7 @@ class AuthRepositoryImpl implements AuthRepository {
         throw Exception(errorBody['message'] ?? 'Failed to update profile');
       }
     } catch (e) {
-      print('Update profile error: $e');
+      debugPrint('Update profile error: $e');
       throw Exception('$e');
     }
   }
@@ -364,7 +365,7 @@ class AuthRepositoryImpl implements AuthRepository {
         throw Exception(responseData['message'] ?? 'Failed to change password');
       }
     } catch (e) {
-      print('Change password error: $e');
+      debugPrint('Change password error: $e');
       throw Exception('$e');
     }
   }

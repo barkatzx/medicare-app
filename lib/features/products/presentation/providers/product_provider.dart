@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:medicare_app/features/products/domain/repositories/product_repository.dart';
 import '../../domain/entities/product_entity.dart';
 
@@ -73,14 +74,16 @@ class ProductProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      print('Loading products page: $_currentPage');
+      debugPrint('Loading products page: $_currentPage');
       final paginatedResponse = await productRepository.getProducts(
         page: _currentPage,
         limit: 20,
       );
       
       final newProducts = paginatedResponse.products;
-      print('Received ${newProducts.length} products, hasNextPage: ${paginatedResponse.hasNextPage}');
+      debugPrint(
+        'Received ${newProducts.length} products, hasNextPage: ${paginatedResponse.hasNextPage}',
+      );
       
       if (isFirstLoad) {
         _products = newProducts;
@@ -97,9 +100,11 @@ class ProductProvider extends ChangeNotifier {
         _filteredProducts = _products;
       }
       
-      print('Total products loaded: ${_products.length}, nextPage: $_currentPage, hasNextPage: $_hasNextPage');
+      debugPrint(
+        'Total products loaded: ${_products.length}, nextPage: $_currentPage, hasNextPage: $_hasNextPage',
+      );
     } catch (e) {
-      print('LoadProducts error: $e');
+      debugPrint('LoadProducts error: $e');
       _errorMessage = e.toString();
     } finally {
       _isLoading = false;

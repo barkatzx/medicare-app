@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medicare_app/core/di/providers.dart';
 import 'package:medicare_app/core/theme/custom_theme.dart';
 import 'package:medicare_app/core/routes/app_routes.dart';
+import 'package:medicare_app/features/categories/domain/entities/category_entity.dart';
+import 'package:medicare_app/features/categories/presentation/providers/category_provider.dart';
 
 class CategoriesScreen extends ConsumerStatefulWidget {
   const CategoriesScreen({super.key});
@@ -51,7 +53,7 @@ class _CategoriesScreenState extends ConsumerState<CategoriesScreen> {
     );
   }
 
-  Widget _buildSearchField(provider) {
+  Widget _buildSearchField(CategoryProvider provider) {
     return Container(
       height: 46,
       decoration: BoxDecoration(
@@ -92,7 +94,7 @@ class _CategoriesScreenState extends ConsumerState<CategoriesScreen> {
     );
   }
 
-  Widget _buildBody(provider) {
+  Widget _buildBody(CategoryProvider provider) {
     if (provider.isLoading && provider.categories.isEmpty) {
       return const Center(
         child: CircularProgressIndicator(
@@ -199,7 +201,7 @@ class _CategoriesScreenState extends ConsumerState<CategoriesScreen> {
     );
   }
 
-  Widget _buildCategoryCard(category) {
+  Widget _buildCategoryCard(CategoryEntity category) {
     return GestureDetector(
       onTap: () {
         Navigator.pushNamed(

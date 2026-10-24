@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:medicare_app/core/services/notification_service.dart';
 import 'package:medicare_app/features/notifications/domain/repositories/notification_repository.dart';
 import '../../domain/entities/notification_entity.dart';
@@ -81,7 +82,7 @@ class NotificationProvider extends ChangeNotifier {
       _hasMore = newNotifications.length == 10;
       if (_hasMore) _currentPage++;
     } catch (e) {
-      print('Error loading more notifications: $e');
+      debugPrint('Error loading more notifications: $e');
     } finally {
       _isLoadingMore = false;
       notifyListeners();
@@ -93,7 +94,7 @@ class NotificationProvider extends ChangeNotifier {
       _unreadCount = await notificationRepository.getUnreadCount();
       notifyListeners();
     } catch (e) {
-      print('Error loading unread count: $e');
+      debugPrint('Error loading unread count: $e');
     }
   }
 
@@ -131,7 +132,7 @@ class NotificationProvider extends ChangeNotifier {
       await loadUnreadCount();
       notifyListeners();
     } catch (e) {
-      print('Error marking as read: $e');
+      debugPrint('Error marking as read: $e');
       rethrow;
     }
   }
@@ -163,7 +164,7 @@ class NotificationProvider extends ChangeNotifier {
       _unreadCount = 0;
       notifyListeners();
     } catch (e) {
-      print('Error marking all as read: $e');
+      debugPrint('Error marking all as read: $e');
       rethrow;
     }
   }
