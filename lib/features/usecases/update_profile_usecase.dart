@@ -10,6 +10,10 @@ class UpdateProfileUseCase {
     required String name,
     required String pharmacyName,
     required String phoneNumber,
+    String? fullAddress,
+    String? divisionId,
+    String? districtId,
+    String? upazilaId,
   }) async {
     if (name.isEmpty) {
       throw Exception('Name is required');
@@ -25,6 +29,10 @@ class UpdateProfileUseCase {
       name: name,
       pharmacyName: pharmacyName,
       phoneNumber: phoneNumber,
+      fullAddress: fullAddress,
+      divisionId: divisionId,
+      districtId: districtId,
+      upazilaId: upazilaId,
     );
   }
 }

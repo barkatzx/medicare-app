@@ -12,6 +12,11 @@ class RegisterUseCase {
     required String email,
     required String phoneNumber,
     required String password,
+    required String pharmacyName,
+    required String fullAddress,
+    required String divisionId,
+    required String districtId,
+    required String upazilaId,
   }) async {
     if (name.isEmpty) {
       throw Exception('Name is required');
@@ -37,11 +42,36 @@ class RegisterUseCase {
       throw Exception('Password must be at least 6 characters');
     }
 
+    if (pharmacyName.isEmpty) {
+      throw Exception('Pharmacy name is required');
+    }
+
+    if (fullAddress.isEmpty) {
+      throw Exception('Full address is required');
+    }
+
+    if (divisionId.isEmpty) {
+      throw Exception('Division is required');
+    }
+
+    if (districtId.isEmpty) {
+      throw Exception('District is required');
+    }
+
+    if (upazilaId.isEmpty) {
+      throw Exception('Upazila is required');
+    }
+
     return await repository.register(
       name: name,
       email: email,
       phoneNumber: phoneNumber,
       password: password,
+      pharmacyName: pharmacyName,
+      fullAddress: fullAddress,
+      divisionId: divisionId,
+      districtId: districtId,
+      upazilaId: upazilaId,
     );
   }
 

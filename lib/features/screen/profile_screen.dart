@@ -45,8 +45,8 @@ class ProfileScreen extends ConsumerWidget {
                 ),
                 _MenuItemData(
                   icon: Icons.location_on_outlined,
-                  title: 'My Addresses',
-                  subtitle: 'Manage delivery locations',
+                  title: 'My Address',
+                  subtitle: 'Your delivery location',
                   iconColor: const Color(0xFF10B981),
                   onTap: () =>
                       Navigator.pushNamed(context, AppRoutes.addresses),
@@ -63,14 +63,6 @@ class ProfileScreen extends ConsumerWidget {
               _buildSectionLabel('Preferences'),
               const SizedBox(height: 10),
               _buildMenuCard([
-                _MenuItemData(
-                  icon: Icons.notifications_none_rounded,
-                  title: 'Notifications',
-                  subtitle: 'Alerts and updates',
-                  iconColor: const Color(0xFFF59E0B),
-                  onTap: () =>
-                      Navigator.pushNamed(context, AppRoutes.notifications),
-                ),
                 _MenuItemData(
                   icon: Icons.shield_outlined,
                   title: 'Privacy & Security',

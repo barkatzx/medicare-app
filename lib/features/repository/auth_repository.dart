@@ -12,6 +12,11 @@ abstract class AuthRepository {
     required String email,
     required String phoneNumber,
     required String password,
+    required String pharmacyName,
+    required String fullAddress,
+    required String divisionId,
+    required String districtId,
+    required String upazilaId,
   });
 
   Future<UserEntity> verifyAuth();
@@ -36,6 +41,10 @@ abstract class AuthRepository {
     required String name,
     required String pharmacyName,
     required String phoneNumber,
+    String? fullAddress,
+    String? divisionId,
+    String? districtId,
+    String? upazilaId,
   });
 
   Future<void> changePassword({

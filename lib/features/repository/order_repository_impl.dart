@@ -102,14 +102,12 @@ class OrderRepositoryImpl implements OrderRepository {
 
   @override
   Future<String> createOrder({
-    required String shippingAddressId,
     required String paymentMethod,
     String? notes,
   }) async {
     try {
       final token = await prefsHelper.getToken();
       final body = {
-        'shippingAddressId': shippingAddressId,
         'paymentMethod': paymentMethod,
         if (notes != null && notes.isNotEmpty) 'notes': notes,
       };

@@ -26,10 +26,5 @@ class AppRoutes {
   static const String editProfile = '/edit-profile';
   static const String changePassword = '/change-password';
   static const String addresses = '/addresses';
-  static const String addAddress = '/add-address';
-  static const String editAddress = '/edit-address';
   static const String about = '/about';
-
-  // Notifications
-  static const String notifications = '/notifications';
 }

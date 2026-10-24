@@ -16,21 +16,15 @@ class ApiConstants {
   static String get login => '$baseUrl/users/login';
   static String get verifyAuth => '$baseUrl/users/verify-auth';
 
+  // ==================== LOCATION ROUTES ====================
+  static String get divisions => '$baseUrl/locations/divisions';
+  static String get districts => '$baseUrl/locations/districts';
+  static String get upazilas => '$baseUrl/locations/upazilas';
+
   // ==================== USER PROFILE ROUTES ====================
   static String get profile => '$baseUrl/users/profile';
   static String get updateprofile => '$baseUrl/users/profile';
   static String get changePassword => '$baseUrl/users/change-password';
-
-  // ==================== ADDRESS ROUTES ====================
-  static String get addresses => '$baseUrl/users/addresses';
-  static String addressDetail(String addressId) =>
-      '$baseUrl/users/addresses/$addressId';
-  static String updateAddress(String addressId) =>
-      '$baseUrl/users/addresses/$addressId';
-  static String setDefaultAddress(String addressId) =>
-      '$baseUrl/users/addresses/$addressId';
-  static String deleteAddress(String addressId) =>
-      '$baseUrl/users/addresses/$addressId';
 
   // ==================== CART ROUTES ====================
   static String get cart => '$baseUrl/users/cart';
@@ -40,12 +34,6 @@ class ApiConstants {
   static String get clearCart => '$baseUrl/users/cart/clear';
   static String removeFromCart(String itemId) =>
       '$baseUrl/users/cart/item/$itemId';
-
-  // ==================== NOTIFICATION ROUTES ====================
-  static String get notifications => '$baseUrl/users/notifications';
-  static String get markAllRead => '$baseUrl/users/notifications/read-all';
-  static String markNotificationRead(String notificationId) =>
-      '$baseUrl/users/notifications/$notificationId';
 
   // ==================== PRODUCT ROUTES ====================
   static String get products => '$baseUrl/products';

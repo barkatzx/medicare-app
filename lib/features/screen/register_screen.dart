@@ -5,6 +5,7 @@ import 'package:medicare_app/core/theme/custom_theme.dart';
 import '../../core/routes/app_routes.dart';
 import '../../core/widgets/custom_button.dart';
 import '../../core/widgets/custom_textfield.dart';
+import '../entity/location_entity.dart';
 
 class RegisterScreen extends ConsumerStatefulWidget {
   const RegisterScreen({super.key});
@@ -20,12 +21,172 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   final _phoneController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
+  final _pharmacyNameController = TextEditingController();
+  final _addressController = TextEditingController();
+
+  List<LocationEntity> _divisions = [];
+  List<LocationEntity> _districts = [];
+  List<LocationEntity> _upazilas = [];
+  String? _divisionId;
+  String? _districtId;
+  String? _upazilaId;
+  bool _loadingDivisions = false;
+  bool _loadingDistricts = false;
+  bool _loadingUpazilas = false;
+  String? _locationError;
 
   bool _isPasswordVisible = false;
   bool _isConfirmPasswordVisible = false;
 
   @override
+  void initState() {
+    super.initState();
+    _loadDivisions();
+  }
+
+  Future<void> _loadDivisions() async {
+    setState(() {
+      _loadingDivisions = true;
+      _locationError = null;
+    });
+    try {
+      final data = await ref.read(locationRepositoryProvider).getDivisions();
+      if (!mounted) return;
+      setState(() => _divisions = data);
+    } catch (_) {
+      if (!mounted) return;
+      setState(
+        () => _locationError = 'Could not load locations. Tap to retry.',
+      );
+    } finally {
+      if (mounted) setState(() => _loadingDivisions = false);
+    }
+  }
+
+  Future<void> _onDivisionChanged(String? id) async {
+    setState(() {
+      _divisionId = id;
+      _districtId = null;
+      _upazilaId = null;
+      _districts = [];
+      _upazilas = [];
+      _locationError = null;
+      _loadingDistricts = id != null;
+    });
+    if (id == null) return;
+    try {
+      final data = await ref.read(locationRepositoryProvider).getDistricts(id);
+      if (!mounted || _divisionId != id) return;
+      setState(() => _districts = data);
+    } catch (_) {
+      if (!mounted || _divisionId != id) return;
+      setState(() => _locationError = 'Could not load districts.');
+    } finally {
+      if (mounted && _divisionId == id) {
+        setState(() => _loadingDistricts = false);
+      }
+    }
+  }
+
+  Future<void> _onDistrictChanged(String? id) async {
+    setState(() {
+      _districtId = id;
+      _upazilaId = null;
+      _upazilas = [];
+      _locationError = null;
+      _loadingUpazilas = id != null;
+    });
+    if (id == null) return;
+    try {
+      final data = await ref.read(locationRepositoryProvider).getUpazilas(id);
+      if (!mounted || _districtId != id) return;
+      setState(() => _upazilas = data);
+    } catch (_) {
+      if (!mounted || _districtId != id) return;
+      setState(() => _locationError = 'Could not load upazilas.');
+    } finally {
+      if (mounted && _districtId == id) {
+        setState(() => _loadingUpazilas = false);
+      }
+    }
+  }
+
+  Widget _buildDropdown({
+    required String label,
+    required String hint,
+    required IconData icon,
+    required List<LocationEntity> items,
+    required String? value,
+    required bool isLoading,
+    required ValueChanged<String?> onChanged,
+    required String requiredMessage,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: CustomTheme.fontSizeSM,
+            fontWeight: CustomTheme.fontWeightMedium,
+            color: CustomTheme.textSecondary,
+          ),
+        ),
+        SizedBox(height: CustomTheme.spacingSM),
+        DropdownButtonFormField<String>(
+          key: ValueKey('$label-${items.length}-$value'),
+          initialValue: value,
+          isExpanded: true,
+          icon: isLoading
+              ? const SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+              : const Icon(Icons.keyboard_arrow_down_rounded),
+          style: TextStyle(fontSize: 15, color: CustomTheme.textSecondary),
+          decoration: InputDecoration(
+            hintText: hint,
+            hintStyle: TextStyle(fontSize: 15, color: CustomTheme.textTertiary),
+            prefixIcon: Icon(icon, size: 20, color: CustomTheme.textTertiary),
+            filled: true,
+            fillColor: CustomTheme.surfaceColor,
+            contentPadding: EdgeInsets.symmetric(
+              horizontal: CustomTheme.spacingMD,
+              vertical: CustomTheme.spacingLG,
+            ),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(CustomTheme.radiusMD),
+              borderSide: BorderSide(color: CustomTheme.secondaryColor),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(CustomTheme.radiusMD),
+              borderSide: BorderSide(color: CustomTheme.secondaryColor),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(CustomTheme.radiusMD),
+              borderSide: BorderSide(color: CustomTheme.secondaryColor),
+            ),
+          ),
+          items: items
+              .map(
+                (e) => DropdownMenuItem<String>(
+                  value: e.id,
+                  child: Text(e.label, overflow: TextOverflow.ellipsis),
+                ),
+              )
+              .toList(),
+          onChanged: items.isEmpty ? null : onChanged,
+          validator: (v) => v == null ? requiredMessage : null,
+        ),
+      ],
+    );
+  }
+
+  @override
   void dispose() {
+    _pharmacyNameController.dispose();
+    _addressController.dispose();
     _nameController.dispose();
     _emailController.dispose();
     _phoneController.dispose();
@@ -139,6 +300,20 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                           ),
                           SizedBox(height: CustomTheme.spacingLG),
                           CustomTextField(
+                            controller: _pharmacyNameController,
+                            label: 'Pharmacy Name',
+                            hintText: 'Your pharmacy name',
+                            prefixIcon: Icons.local_pharmacy_outlined,
+                            fontSize: 15,
+                            validator: (value) {
+                              if (value == null || value.trim().isEmpty) {
+                                return 'Pharmacy name is required';
+                              }
+                              return null;
+                            },
+                          ),
+                          SizedBox(height: CustomTheme.spacingLG),
+                          CustomTextField(
                             controller: _phoneController,
                             label: 'Phone Number',
                             hintText: '01XXXXXXXXX',
@@ -220,6 +395,70 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                               return null;
                             },
                           ),
+                          SizedBox(height: CustomTheme.spacingLG),
+                          CustomTextField(
+                            controller: _addressController,
+                            label: 'Full Address',
+                            hintText: 'House, road, area',
+                            prefixIcon: Icons.home_outlined,
+                            keyboardType: TextInputType.multiline,
+                            maxLines: 3,
+                            fontSize: 15,
+                            validator: (value) {
+                              if (value == null || value.trim().isEmpty) {
+                                return 'Full address is required';
+                              }
+                              return null;
+                            },
+                          ),
+                          SizedBox(height: CustomTheme.spacingLG),
+                          _buildDropdown(
+                            label: 'Division',
+                            hint: 'Select division',
+                            icon: Icons.map_outlined,
+                            items: _divisions,
+                            value: _divisionId,
+                            isLoading: _loadingDivisions,
+                            onChanged: _onDivisionChanged,
+                            requiredMessage: 'Division is required',
+                          ),
+                          SizedBox(height: CustomTheme.spacingLG),
+                          _buildDropdown(
+                            label: 'District',
+                            hint: 'Select district',
+                            icon: Icons.location_city_outlined,
+                            items: _districts,
+                            value: _districtId,
+                            isLoading: _loadingDistricts,
+                            onChanged: _onDistrictChanged,
+                            requiredMessage: 'District is required',
+                          ),
+                          SizedBox(height: CustomTheme.spacingLG),
+                          _buildDropdown(
+                            label: 'Upazila',
+                            hint: 'Select upazila',
+                            icon: Icons.pin_drop_outlined,
+                            items: _upazilas,
+                            value: _upazilaId,
+                            isLoading: _loadingUpazilas,
+                            onChanged: (id) => setState(() => _upazilaId = id),
+                            requiredMessage: 'Upazila is required',
+                          ),
+                          if (_locationError != null)
+                            GestureDetector(
+                              onTap: _divisions.isEmpty ? _loadDivisions : null,
+                              child: Padding(
+                                padding: EdgeInsets.only(
+                                  top: CustomTheme.spacingSM,
+                                ),
+                                child: Text(
+                                  _locationError!,
+                                  style: CustomTextStyle.bodySmall.copyWith(
+                                    color: CustomTheme.errorColor,
+                                  ),
+                                ),
+                              ),
+                            ),
                           SizedBox(height: CustomTheme.spacingXXL),
 
                           // Error Message
@@ -338,6 +577,11 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         email: _emailController.text.trim(),
         phoneNumber: _phoneController.text.trim(),
         password: _passwordController.text,
+        pharmacyName: _pharmacyNameController.text.trim(),
+        fullAddress: _addressController.text.trim(),
+        divisionId: _divisionId ?? '',
+        districtId: _districtId ?? '',
+        upazilaId: _upazilaId ?? '',
       );
 
       if (success && mounted) {

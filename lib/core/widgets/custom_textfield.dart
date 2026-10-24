@@ -12,6 +12,7 @@ class CustomTextField extends StatefulWidget {
   final String? Function(String?)? validator;
   final bool enabled;
   final double? fontSize;
+  final int maxLines;
 
   const CustomTextField({
     super.key,
@@ -25,6 +26,7 @@ class CustomTextField extends StatefulWidget {
     this.validator,
     this.enabled = true,
     this.fontSize,
+    this.maxLines = 1,
   });
 
   @override
@@ -106,6 +108,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
                   obscureText: widget.obscureText,
                   keyboardType: widget.keyboardType,
                   enabled: widget.enabled,
+                  maxLines: widget.maxLines,
                   style: TextStyle(
                     fontSize: widget.fontSize ?? CustomTheme.fontSizeMD,
                     color: CustomTheme.textSecondary,
