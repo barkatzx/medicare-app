@@ -1,8 +1,5 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:http/http.dart' as http;
-import 'package:medicare_app/core/constants/api_constants.dart';
 import 'package:medicare_app/core/di/providers.dart';
 import 'package:medicare_app/features/cart/domain/entities/cart_entity.dart';
 import 'package:medicare_app/features/address/domain/entities/address_entity.dart';
@@ -835,74 +832,6 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen>
           ),
 
           const SizedBox(height: 32),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildReviewItem(CartItemEntity item) {
-    return Padding(
-      padding: const EdgeInsets.all(14),
-      child: Row(
-        children: [
-          Container(
-            width: 50,
-            height: 50,
-            decoration: BoxDecoration(
-              color: CustomTheme.backgroundColor,
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(12),
-              child: item.productImage.isNotEmpty
-                  ? Image.network(
-                      item.productImage,
-                      fit: BoxFit.cover,
-                      errorBuilder: (_, _, _) => Icon(
-                        Icons.medical_services,
-                        size: 22,
-                        color: CustomTheme.textTertiary,
-                      ),
-                    )
-                  : Icon(
-                      Icons.medical_services,
-                      size: 22,
-                      color: CustomTheme.textTertiary,
-                    ),
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  item.productName,
-                  style: CustomTextStyle.bodyMedium.copyWith(
-                    fontWeight: CustomTheme.fontWeightMedium,
-                    color: CustomTheme.textPrimary,
-                    fontSize: 13,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 3),
-                Text(
-                  '${item.finalPrice.toStringAsFixed(2)}৳ × ${item.quantity}',
-                  style: CustomTextStyle.caption.copyWith(fontSize: 11),
-                ),
-              ],
-            ),
-          ),
-          Text(
-            '${item.itemTotal.toStringAsFixed(2)}৳',
-            style: TextStyle(
-              fontFamily: CustomTheme.primaryFontFamily,
-              fontSize: 14,
-              fontWeight: CustomTheme.fontWeightBold,
-              color: CustomTheme.textPrimary,
-            ),
-          ),
         ],
       ),
     );

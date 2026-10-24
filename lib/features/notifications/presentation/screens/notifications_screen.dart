@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medicare_app/core/di/providers.dart';
-import 'package:medicare_app/core/services/notification_service.dart';
 import 'package:medicare_app/features/notifications/presentation/providers/notification_provider.dart';
 import 'package:medicare_app/core/theme/custom_theme.dart';
 import 'package:medicare_app/core/widgets/loading_widget.dart';
