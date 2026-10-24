@@ -75,7 +75,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           Container(
             padding: EdgeInsets.all(CustomTheme.spacingXL),
             decoration: BoxDecoration(
-              color: CustomTheme.primaryColor.withOpacity(0.1),
+              color: CustomTheme.primaryColor.withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
             child: Icon(
@@ -164,7 +164,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         Container(
           padding: EdgeInsets.all(CustomTheme.spacingXL),
           decoration: BoxDecoration(
-            color: CustomTheme.successColor.withOpacity(0.1),
+            color: CustomTheme.successColor.withValues(alpha: 0.1),
             shape: BoxShape.circle,
           ),
           child: Icon(
@@ -198,10 +198,10 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         Container(
           padding: EdgeInsets.all(CustomTheme.spacingLG),
           decoration: BoxDecoration(
-            color: CustomTheme.successColor.withOpacity(0.05),
+            color: CustomTheme.successColor.withValues(alpha: 0.05),
             borderRadius: BorderRadius.circular(CustomTheme.radiusLG),
             border: Border.all(
-              color: CustomTheme.successColor.withOpacity(0.2),
+              color: CustomTheme.successColor.withValues(alpha: 0.2),
               width: 1,
             ),
           ),

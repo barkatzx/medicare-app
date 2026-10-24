@@ -36,7 +36,7 @@ class _HomeAppBarState extends ConsumerState<HomeAppBar> {
     final user = ref.watch(authProviderNotifier).currentUser;
     final unreadCount = ref.watch(notificationProviderNotifier).unreadCount;
     final addresses = ref.watch(addressProviderNotifier).addresses;
-    
+
     AddressEntity? defaultAddress;
     try {
       defaultAddress = addresses.firstWhere((a) => a.isDefault);
@@ -63,7 +63,7 @@ class _HomeAppBarState extends ConsumerState<HomeAppBar> {
                   gradient: LinearGradient(
                     colors: [
                       CustomTheme.primaryColor,
-                      CustomTheme.primaryColor.withOpacity(0.4),
+                      CustomTheme.primaryColor.withValues(alpha: 0.4),
                     ],
                   ),
                 ),
@@ -125,12 +125,12 @@ class _HomeAppBarState extends ConsumerState<HomeAppBar> {
                       Icon(
                         Icons.location_on,
                         size: 12,
-                        color: CustomTheme.primaryColor.withOpacity(0.7),
+                        color: CustomTheme.primaryColor.withValues(alpha: 0.7),
                       ),
                       const SizedBox(width: 2),
                       Flexible(
                         child: Text(
-                          defaultAddress != null 
+                          defaultAddress != null
                               ? '${defaultAddress.city}, ${defaultAddress.state}'
                               : 'Add Location',
                           style: CustomTextStyle.caption.copyWith(
@@ -187,12 +187,14 @@ class _HomeAppBarState extends ConsumerState<HomeAppBar> {
             shape: BoxShape.circle,
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.04),
+                color: Colors.black.withValues(alpha: 0.04),
                 blurRadius: 10,
                 offset: const Offset(0, 4),
               ),
             ],
-            border: Border.all(color: CustomTheme.borderLight.withOpacity(0.5)),
+            border: Border.all(
+              color: CustomTheme.borderLight.withValues(alpha: 0.5),
+            ),
           ),
           child: Material(
             color: Colors.transparent,
@@ -202,11 +204,7 @@ class _HomeAppBarState extends ConsumerState<HomeAppBar> {
               child: Stack(
                 alignment: Alignment.center,
                 children: [
-                  Icon(
-                    icon,
-                    color: CustomTheme.textPrimary,
-                    size: 22,
-                  ),
+                  Icon(icon, color: CustomTheme.textPrimary, size: 22),
                   if (badgeCount > 0)
                     Positioned(
                       top: 8,

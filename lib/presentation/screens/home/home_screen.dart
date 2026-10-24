@@ -73,7 +73,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: CustomTheme.primaryColor.withOpacity(0.25),
+            color: CustomTheme.primaryColor.withValues(alpha: 0.25),
             blurRadius: 20,
             offset: const Offset(0, 8),
           ),
@@ -85,9 +85,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
           _buildNavItem(0, Icons.home_rounded, 'Home', selectedIndex),
           _buildNavItem(1, Icons.add_box_outlined, 'Shortcuts', selectedIndex),
           _buildNavItem(
-              2, Icons.medical_services_outlined, 'Company', selectedIndex),
-          _buildNavItem(3, Icons.shopping_bag_outlined, 'Bag', selectedIndex,
-              badgeCount: cartItemCount),
+            2,
+            Icons.medical_services_outlined,
+            'Company',
+            selectedIndex,
+          ),
+          _buildNavItem(
+            3,
+            Icons.shopping_bag_outlined,
+            'Bag',
+            selectedIndex,
+            badgeCount: cartItemCount,
+          ),
           _buildNavItem(4, Icons.person_outline, 'Profile', selectedIndex),
         ],
       ),
@@ -130,7 +139,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                     key: ValueKey('$index-$isSelected'),
                     color: isSelected
                         ? CustomTheme.primaryColor
-                        : Colors.white.withOpacity(0.65),
+                        : Colors.white.withValues(alpha: 0.65),
                     size: 22,
                   ),
                 ),
@@ -150,8 +159,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                           width: 1.5,
                         ),
                       ),
-                      constraints:
-                          const BoxConstraints(minWidth: 16, minHeight: 16),
+                      constraints: const BoxConstraints(
+                        minWidth: 16,
+                        minHeight: 16,
+                      ),
                       child: Text(
                         badgeCount > 9 ? '9+' : '$badgeCount',
                         style: const TextStyle(
@@ -265,9 +276,11 @@ class _HomeContentScreenState extends ConsumerState<HomeContentScreen> {
       child: ListView.builder(
         controller: _scrollController,
         physics: const AlwaysScrollableScrollPhysics(
-            parent: BouncingScrollPhysics()),
+          parent: BouncingScrollPhysics(),
+        ),
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
-        itemCount: productProvider.products.length +
+        itemCount:
+            productProvider.products.length +
             (productProvider.isLoadingMore ? 1 : 0) +
             (productProvider.errorMessage != null &&
                     productProvider.products.isNotEmpty
@@ -333,7 +346,7 @@ class _HomeContentScreenState extends ConsumerState<HomeContentScreen> {
               width: 80,
               height: 80,
               decoration: BoxDecoration(
-                color: CustomTheme.errorColor.withOpacity(0.08),
+                color: CustomTheme.errorColor.withValues(alpha: 0.08),
                 shape: BoxShape.circle,
               ),
               child: const Icon(
@@ -358,7 +371,9 @@ class _HomeContentScreenState extends ConsumerState<HomeContentScreen> {
               onTap: () => productProvider.loadProducts(refresh: true),
               child: Container(
                 padding: const EdgeInsets.symmetric(
-                    horizontal: 28, vertical: 13),
+                  horizontal: 28,
+                  vertical: 13,
+                ),
                 decoration: BoxDecoration(
                   color: CustomTheme.primaryColor,
                   borderRadius: BorderRadius.circular(13),
@@ -390,7 +405,7 @@ class _HomeContentScreenState extends ConsumerState<HomeContentScreen> {
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.06),
+                    color: Colors.black.withValues(alpha: 0.06),
                     blurRadius: 20,
                     offset: const Offset(0, 6),
                   ),
@@ -431,16 +446,19 @@ class _HomeContentScreenState extends ConsumerState<HomeContentScreen> {
       margin: const EdgeInsets.only(top: 8),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: CustomTheme.errorColor.withOpacity(0.06),
+        color: CustomTheme.errorColor.withValues(alpha: 0.06),
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
-          color: CustomTheme.errorColor.withOpacity(0.15),
+          color: CustomTheme.errorColor.withValues(alpha: 0.15),
         ),
       ),
       child: Row(
         children: [
-          const Icon(Icons.error_outline,
-              color: CustomTheme.errorColor, size: 18),
+          const Icon(
+            Icons.error_outline,
+            color: CustomTheme.errorColor,
+            size: 18,
+          ),
           const SizedBox(width: 10),
           Expanded(
             child: Text(
@@ -454,8 +472,7 @@ class _HomeContentScreenState extends ConsumerState<HomeContentScreen> {
           GestureDetector(
             onTap: () => productProvider.loadProducts(),
             child: Container(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
                 color: CustomTheme.errorColor,
                 borderRadius: BorderRadius.circular(8),

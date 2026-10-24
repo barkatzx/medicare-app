@@ -34,7 +34,9 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
     if (!_formKey.currentState!.validate()) return;
     FocusScope.of(context).unfocus();
 
-    final success = await ref.read(authProviderNotifier).changePassword(
+    final success = await ref
+        .read(authProviderNotifier)
+        .changePassword(
           oldPassword: _oldPasswordController.text,
           newPassword: _newPasswordController.text,
         );
@@ -44,18 +46,26 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
         SnackBar(
           content: Row(
             children: [
-              const Icon(Icons.check_circle_outline,
-                  color: Colors.white, size: 18),
+              const Icon(
+                Icons.check_circle_outline,
+                color: Colors.white,
+                size: 18,
+              ),
               const SizedBox(width: 10),
-              Text('Password changed successfully',
-                  style: CustomTextStyle.bodyMedium
-                      .copyWith(color: Colors.white, fontSize: 13)),
+              Text(
+                'Password changed successfully',
+                style: CustomTextStyle.bodyMedium.copyWith(
+                  color: Colors.white,
+                  fontSize: 13,
+                ),
+              ),
             ],
           ),
           backgroundColor: CustomTheme.successColor,
           behavior: SnackBarBehavior.floating,
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
           margin: const EdgeInsets.all(16),
         ),
       );
@@ -67,8 +77,9 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
           content: Text(error ?? 'Failed to change password'),
           backgroundColor: CustomTheme.errorColor,
           behavior: SnackBarBehavior.floating,
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
           margin: const EdgeInsets.all(16),
         ),
       );
@@ -103,8 +114,10 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
               const SizedBox(height: 6),
               Text(
                 'Keep your account secure with a strong password.',
-                style: CustomTextStyle.bodyMedium
-                    .copyWith(fontSize: 14, color: CustomTheme.textSecondary),
+                style: CustomTextStyle.bodyMedium.copyWith(
+                  fontSize: 14,
+                  color: CustomTheme.textSecondary,
+                ),
               ),
               const SizedBox(height: 28),
 
@@ -112,22 +125,27 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
               Container(
                 padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
-                  color: CustomTheme.primaryColor.withOpacity(0.04),
+                  color: CustomTheme.primaryColor.withValues(alpha: 0.04),
                   borderRadius: BorderRadius.circular(14),
                   border: Border.all(
-                    color: CustomTheme.primaryColor.withOpacity(0.1),
+                    color: CustomTheme.primaryColor.withValues(alpha: 0.1),
                   ),
                 ),
                 child: Row(
                   children: [
-                    Icon(Icons.shield_outlined,
-                        size: 18, color: CustomTheme.primaryColor),
+                    Icon(
+                      Icons.shield_outlined,
+                      size: 18,
+                      color: CustomTheme.primaryColor,
+                    ),
                     const SizedBox(width: 10),
                     Expanded(
                       child: Text(
                         'Use a strong password with at least 6 characters.',
-                        style: CustomTextStyle.bodySmall
-                            .copyWith(fontSize: 12, height: 1.4),
+                        style: CustomTextStyle.bodySmall.copyWith(
+                          fontSize: 12,
+                          height: 1.4,
+                        ),
                       ),
                     ),
                   ],
@@ -203,8 +221,8 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: CustomTheme.primaryColor,
                     foregroundColor: Colors.white,
-                    disabledBackgroundColor:
-                        CustomTheme.primaryColor.withOpacity(0.5),
+                    disabledBackgroundColor: CustomTheme.primaryColor
+                        .withValues(alpha: 0.5),
                     padding: EdgeInsets.zero,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
@@ -220,10 +238,7 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
                       gradient: isLoading
                           ? null
                           : const LinearGradient(
-                              colors: [
-                                Color(0xFF2A2A2A),
-                                Color(0xFF010101)
-                              ],
+                              colors: [Color(0xFF2A2A2A), Color(0xFF010101)],
                               begin: Alignment.topCenter,
                               end: Alignment.bottomCenter,
                             ),
@@ -250,8 +265,11 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
                                   ),
                                 ),
                                 const SizedBox(width: 8),
-                                const Icon(Icons.lock_rounded,
-                                    color: Colors.white, size: 18),
+                                const Icon(
+                                  Icons.lock_rounded,
+                                  color: Colors.white,
+                                  size: 18,
+                                ),
                               ],
                             ),
                     ),
@@ -283,8 +301,11 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
                 color: CustomTheme.surfaceColor,
                 shape: BoxShape.circle,
               ),
-              child: const Icon(Icons.arrow_back_ios_new_rounded,
-                  color: CustomTheme.textPrimary, size: 15),
+              child: const Icon(
+                Icons.arrow_back_ios_new_rounded,
+                color: CustomTheme.textPrimary,
+                size: 15,
+              ),
             ),
           ),
         ),
@@ -320,7 +341,8 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
         TextFormField(
           controller: controller,
           obscureText: obscure,
-          validator: validator ??
+          validator:
+              validator ??
               (value) => value == null || value.isEmpty
                   ? 'This field is required'
                   : null,
@@ -337,11 +359,16 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
             ),
             prefixIcon: Padding(
               padding: const EdgeInsets.only(left: 14, right: 10),
-              child: Icon(Icons.lock_outline_rounded,
-                  size: 18, color: CustomTheme.textTertiary),
+              child: Icon(
+                Icons.lock_outline_rounded,
+                size: 18,
+                color: CustomTheme.textTertiary,
+              ),
             ),
-            prefixIconConstraints:
-                const BoxConstraints(minWidth: 44, minHeight: 44),
+            prefixIconConstraints: const BoxConstraints(
+              minWidth: 44,
+              minHeight: 44,
+            ),
             suffixIcon: Padding(
               padding: const EdgeInsets.only(right: 8),
               child: IconButton(
@@ -369,7 +396,7 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(13),
               borderSide: BorderSide(
-                color: CustomTheme.primaryColor.withOpacity(0.5),
+                color: CustomTheme.primaryColor.withValues(alpha: 0.5),
                 width: 1.5,
               ),
             ),
@@ -387,8 +414,10 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
                 width: 1.5,
               ),
             ),
-            errorStyle: CustomTextStyle.caption
-                .copyWith(color: CustomTheme.errorColor, fontSize: 11),
+            errorStyle: CustomTextStyle.caption.copyWith(
+              color: CustomTheme.errorColor,
+              fontSize: 11,
+            ),
           ),
         ),
       ],

@@ -47,7 +47,8 @@ class ProductCard extends StatelessWidget {
                               child: CircularProgressIndicator(strokeWidth: 2),
                             ),
                           ),
-                          errorWidget: (context, url, error) => _buildImagePlaceholder(),
+                          errorWidget: (context, url, error) =>
+                              _buildImagePlaceholder(),
                         )
                       : _buildImagePlaceholder(),
                 ),
@@ -62,7 +63,7 @@ class ProductCard extends StatelessWidget {
                     Text(
                       product.categoryName,
                       style: CustomTextStyle.caption.copyWith(
-                        color: CustomTheme.primaryColor.withOpacity(0.5),
+                        color: CustomTheme.primaryColor.withValues(alpha: 0.5),
                         fontWeight: CustomTheme.fontWeightBold,
                         letterSpacing: 0.5,
                         fontSize: 12,
@@ -99,7 +100,7 @@ class ProductCard extends StatelessWidget {
       child: Icon(
         Icons.medical_services_outlined,
         size: 30,
-        color: CustomTheme.primaryColor.withOpacity(0.1),
+        color: CustomTheme.primaryColor.withValues(alpha: 0.1),
       ),
     );
   }
@@ -129,7 +130,7 @@ class ProductCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
             decoration: BoxDecoration(
-              color: CustomTheme.errorColor.withOpacity(0.1),
+              color: CustomTheme.errorColor.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Text(
@@ -147,7 +148,7 @@ class ProductCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
             decoration: BoxDecoration(
-              color: CustomTheme.errorColor.withOpacity(0.1),
+              color: CustomTheme.errorColor.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Text(
@@ -185,9 +186,11 @@ class _AddToCartButtonState extends ConsumerState<_AddToCartButton> {
       onTapCancel: () => setState(() => _isPressed = false),
       onTap: () {
         // Fix: Ensure product has at least one valid price before adding to cart
-        final bool hasPrice = widget.product.price > 0 || 
-                             (widget.product.discountedPrice != null && widget.product.discountedPrice! > 0);
-        
+        final bool hasPrice =
+            widget.product.price > 0 ||
+            (widget.product.discountedPrice != null &&
+                widget.product.discountedPrice! > 0);
+
         if (!hasPrice) {
           if (context.mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
@@ -230,7 +233,7 @@ class _AddToCartButtonState extends ConsumerState<_AddToCartButton> {
         }
 
         final cartProvider = ref.read(cartProviderNotifier);
-        
+
         // Optimistic UI, instantaneous add to cart without blocking
         cartProvider.addToCart(widget.product.id, 1).then((success) {
           if (context.mounted) {
@@ -260,8 +263,8 @@ class _AddToCartButtonState extends ConsumerState<_AddToCartButton> {
         width: 40,
         height: 40,
         decoration: BoxDecoration(
-          color: _isPressed 
-              ? CustomTheme.primaryColor.withOpacity(0.2) 
+          color: _isPressed
+              ? CustomTheme.primaryColor.withValues(alpha: 0.2)
               : CustomTheme.backgroundColor,
           borderRadius: BorderRadius.circular(CustomTheme.radiusSM),
           border: Border.all(
@@ -272,8 +275,8 @@ class _AddToCartButtonState extends ConsumerState<_AddToCartButton> {
         child: Icon(
           widget.product.stock <= 0 ? Icons.close : Icons.add,
           size: 20,
-          color: widget.product.stock <= 0 
-              ? CustomTheme.textTertiary 
+          color: widget.product.stock <= 0
+              ? CustomTheme.textTertiary
               : CustomTheme.primaryColor,
         ),
       ),

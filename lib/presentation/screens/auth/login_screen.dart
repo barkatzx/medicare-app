@@ -43,7 +43,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               height: size.width * 0.8,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: CustomTheme.primaryColor.withOpacity(0.05),
+                color: CustomTheme.primaryColor.withValues(alpha: 0.05),
               ),
             ),
           ),
@@ -55,7 +55,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               height: size.width * 0.7,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: CustomTheme.primaryColor.withOpacity(0.03),
+                color: CustomTheme.primaryColor.withValues(alpha: 0.03),
               ),
             ),
           ),
@@ -91,7 +91,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       padding: EdgeInsets.all(CustomTheme.spacingXXL),
                       decoration: BoxDecoration(
                         color: CustomTheme.surfaceColor,
-                        borderRadius: BorderRadius.circular(CustomTheme.radiusXL),
+                        borderRadius: BorderRadius.circular(
+                          CustomTheme.radiusXL,
+                        ),
                         boxShadow: CustomTheme.boxShadowLight,
                       ),
                       child: Column(
@@ -147,7 +149,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             alignment: Alignment.centerRight,
                             child: TextButton(
                               onPressed: () {
-                                Navigator.pushNamed(context, AppRoutes.forgotPassword);
+                                Navigator.pushNamed(
+                                  context,
+                                  AppRoutes.forgotPassword,
+                                );
                               },
                               style: TextButton.styleFrom(
                                 padding: EdgeInsets.zero,
@@ -168,29 +173,45 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           // Error Message
                           Consumer(
                             builder: (context, ref, child) {
-                              final authProvider = ref.watch(authProviderNotifier);
+                              final authProvider = ref.watch(
+                                authProviderNotifier,
+                              );
                               if (authProvider.errorMessage != null) {
                                 return Container(
-                                  padding: EdgeInsets.all(CustomTheme.spacingMD),
-                                  margin: EdgeInsets.only(bottom: CustomTheme.spacingLG),
+                                  padding: EdgeInsets.all(
+                                    CustomTheme.spacingMD,
+                                  ),
+                                  margin: EdgeInsets.only(
+                                    bottom: CustomTheme.spacingLG,
+                                  ),
                                   decoration: BoxDecoration(
-                                    color: CustomTheme.errorColor.withOpacity(0.05),
-                                    borderRadius: BorderRadius.circular(CustomTheme.radiusMD),
+                                    color: CustomTheme.errorColor.withValues(
+                                      alpha: 0.05,
+                                    ),
+                                    borderRadius: BorderRadius.circular(
+                                      CustomTheme.radiusMD,
+                                    ),
                                     border: Border.all(
-                                      color: CustomTheme.errorColor.withOpacity(0.1),
+                                      color: CustomTheme.errorColor.withValues(
+                                        alpha: 0.1,
+                                      ),
                                     ),
                                   ),
                                   child: Row(
                                     children: [
-                                      Icon(Icons.error_outline,
-                                          color: CustomTheme.errorColor, size: 18),
+                                      Icon(
+                                        Icons.error_outline,
+                                        color: CustomTheme.errorColor,
+                                        size: 18,
+                                      ),
                                       SizedBox(width: CustomTheme.spacingSM),
                                       Expanded(
                                         child: Text(
                                           authProvider.errorMessage!,
-                                          style: CustomTextStyle.bodySmall.copyWith(
-                                            color: CustomTheme.errorColor,
-                                          ),
+                                          style: CustomTextStyle.bodySmall
+                                              .copyWith(
+                                                color: CustomTheme.errorColor,
+                                              ),
                                         ),
                                       ),
                                     ],
@@ -204,7 +225,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           // Login Button
                           Consumer(
                             builder: (context, ref, child) {
-                              final authProvider = ref.watch(authProviderNotifier);
+                              final authProvider = ref.watch(
+                                authProviderNotifier,
+                              );
                               return CustomButton(
                                 text: 'Sign In',
                                 isLoading: authProvider.isLoading,
@@ -219,7 +242,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     SizedBox(height: CustomTheme.spacingXXL),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
-
 
                       children: [
                         Text(

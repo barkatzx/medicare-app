@@ -15,23 +15,32 @@ class CategoryProductsScreen extends ConsumerStatefulWidget {
   });
 
   @override
-  ConsumerState<CategoryProductsScreen> createState() => _CategoryProductsScreenState();
+  ConsumerState<CategoryProductsScreen> createState() =>
+      _CategoryProductsScreenState();
 }
 
-class _CategoryProductsScreenState extends ConsumerState<CategoryProductsScreen> {
+class _CategoryProductsScreenState
+    extends ConsumerState<CategoryProductsScreen> {
   final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(categoryProductsProviderFamily(widget.categoryId)).loadProducts(refresh: true);
+      ref
+          .read(categoryProductsProviderFamily(widget.categoryId))
+          .loadProducts(refresh: true);
     });
 
     _scrollController.addListener(() {
-      if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 200) {
-        final provider = ref.read(categoryProductsProviderFamily(widget.categoryId));
-        if (!provider.isLoading && !provider.isLoadingMore && provider.hasNextPage) {
+      if (_scrollController.position.pixels >=
+          _scrollController.position.maxScrollExtent - 200) {
+        final provider = ref.read(
+          categoryProductsProviderFamily(widget.categoryId),
+        );
+        if (!provider.isLoading &&
+            !provider.isLoadingMore &&
+            provider.hasNextPage) {
           provider.loadProducts();
         }
       }
@@ -46,7 +55,9 @@ class _CategoryProductsScreenState extends ConsumerState<CategoryProductsScreen>
 
   @override
   Widget build(BuildContext context) {
-    final provider = ref.watch(categoryProductsProviderFamily(widget.categoryId));
+    final provider = ref.watch(
+      categoryProductsProviderFamily(widget.categoryId),
+    );
 
     return Scaffold(
       backgroundColor: CustomTheme.backgroundColor,
@@ -73,10 +84,7 @@ class _CategoryProductsScreenState extends ConsumerState<CategoryProductsScreen>
             ),
           ),
         ),
-        title: Text(
-          widget.categoryName,
-          style: CustomTextStyle.heading2,
-        ),
+        title: Text(widget.categoryName, style: CustomTextStyle.heading2),
         backgroundColor: CustomTheme.backgroundColor,
         foregroundColor: CustomTheme.textPrimary,
         elevation: 0,
@@ -89,9 +97,7 @@ class _CategoryProductsScreenState extends ConsumerState<CategoryProductsScreen>
   Widget _buildBody(provider) {
     if (provider.isLoading && provider.products.isEmpty) {
       return Center(
-        child: CircularProgressIndicator(
-          color: CustomTheme.primaryColor,
-        ),
+        child: CircularProgressIndicator(color: CustomTheme.primaryColor),
       );
     }
 
@@ -104,7 +110,7 @@ class _CategoryProductsScreenState extends ConsumerState<CategoryProductsScreen>
               width: 80,
               height: 80,
               decoration: BoxDecoration(
-                color: CustomTheme.errorColor.withOpacity(0.1),
+                color: CustomTheme.errorColor.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: Icon(
@@ -136,10 +142,7 @@ class _CategoryProductsScreenState extends ConsumerState<CategoryProductsScreen>
                   vertical: CustomTheme.spacingMD,
                 ),
               ),
-              child: Text(
-                'Retry',
-                style: CustomTextStyle.button,
-              ),
+              child: Text('Retry', style: CustomTextStyle.button),
             ),
           ],
         ),
@@ -179,9 +182,7 @@ class _CategoryProductsScreenState extends ConsumerState<CategoryProductsScreen>
           if (provider.isLoadingMore && index == provider.products.length) {
             return Padding(
               padding: EdgeInsets.symmetric(vertical: CustomTheme.spacingMD),
-              child: const Center(
-                child: CircularProgressIndicator(),
-              ),
+              child: const Center(child: CircularProgressIndicator()),
             );
           }
           final product = provider.products[index];

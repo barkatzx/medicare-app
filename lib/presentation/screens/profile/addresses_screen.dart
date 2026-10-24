@@ -54,8 +54,11 @@ class _AddressesScreenState extends ConsumerState<AddressesScreen> {
                 color: CustomTheme.surfaceColor,
                 shape: BoxShape.circle,
               ),
-              child: const Icon(Icons.arrow_back_ios_new_rounded,
-                  color: CustomTheme.textPrimary, size: 15),
+              child: const Icon(
+                Icons.arrow_back_ios_new_rounded,
+                color: CustomTheme.textPrimary,
+                size: 15,
+              ),
             ),
           ),
         ),
@@ -140,8 +143,10 @@ class _AddressesScreenState extends ConsumerState<AddressesScreen> {
             const SizedBox(height: 14),
             Text(
               'Loading addresses…',
-              style: CustomTextStyle.bodySmall
-                  .copyWith(fontSize: 13, color: CustomTheme.textTertiary),
+              style: CustomTextStyle.bodySmall.copyWith(
+                fontSize: 13,
+                color: CustomTheme.textTertiary,
+              ),
             ),
           ],
         ),
@@ -162,8 +167,11 @@ class _AddressesScreenState extends ConsumerState<AddressesScreen> {
                   color: CustomTheme.surfaceColor,
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.location_off_outlined,
-                    size: 40, color: CustomTheme.textTertiary),
+                child: const Icon(
+                  Icons.location_off_outlined,
+                  size: 40,
+                  color: CustomTheme.textTertiary,
+                ),
               ),
               const SizedBox(height: 20),
               Text(
@@ -177,8 +185,10 @@ class _AddressesScreenState extends ConsumerState<AddressesScreen> {
               Text(
                 'Add a shipping address for\na faster checkout experience.',
                 textAlign: TextAlign.center,
-                style: CustomTextStyle.bodyMedium
-                    .copyWith(fontSize: 13, height: 1.6),
+                style: CustomTextStyle.bodyMedium.copyWith(
+                  fontSize: 13,
+                  height: 1.6,
+                ),
               ),
             ],
           ),
@@ -203,7 +213,9 @@ class _AddressesScreenState extends ConsumerState<AddressesScreen> {
   }
 
   Widget _buildAddressCard(
-      AddressEntity address, AddressProvider addressProvider) {
+    AddressEntity address,
+    AddressProvider addressProvider,
+  ) {
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
       decoration: BoxDecoration(
@@ -211,7 +223,9 @@ class _AddressesScreenState extends ConsumerState<AddressesScreen> {
         borderRadius: BorderRadius.circular(16),
         border: address.isDefault
             ? Border.all(
-                color: CustomTheme.primaryColor.withOpacity(0.2), width: 1.5)
+                color: CustomTheme.primaryColor.withValues(alpha: 0.2),
+                width: 1.5,
+              )
             : null,
       ),
       child: Padding(
@@ -228,7 +242,7 @@ class _AddressesScreenState extends ConsumerState<AddressesScreen> {
                   height: 42,
                   decoration: BoxDecoration(
                     color: address.isDefault
-                        ? CustomTheme.primaryColor.withOpacity(0.08)
+                        ? CustomTheme.primaryColor.withValues(alpha: 0.08)
                         : CustomTheme.backgroundColor,
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -291,14 +305,16 @@ class _AddressesScreenState extends ConsumerState<AddressesScreen> {
                       Text(
                         '${address.city}, ${address.state} ${address.postalCode}',
                         style: CustomTextStyle.caption.copyWith(
-                            fontSize: 11,
-                            color: CustomTheme.textTertiary),
+                          fontSize: 11,
+                          color: CustomTheme.textTertiary,
+                        ),
                       ),
                       Text(
                         address.country,
                         style: CustomTextStyle.caption.copyWith(
-                            fontSize: 11,
-                            color: CustomTheme.textTertiary),
+                          fontSize: 11,
+                          color: CustomTheme.textTertiary,
+                        ),
                       ),
                     ],
                   ),
@@ -316,7 +332,7 @@ class _AddressesScreenState extends ConsumerState<AddressesScreen> {
                     _buildIconBtn(
                       Icons.delete_outline_rounded,
                       CustomTheme.errorColor,
-                      CustomTheme.errorColor.withOpacity(0.08),
+                      CustomTheme.errorColor.withValues(alpha: 0.08),
                       () => _showDeleteConfirmation(address),
                     ),
                   ],
@@ -334,8 +350,11 @@ class _AddressesScreenState extends ConsumerState<AddressesScreen> {
                 child: Row(
                   children: [
                     const SizedBox(width: 54),
-                    Icon(Icons.check_circle_outline,
-                        size: 14, color: CustomTheme.primaryColor),
+                    Icon(
+                      Icons.check_circle_outline,
+                      size: 14,
+                      color: CustomTheme.primaryColor,
+                    ),
                     const SizedBox(width: 6),
                     Text(
                       'Set as default address',
@@ -357,7 +376,11 @@ class _AddressesScreenState extends ConsumerState<AddressesScreen> {
   }
 
   Widget _buildIconBtn(
-      IconData icon, Color color, Color bg, VoidCallback onTap) {
+    IconData icon,
+    Color color,
+    Color bg,
+    VoidCallback onTap,
+  ) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -385,8 +408,7 @@ class _AddressesScreenState extends ConsumerState<AddressesScreen> {
     showDialog(
       context: context,
       builder: (dialogContext) => Dialog(
-        shape:
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         backgroundColor: CustomTheme.surfaceColor,
         child: Padding(
           padding: const EdgeInsets.all(24),
@@ -397,15 +419,20 @@ class _AddressesScreenState extends ConsumerState<AddressesScreen> {
                 width: 52,
                 height: 52,
                 decoration: BoxDecoration(
-                  color: CustomTheme.errorColor.withOpacity(0.08),
+                  color: CustomTheme.errorColor.withValues(alpha: 0.08),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.location_off_outlined,
-                    color: CustomTheme.errorColor, size: 24),
+                child: const Icon(
+                  Icons.location_off_outlined,
+                  color: CustomTheme.errorColor,
+                  size: 24,
+                ),
               ),
               const SizedBox(height: 16),
-              Text('Delete Address',
-                  style: CustomTextStyle.heading3.copyWith(fontSize: 17)),
+              Text(
+                'Delete Address',
+                style: CustomTextStyle.heading3.copyWith(fontSize: 17),
+              ),
               const SizedBox(height: 8),
               Text(
                 'This address will be permanently removed. This action cannot be undone.',
@@ -443,8 +470,9 @@ class _AddressesScreenState extends ConsumerState<AddressesScreen> {
                       onTap: () async {
                         final provider = ref.read(addressProviderNotifier);
                         await provider.deleteAddress(address.id);
-                        if (dialogContext.mounted)
+                        if (dialogContext.mounted) {
                           Navigator.pop(dialogContext);
+                        }
                       },
                       child: Container(
                         height: 44,
@@ -455,8 +483,9 @@ class _AddressesScreenState extends ConsumerState<AddressesScreen> {
                         child: Center(
                           child: Text(
                             'Delete',
-                            style:
-                                CustomTextStyle.button.copyWith(fontSize: 14),
+                            style: CustomTextStyle.button.copyWith(
+                              fontSize: 14,
+                            ),
                           ),
                         ),
                       ),
@@ -494,16 +523,19 @@ class _AddressFormSheetState extends ConsumerState<AddressFormSheet> {
   @override
   void initState() {
     super.initState();
-    _streetController =
-        TextEditingController(text: widget.address?.street ?? '');
-    _cityController =
-        TextEditingController(text: widget.address?.city ?? '');
+    _streetController = TextEditingController(
+      text: widget.address?.street ?? '',
+    );
+    _cityController = TextEditingController(text: widget.address?.city ?? '');
     _stateController = TextEditingController(
-        text: widget.address?.state ?? 'Dhaka Division');
-    _zipController =
-        TextEditingController(text: widget.address?.postalCode ?? '');
-    _countryController =
-        TextEditingController(text: widget.address?.country ?? 'Bangladesh');
+      text: widget.address?.state ?? 'Dhaka Division',
+    );
+    _zipController = TextEditingController(
+      text: widget.address?.postalCode ?? '',
+    );
+    _countryController = TextEditingController(
+      text: widget.address?.country ?? 'Bangladesh',
+    );
     _isDefault = widget.address?.isDefault ?? false;
   }
 
@@ -532,7 +564,8 @@ class _AddressFormSheetState extends ConsumerState<AddressFormSheet> {
         physics: const BouncingScrollPhysics(),
         child: Padding(
           padding: EdgeInsets.only(
-              bottom: MediaQuery.of(context).viewInsets.bottom + 32),
+            bottom: MediaQuery.of(context).viewInsets.bottom + 32,
+          ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -554,7 +587,7 @@ class _AddressFormSheetState extends ConsumerState<AddressFormSheet> {
                     width: 38,
                     height: 38,
                     decoration: BoxDecoration(
-                      color: CustomTheme.primaryColor.withOpacity(0.08),
+                      color: CustomTheme.primaryColor.withValues(alpha: 0.08),
                       borderRadius: BorderRadius.circular(11),
                     ),
                     child: Icon(
@@ -571,8 +604,7 @@ class _AddressFormSheetState extends ConsumerState<AddressFormSheet> {
                     children: [
                       Text(
                         isEditing ? 'Update Address' : 'Add New Address',
-                        style:
-                            CustomTextStyle.heading3.copyWith(fontSize: 17),
+                        style: CustomTextStyle.heading3.copyWith(fontSize: 17),
                       ),
                       Text(
                         isEditing
@@ -590,46 +622,64 @@ class _AddressFormSheetState extends ConsumerState<AddressFormSheet> {
                 key: _formKey,
                 child: Column(
                   children: [
-                    _buildField('Street Address', _streetController,
-                        Icons.location_on_outlined),
+                    _buildField(
+                      'Street Address',
+                      _streetController,
+                      Icons.location_on_outlined,
+                    ),
                     const SizedBox(height: 12),
                     Row(
                       children: [
                         Expanded(
-                          child: _buildField('City', _cityController,
-                              Icons.location_city_outlined),
+                          child: _buildField(
+                            'City',
+                            _cityController,
+                            Icons.location_city_outlined,
+                          ),
                         ),
                         const SizedBox(width: 12),
                         Expanded(
-                          child: _buildField('Postal Code', _zipController,
-                              Icons.markunread_mailbox_outlined),
+                          child: _buildField(
+                            'Postal Code',
+                            _zipController,
+                            Icons.markunread_mailbox_outlined,
+                          ),
                         ),
                       ],
                     ),
                     const SizedBox(height: 12),
-                    _buildField('State / Division', _stateController,
-                        Icons.map_outlined),
+                    _buildField(
+                      'State / Division',
+                      _stateController,
+                      Icons.map_outlined,
+                    ),
                     const SizedBox(height: 12),
                     _buildField(
-                        'Country', _countryController, Icons.public_outlined),
+                      'Country',
+                      _countryController,
+                      Icons.public_outlined,
+                    ),
                     const SizedBox(height: 16),
 
                     // Default toggle
                     GestureDetector(
-                      onTap: () =>
-                          setState(() => _isDefault = !_isDefault),
+                      onTap: () => setState(() => _isDefault = !_isDefault),
                       child: AnimatedContainer(
                         duration: const Duration(milliseconds: 200),
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 14, vertical: 12),
+                          horizontal: 14,
+                          vertical: 12,
+                        ),
                         decoration: BoxDecoration(
                           color: _isDefault
-                              ? CustomTheme.primaryColor.withOpacity(0.06)
+                              ? CustomTheme.primaryColor.withValues(alpha: 0.06)
                               : CustomTheme.backgroundColor,
                           borderRadius: BorderRadius.circular(13),
                           border: Border.all(
                             color: _isDefault
-                                ? CustomTheme.primaryColor.withOpacity(0.2)
+                                ? CustomTheme.primaryColor.withValues(
+                                    alpha: 0.2,
+                                  )
                                 : Colors.transparent,
                             width: 1.5,
                           ),
@@ -662,8 +712,9 @@ class _AddressFormSheetState extends ConsumerState<AddressFormSheet> {
                                   ),
                                   Text(
                                     'Used automatically at checkout',
-                                    style: CustomTextStyle.caption
-                                        .copyWith(fontSize: 10),
+                                    style: CustomTextStyle.caption.copyWith(
+                                      fontSize: 10,
+                                    ),
                                   ),
                                 ],
                               ),
@@ -685,8 +736,11 @@ class _AddressFormSheetState extends ConsumerState<AddressFormSheet> {
                                 ),
                               ),
                               child: _isDefault
-                                  ? const Icon(Icons.check_rounded,
-                                      size: 13, color: Colors.white)
+                                  ? const Icon(
+                                      Icons.check_rounded,
+                                      size: 13,
+                                      color: Colors.white,
+                                    )
                                   : null,
                             ),
                           ],
@@ -705,11 +759,12 @@ class _AddressFormSheetState extends ConsumerState<AddressFormSheet> {
                         style: ElevatedButton.styleFrom(
                           backgroundColor: CustomTheme.primaryColor,
                           foregroundColor: Colors.white,
-                          disabledBackgroundColor:
-                              CustomTheme.primaryColor.withOpacity(0.5),
+                          disabledBackgroundColor: CustomTheme.primaryColor
+                              .withValues(alpha: 0.5),
                           padding: EdgeInsets.zero,
                           shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(15)),
+                            borderRadius: BorderRadius.circular(15),
+                          ),
                           elevation: 0,
                           shadowColor: Colors.transparent,
                           surfaceTintColor: Colors.transparent,
@@ -723,7 +778,7 @@ class _AddressFormSheetState extends ConsumerState<AddressFormSheet> {
                                 : const LinearGradient(
                                     colors: [
                                       Color(0xFF2A2A2A),
-                                      Color(0xFF010101)
+                                      Color(0xFF010101),
                                     ],
                                     begin: Alignment.topCenter,
                                     end: Alignment.bottomCenter,
@@ -735,8 +790,9 @@ class _AddressFormSheetState extends ConsumerState<AddressFormSheet> {
                                     width: 22,
                                     height: 22,
                                     child: CircularProgressIndicator(
-                                        color: Colors.white,
-                                        strokeWidth: 2.5),
+                                      color: Colors.white,
+                                      strokeWidth: 2.5,
+                                    ),
                                   )
                                 : Text(
                                     isEditing
@@ -763,7 +819,10 @@ class _AddressFormSheetState extends ConsumerState<AddressFormSheet> {
   }
 
   Widget _buildField(
-      String label, TextEditingController controller, IconData icon) {
+    String label,
+    TextEditingController controller,
+    IconData icon,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -779,8 +838,7 @@ class _AddressFormSheetState extends ConsumerState<AddressFormSheet> {
         const SizedBox(height: 6),
         TextFormField(
           controller: controller,
-          validator: (val) =>
-              val == null || val.isEmpty ? 'Required' : null,
+          validator: (val) => val == null || val.isEmpty ? 'Required' : null,
           style: CustomTextStyle.bodyMedium.copyWith(
             fontWeight: CustomTheme.fontWeightMedium,
             color: CustomTheme.textPrimary,
@@ -791,12 +849,16 @@ class _AddressFormSheetState extends ConsumerState<AddressFormSheet> {
               padding: const EdgeInsets.only(left: 14, right: 10),
               child: Icon(icon, size: 17, color: CustomTheme.textTertiary),
             ),
-            prefixIconConstraints:
-                const BoxConstraints(minWidth: 44, minHeight: 44),
+            prefixIconConstraints: const BoxConstraints(
+              minWidth: 44,
+              minHeight: 44,
+            ),
             filled: true,
             fillColor: CustomTheme.backgroundColor,
             contentPadding: const EdgeInsets.symmetric(
-                horizontal: 16, vertical: 13),
+              horizontal: 16,
+              vertical: 13,
+            ),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(13),
               borderSide: BorderSide.none,
@@ -804,21 +866,27 @@ class _AddressFormSheetState extends ConsumerState<AddressFormSheet> {
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(13),
               borderSide: BorderSide(
-                  color: CustomTheme.primaryColor.withOpacity(0.5),
-                  width: 1.5),
+                color: CustomTheme.primaryColor.withValues(alpha: 0.5),
+                width: 1.5,
+              ),
             ),
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(13),
               borderSide: const BorderSide(
-                  color: CustomTheme.errorColor, width: 1.5),
+                color: CustomTheme.errorColor,
+                width: 1.5,
+              ),
             ),
             focusedErrorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(13),
               borderSide: const BorderSide(
-                  color: CustomTheme.errorColor, width: 1.5),
+                color: CustomTheme.errorColor,
+                width: 1.5,
+              ),
             ),
-            errorStyle: CustomTextStyle.caption
-                .copyWith(color: CustomTheme.errorColor),
+            errorStyle: CustomTextStyle.caption.copyWith(
+              color: CustomTheme.errorColor,
+            ),
           ),
         ),
       ],
@@ -831,16 +899,18 @@ class _AddressFormSheetState extends ConsumerState<AddressFormSheet> {
 
     final provider = ref.read(addressProviderNotifier);
     final success = widget.address == null
-        ? await provider.addAddress(AddressEntity(
-            id: '',
-            userId: '',
-            street: _streetController.text.trim(),
-            city: _cityController.text.trim(),
-            state: _stateController.text.trim(),
-            postalCode: _zipController.text.trim(),
-            country: _countryController.text.trim(),
-            isDefault: _isDefault,
-          ))
+        ? await provider.addAddress(
+            AddressEntity(
+              id: '',
+              userId: '',
+              street: _streetController.text.trim(),
+              city: _cityController.text.trim(),
+              state: _stateController.text.trim(),
+              postalCode: _zipController.text.trim(),
+              country: _countryController.text.trim(),
+              isDefault: _isDefault,
+            ),
+          )
         : await provider.updateAddress(widget.address!.id, {
             'street': _streetController.text.trim(),
             'city': _cityController.text.trim(),

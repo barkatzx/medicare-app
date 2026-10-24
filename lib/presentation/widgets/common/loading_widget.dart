@@ -6,11 +6,7 @@ class LoadingWidget extends StatefulWidget {
   final String? message;
   final bool isOverlay;
 
-  const LoadingWidget({
-    super.key,
-    this.message,
-    this.isOverlay = true,
-  });
+  const LoadingWidget({super.key, this.message, this.isOverlay = true});
 
   @override
   State<LoadingWidget> createState() => _LoadingWidgetState();
@@ -65,7 +61,7 @@ class _LoadingWidgetState extends State<LoadingWidget>
             borderRadius: BorderRadius.circular(24),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.08),
+                color: Colors.black.withValues(alpha: 0.08),
                 blurRadius: 24,
                 offset: const Offset(0, 8),
               ),
@@ -90,7 +86,9 @@ class _LoadingWidgetState extends State<LoadingWidget>
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           border: Border.all(
-                            color: CustomTheme.primaryColor.withOpacity(0.1),
+                            color: CustomTheme.primaryColor.withValues(
+                              alpha: 0.1,
+                            ),
                             width: 3,
                           ),
                         ),
@@ -107,9 +105,9 @@ class _LoadingWidgetState extends State<LoadingWidget>
                           shape: BoxShape.circle,
                           gradient: SweepGradient(
                             colors: [
-                              CustomTheme.primaryColor.withOpacity(0.0),
-                              CustomTheme.primaryColor.withOpacity(0.3),
-                              CustomTheme.primaryColor.withOpacity(0.6),
+                              CustomTheme.primaryColor.withValues(alpha: 0.0),
+                              CustomTheme.primaryColor.withValues(alpha: 0.3),
+                              CustomTheme.primaryColor.withValues(alpha: 0.6),
                               CustomTheme.primaryColor,
                             ],
                           ),
@@ -154,7 +152,7 @@ class _LoadingWidgetState extends State<LoadingWidget>
     return BackdropFilter(
       filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
       child: Container(
-        color: Colors.black.withOpacity(0.25),
+        color: Colors.black.withValues(alpha: 0.25),
         child: content,
       ),
     );

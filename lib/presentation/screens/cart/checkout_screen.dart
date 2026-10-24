@@ -44,10 +44,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen>
       vsync: this,
     );
     _stepAnimController = stepCtrl;
-    _stepFadeAnim = CurvedAnimation(
-      parent: stepCtrl,
-      curve: Curves.easeOut,
-    );
+    _stepFadeAnim = CurvedAnimation(parent: stepCtrl, curve: Curves.easeOut);
     stepCtrl.forward();
 
     final pulseCtrl = AnimationController(
@@ -55,9 +52,10 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen>
       vsync: this,
     )..repeat(reverse: true);
     _pulseController = pulseCtrl;
-    _pulseAnim = Tween<double>(begin: 0.95, end: 1.05).animate(
-      CurvedAnimation(parent: pulseCtrl, curve: Curves.easeInOut),
-    );
+    _pulseAnim = Tween<double>(
+      begin: 0.95,
+      end: 1.05,
+    ).animate(CurvedAnimation(parent: pulseCtrl, curve: Curves.easeInOut));
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _prefillUserData();
@@ -174,7 +172,6 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen>
     );
   }
 
-
   // ─── Step 1: Shipping Form ───
   Widget _buildShippingForm(CartProvider cartProvider) {
     final items = cartProvider.cartItems;
@@ -183,8 +180,11 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen>
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // ── Order Items Summary ──
-        _buildSectionHeader('Your Order', '${items.length} items',
-            Icons.shopping_bag_outlined),
+        _buildSectionHeader(
+          'Your Order',
+          '${items.length} items',
+          Icons.shopping_bag_outlined,
+        ),
         const SizedBox(height: 12),
         _buildItemsCard(items, cartProvider),
         const SizedBox(height: 32),
@@ -199,7 +199,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen>
           width: 36,
           height: 36,
           decoration: BoxDecoration(
-            color: CustomTheme.primaryColor.withOpacity(0.08),
+            color: CustomTheme.primaryColor.withValues(alpha: 0.08),
             borderRadius: BorderRadius.circular(10),
           ),
           child: Icon(icon, size: 18, color: CustomTheme.primaryColor),
@@ -208,30 +208,37 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen>
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(title,
-                style: CustomTextStyle.heading4.copyWith(
-                  fontSize: 15,
-                  letterSpacing: -0.2,
-                )),
-            Text(subtitle,
-                style: CustomTextStyle.caption.copyWith(
-                  fontSize: 11,
-                  color: CustomTheme.textTertiary,
-                )),
+            Text(
+              title,
+              style: CustomTextStyle.heading4.copyWith(
+                fontSize: 15,
+                letterSpacing: -0.2,
+              ),
+            ),
+            Text(
+              subtitle,
+              style: CustomTextStyle.caption.copyWith(
+                fontSize: 11,
+                color: CustomTheme.textTertiary,
+              ),
+            ),
           ],
         ),
       ],
     );
   }
 
-  Widget _buildItemsCard(List<CartItemEntity> items, CartProvider cartProvider) {
+  Widget _buildItemsCard(
+    List<CartItemEntity> items,
+    CartProvider cartProvider,
+  ) {
     return Container(
       decoration: BoxDecoration(
         color: CustomTheme.surfaceColor,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 12,
             offset: const Offset(0, 2),
           ),
@@ -261,13 +268,17 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen>
                               ? Image.network(
                                   item.productImage,
                                   fit: BoxFit.cover,
-                                  errorBuilder: (_, __, ___) => Icon(
-                                      Icons.medical_services,
-                                      size: 22,
-                                      color: CustomTheme.textTertiary),
+                                  errorBuilder: (_, _, _) => Icon(
+                                    Icons.medical_services,
+                                    size: 22,
+                                    color: CustomTheme.textTertiary,
+                                  ),
                                 )
-                              : Icon(Icons.medical_services,
-                                  size: 22, color: CustomTheme.textTertiary),
+                              : Icon(
+                                  Icons.medical_services,
+                                  size: 22,
+                                  color: CustomTheme.textTertiary,
+                                ),
                         ),
                       ),
                       const SizedBox(width: 12),
@@ -290,7 +301,9 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen>
                               children: [
                                 Container(
                                   padding: const EdgeInsets.symmetric(
-                                      horizontal: 7, vertical: 2),
+                                    horizontal: 7,
+                                    vertical: 2,
+                                  ),
                                   decoration: BoxDecoration(
                                     color: CustomTheme.backgroundColor,
                                     borderRadius: BorderRadius.circular(6),
@@ -300,7 +313,8 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen>
                                     style: TextStyle(
                                       fontFamily: CustomTheme.primaryFontFamily,
                                       fontSize: 11,
-                                      fontWeight: CustomTheme.fontWeightSemiBold,
+                                      fontWeight:
+                                          CustomTheme.fontWeightSemiBold,
                                       color: CustomTheme.textSecondary,
                                     ),
                                   ),
@@ -308,8 +322,9 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen>
                                 const SizedBox(width: 6),
                                 Text(
                                   '${item.finalPrice.toStringAsFixed(2)}৳ each',
-                                  style: CustomTextStyle.caption
-                                      .copyWith(fontSize: 11),
+                                  style: CustomTextStyle.caption.copyWith(
+                                    fontSize: 11,
+                                  ),
                                 ),
                               ],
                             ),
@@ -329,7 +344,12 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen>
                   ),
                 ),
                 if (i < items.length - 1)
-                  Divider(height: 1, color: CustomTheme.borderLight, indent: 14, endIndent: 14),
+                  Divider(
+                    height: 1,
+                    color: CustomTheme.borderLight,
+                    indent: 14,
+                    endIndent: 14,
+                  ),
               ],
             );
           }),
@@ -381,16 +401,41 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen>
       ),
       child: Column(
         children: [
-          _buildInfoTile(Icons.person_outline, 'Full Name', user?.name ?? 'N/A', false),
-          _buildInfoTile(Icons.local_pharmacy_outlined, 'Pharmacy', user?.pharmacyName ?? 'N/A', false),
-          _buildInfoTile(Icons.email_outlined, 'Email', user?.email ?? 'N/A', false),
-          _buildInfoTile(Icons.phone_outlined, 'Phone', user?.phoneNumber ?? 'N/A', true),
+          _buildInfoTile(
+            Icons.person_outline,
+            'Full Name',
+            user?.name ?? 'N/A',
+            false,
+          ),
+          _buildInfoTile(
+            Icons.local_pharmacy_outlined,
+            'Pharmacy',
+            user?.pharmacyName ?? 'N/A',
+            false,
+          ),
+          _buildInfoTile(
+            Icons.email_outlined,
+            'Email',
+            user?.email ?? 'N/A',
+            false,
+          ),
+          _buildInfoTile(
+            Icons.phone_outlined,
+            'Phone',
+            user?.phoneNumber ?? 'N/A',
+            true,
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildInfoTile(IconData icon, String label, String value, bool isLast) {
+  Widget _buildInfoTile(
+    IconData icon,
+    String label,
+    String value,
+    bool isLast,
+  ) {
     return Column(
       children: [
         Padding(
@@ -436,10 +481,11 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen>
         ),
         if (!isLast)
           Divider(
-              height: 1,
-              color: CustomTheme.borderLight,
-              indent: 62,
-              endIndent: 16),
+            height: 1,
+            color: CustomTheme.borderLight,
+            indent: 62,
+            endIndent: 16,
+          ),
       ],
     );
   }
@@ -457,11 +503,14 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen>
             width: 42,
             height: 42,
             decoration: BoxDecoration(
-              color: CustomTheme.primaryColor.withOpacity(0.08),
+              color: CustomTheme.primaryColor.withValues(alpha: 0.08),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: const Icon(Icons.home_outlined,
-                color: CustomTheme.primaryColor, size: 20),
+            child: const Icon(
+              Icons.home_outlined,
+              color: CustomTheme.primaryColor,
+              size: 20,
+            ),
           ),
           const SizedBox(width: 14),
           Expanded(
@@ -512,8 +561,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen>
           GestureDetector(
             onTap: () => Navigator.pushNamed(context, '/addresses'),
             child: Container(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
               decoration: BoxDecoration(
                 color: CustomTheme.primaryColor,
                 borderRadius: BorderRadius.circular(10),
@@ -549,7 +597,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen>
         borderRadius: BorderRadius.circular(14),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -570,8 +618,10 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen>
             padding: const EdgeInsets.only(left: 14, right: 10),
             child: Icon(icon, size: 19, color: CustomTheme.textTertiary),
           ),
-          prefixIconConstraints:
-              const BoxConstraints(minWidth: 48, minHeight: 48),
+          prefixIconConstraints: const BoxConstraints(
+            minWidth: 48,
+            minHeight: 48,
+          ),
           border: InputBorder.none,
           contentPadding: const EdgeInsets.symmetric(
             horizontal: 16,
@@ -580,7 +630,9 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen>
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(14),
             borderSide: BorderSide(
-                color: CustomTheme.primaryColor.withOpacity(0.4), width: 1.5),
+              color: CustomTheme.primaryColor.withValues(alpha: 0.4),
+              width: 1.5,
+            ),
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(14),
@@ -588,13 +640,17 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen>
           ),
           errorBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(14),
-            borderSide:
-                const BorderSide(color: CustomTheme.errorColor, width: 1.5),
+            borderSide: const BorderSide(
+              color: CustomTheme.errorColor,
+              width: 1.5,
+            ),
           ),
           focusedErrorBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(14),
-            borderSide:
-                const BorderSide(color: CustomTheme.errorColor, width: 1.5),
+            borderSide: const BorderSide(
+              color: CustomTheme.errorColor,
+              width: 1.5,
+            ),
           ),
         ),
         validator: isRequired ? validator : null,
@@ -603,7 +659,11 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen>
   }
 
   Widget _buildPaymentOption(
-      String value, String title, dynamic icon, String subtitle) {
+    String value,
+    String title,
+    dynamic icon,
+    String subtitle,
+  ) {
     final isSelected = _selectedPayment == value;
     return GestureDetector(
       onTap: () => setState(() => _selectedPayment = value),
@@ -686,8 +746,11 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen>
                 ),
               ),
               child: isSelected
-                  ? const Icon(Icons.check_rounded,
-                      size: 14, color: Colors.white)
+                  ? const Icon(
+                      Icons.check_rounded,
+                      size: 14,
+                      color: Colors.white,
+                    )
                   : null,
             ),
           ],
@@ -703,9 +766,9 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen>
 
     final defaultAddress =
         addressProvider.addresses.where((a) => a.isDefault).firstOrNull ??
-            (addressProvider.addresses.isNotEmpty
-                ? addressProvider.addresses.first
-                : null);
+        (addressProvider.addresses.isNotEmpty
+            ? addressProvider.addresses.first
+            : null);
 
     if (defaultAddress != null && _addressController.text.isEmpty) {
       _addressController.text = defaultAddress.street;
@@ -719,35 +782,50 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen>
         children: [
           // ── Delivery Information ──
           _buildSectionHeader(
-              'Delivery Info', 'Auto-filled', Icons.person_outline),
+            'Delivery Info',
+            'Auto-filled',
+            Icons.person_outline,
+          ),
           const SizedBox(height: 12),
           _buildDeliveryInfoCard(user),
           const SizedBox(height: 20),
 
           // ── Shipping Address ──
           _buildSectionHeader(
-              'Ship To', 'Delivery address', Icons.location_on_outlined),
+            'Ship To',
+            'Delivery address',
+            Icons.location_on_outlined,
+          ),
           const SizedBox(height: 12),
 
           if (defaultAddress != null)
             _buildAddressCard(defaultAddress)
           else ...[
-            _buildTextField(_addressController, 'Full Address',
-                Icons.home_outlined,
-                maxLines: 2,
-                validator: (v) =>
-                    (v == null || v.isEmpty) ? 'Address is required' : null),
+            _buildTextField(
+              _addressController,
+              'Full Address',
+              Icons.home_outlined,
+              maxLines: 2,
+              validator: (v) =>
+                  (v == null || v.isEmpty) ? 'Address is required' : null,
+            ),
             const SizedBox(height: 10),
             _buildTextField(
-                _cityController, 'City / Area', Icons.location_city_outlined,
-                validator: (v) =>
-                    (v == null || v.isEmpty) ? 'City is required' : null),
+              _cityController,
+              'City / Area',
+              Icons.location_city_outlined,
+              validator: (v) =>
+                  (v == null || v.isEmpty) ? 'City is required' : null,
+            ),
           ],
 
           const SizedBox(height: 20),
 
           _buildSectionHeader(
-              'Payment', 'How you\'ll pay', Icons.payment_outlined),
+            'Payment',
+            'How you\'ll pay',
+            Icons.payment_outlined,
+          ),
           const SizedBox(height: 12),
           _buildPaymentOption(
             'cash_on_delivery',
@@ -780,13 +858,17 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen>
                   ? Image.network(
                       item.productImage,
                       fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => Icon(
-                          Icons.medical_services,
-                          size: 22,
-                          color: CustomTheme.textTertiary),
+                      errorBuilder: (_, _, _) => Icon(
+                        Icons.medical_services,
+                        size: 22,
+                        color: CustomTheme.textTertiary,
+                      ),
                     )
-                  : Icon(Icons.medical_services,
-                      size: 22, color: CustomTheme.textTertiary),
+                  : Icon(
+                      Icons.medical_services,
+                      size: 22,
+                      color: CustomTheme.textTertiary,
+                    ),
             ),
           ),
           const SizedBox(width: 12),
@@ -841,14 +923,17 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen>
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.06),
+                    color: Colors.black.withValues(alpha: 0.06),
                     blurRadius: 24,
                     offset: const Offset(0, 8),
                   ),
                 ],
               ),
-              child: const Icon(Icons.shopping_cart_outlined,
-                  size: 46, color: CustomTheme.textTertiary),
+              child: const Icon(
+                Icons.shopping_cart_outlined,
+                size: 46,
+                color: CustomTheme.textTertiary,
+              ),
             ),
             const SizedBox(height: 24),
             Text(
@@ -869,13 +954,16 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen>
               onTap: () =>
                   Navigator.popUntil(context, (route) => route.isFirst),
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 32,
+                  vertical: 14,
+                ),
                 decoration: BoxDecoration(
                   color: CustomTheme.primaryColor,
                   borderRadius: BorderRadius.circular(14),
                   boxShadow: [
                     BoxShadow(
-                      color: CustomTheme.primaryColor.withOpacity(0.3),
+                      color: CustomTheme.primaryColor.withValues(alpha: 0.3),
                       blurRadius: 16,
                       offset: const Offset(0, 6),
                     ),
@@ -913,7 +1001,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen>
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.07),
+            color: Colors.black.withValues(alpha: 0.07),
             blurRadius: 20,
             offset: const Offset(0, -4),
           ),
@@ -945,9 +1033,12 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen>
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text('Subtotal',
-                          style: CustomTextStyle.bodyMedium
-                              .copyWith(fontSize: 13)),
+                      Text(
+                        'Subtotal',
+                        style: CustomTextStyle.bodyMedium.copyWith(
+                          fontSize: 13,
+                        ),
+                      ),
                       Text(
                         '${cartProvider.subtotal.toStringAsFixed(2)}৳',
                         style: CustomTextStyle.bodyMedium.copyWith(
@@ -963,9 +1054,10 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen>
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text('You save',
-                            style: CustomTextStyle.caption
-                                .copyWith(fontSize: 12)),
+                        Text(
+                          'You save',
+                          style: CustomTextStyle.caption.copyWith(fontSize: 12),
+                        ),
                         Text(
                           '-${totalSavings.toStringAsFixed(2)}৳',
                           style: TextStyle(
@@ -1023,12 +1115,14 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen>
                 );
               },
               child: ElevatedButton(
-                onPressed:
-                    _isPlacingOrder ? null : () => _handleContinue(cartProvider),
+                onPressed: _isPlacingOrder
+                    ? null
+                    : () => _handleContinue(cartProvider),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: CustomTheme.primaryColor,
-                  disabledBackgroundColor:
-                      CustomTheme.primaryColor.withOpacity(0.5),
+                  disabledBackgroundColor: CustomTheme.primaryColor.withValues(
+                    alpha: 0.5,
+                  ),
                   padding: EdgeInsets.zero,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
@@ -1050,7 +1144,9 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen>
                         ? []
                         : [
                             BoxShadow(
-                              color: CustomTheme.primaryColor.withOpacity(0.35),
+                              color: CustomTheme.primaryColor.withValues(
+                                alpha: 0.35,
+                              ),
                               blurRadius: 16,
                               offset: const Offset(0, 6),
                             ),
@@ -1083,23 +1179,29 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen>
                                 const SizedBox(width: 8),
                                 Container(
                                   padding: const EdgeInsets.symmetric(
-                                      horizontal: 10, vertical: 4),
+                                    horizontal: 10,
+                                    vertical: 4,
+                                  ),
                                   decoration: BoxDecoration(
-                                    color: Colors.white.withOpacity(0.15),
+                                    color: Colors.white.withValues(alpha: 0.15),
                                     borderRadius: BorderRadius.circular(15),
                                   ),
                                   child: Text(
                                     '${total.toStringAsFixed(2)}৳',
                                     style: CustomTextStyle.button.copyWith(
                                       fontSize: 13,
-                                      fontWeight: CustomTheme.fontWeightSemiBold,
+                                      fontWeight:
+                                          CustomTheme.fontWeightSemiBold,
                                     ),
                                   ),
                                 ),
                               ] else ...[
                                 const SizedBox(width: 8),
-                                const Icon(Icons.arrow_forward_rounded,
-                                    color: Colors.white, size: 18),
+                                const Icon(
+                                  Icons.arrow_forward_rounded,
+                                  color: Colors.white,
+                                  size: 18,
+                                ),
                               ],
                             ],
                           ),
@@ -1123,24 +1225,28 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen>
 
         if (addressProvider.addresses.isEmpty) {
           setState(() => _isPlacingOrder = true);
-          final success = await addressProvider.addAddress(AddressEntity(
-            id: '',
-            userId: '',
-            street: _addressController.text.trim(),
-            city: _cityController.text.trim(),
-            state: 'Dhaka Division',
-            postalCode: '1000',
-            country: 'Bangladesh',
-            isDefault: true,
-          ));
+          final success = await addressProvider.addAddress(
+            AddressEntity(
+              id: '',
+              userId: '',
+              street: _addressController.text.trim(),
+              city: _cityController.text.trim(),
+              state: 'Dhaka Division',
+              postalCode: '1000',
+              country: 'Bangladesh',
+              isDefault: true,
+            ),
+          );
           setState(() => _isPlacingOrder = false);
 
           if (!success) {
             if (mounted) {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                    content: Text(
-                        addressProvider.error ?? 'Failed to save address')),
+                  content: Text(
+                    addressProvider.error ?? 'Failed to save address',
+                  ),
+                ),
               );
             }
             return;
@@ -1159,9 +1265,9 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen>
       final addressProvider = ref.read(addressProviderNotifier);
       final defaultAddress =
           addressProvider.addresses.where((a) => a.isDefault).firstOrNull ??
-              (addressProvider.addresses.isNotEmpty
-                  ? addressProvider.addresses.first
-                  : null);
+          (addressProvider.addresses.isNotEmpty
+              ? addressProvider.addresses.first
+              : null);
 
       if (defaultAddress == null) {
         throw Exception('Please select or add a shipping address first');
@@ -1170,8 +1276,9 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen>
       final orderProvider = ref.read(orderProviderNotifier);
       final orderId = await orderProvider.placeOrder(
         shippingAddressId: defaultAddress.id,
-        paymentMethod:
-            _selectedPayment == 'cash_on_delivery' ? 'cod' : _selectedPayment,
+        paymentMethod: _selectedPayment == 'cash_on_delivery'
+            ? 'cod'
+            : _selectedPayment,
         notes: null,
       );
 
@@ -1193,8 +1300,9 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen>
             content: Text('Failed to place order: $errorMessage'),
             backgroundColor: CustomTheme.errorColor,
             behavior: SnackBarBehavior.floating,
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
             margin: const EdgeInsets.all(16),
             duration: const Duration(seconds: 4),
             action: SnackBarAction(

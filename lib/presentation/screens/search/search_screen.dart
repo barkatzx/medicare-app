@@ -95,7 +95,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
         height: 45,
         margin: const EdgeInsets.only(right: 16),
         decoration: BoxDecoration(
-          color: CustomTheme.secondaryColor.withOpacity(0.5),
+          color: CustomTheme.secondaryColor.withValues(alpha: 0.5),
           borderRadius: BorderRadius.circular(CustomTheme.radiusMD),
           border: Border.all(color: CustomTheme.borderLight),
         ),
@@ -105,8 +105,14 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
           onChanged: _onSearchChanged,
           decoration: InputDecoration(
             hintText: 'Search medicines, health products...',
-            hintStyle: CustomTextStyle.bodySmall.copyWith(color: CustomTheme.textTertiary),
-            prefixIcon: Icon(Icons.search, size: 20, color: CustomTheme.primaryColor),
+            hintStyle: CustomTextStyle.bodySmall.copyWith(
+              color: CustomTheme.textTertiary,
+            ),
+            prefixIcon: Icon(
+              Icons.search,
+              size: 20,
+              color: CustomTheme.primaryColor,
+            ),
             suffixIcon: _searchController.text.isNotEmpty
                 ? IconButton(
                     icon: const Icon(Icons.cancel, size: 18),
@@ -155,20 +161,23 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
           Container(
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
-              color: CustomTheme.primaryColor.withOpacity(0.05),
+              color: CustomTheme.primaryColor.withValues(alpha: 0.05),
               shape: BoxShape.circle,
             ),
-            child: Icon(Icons.search_rounded, size: 48, color: CustomTheme.primaryColor.withOpacity(0.5)),
+            child: Icon(
+              Icons.search_rounded,
+              size: 48,
+              color: CustomTheme.primaryColor.withValues(alpha: 0.5),
+            ),
           ),
           const SizedBox(height: 24),
-          Text(
-            'Quick Search',
-            style: CustomTextStyle.heading3,
-          ),
+          Text('Quick Search', style: CustomTextStyle.heading3),
           const SizedBox(height: 8),
           Text(
             'Find medicines, health products, and more',
-            style: CustomTextStyle.bodyMedium.copyWith(color: CustomTheme.textTertiary),
+            style: CustomTextStyle.bodyMedium.copyWith(
+              color: CustomTheme.textTertiary,
+            ),
           ),
         ],
       ),
@@ -202,7 +211,11 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Container(width: double.infinity, height: 16, color: Colors.white),
+                  Container(
+                    width: double.infinity,
+                    height: 16,
+                    color: Colors.white,
+                  ),
                   const SizedBox(height: 8),
                   Container(width: 100, height: 14, color: Colors.white),
                 ],
@@ -221,14 +234,20 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.search_off_rounded, size: 80, color: CustomTheme.textTertiary.withOpacity(0.3)),
+            Icon(
+              Icons.search_off_rounded,
+              size: 80,
+              color: CustomTheme.textTertiary.withValues(alpha: 0.3),
+            ),
             const SizedBox(height: 24),
             Text('No results found', style: CustomTextStyle.heading3),
             const SizedBox(height: 8),
             Text(
               'We couldn\'t find anything for "$query". Check your spelling or try another term.',
               textAlign: TextAlign.center,
-              style: CustomTextStyle.bodyMedium.copyWith(color: CustomTheme.textTertiary),
+              style: CustomTextStyle.bodyMedium.copyWith(
+                color: CustomTheme.textTertiary,
+              ),
             ),
           ],
         ),
@@ -243,14 +262,24 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.error_outline_rounded, size: 64, color: CustomTheme.errorColor),
+            const Icon(
+              Icons.error_outline_rounded,
+              size: 64,
+              color: CustomTheme.errorColor,
+            ),
             const SizedBox(height: 24),
             Text('Something went wrong', style: CustomTextStyle.heading3),
             const SizedBox(height: 8),
-            Text(error, textAlign: TextAlign.center, style: CustomTextStyle.bodySmall),
+            Text(
+              error,
+              textAlign: TextAlign.center,
+              style: CustomTextStyle.bodySmall,
+            ),
             const SizedBox(height: 24),
             ElevatedButton(
-              onPressed: () => ref.read(productProviderNotifier).searchProducts(_searchController.text),
+              onPressed: () => ref
+                  .read(productProviderNotifier)
+                  .searchProducts(_searchController.text),
               child: const Text('Retry'),
             ),
           ],
@@ -263,7 +292,9 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     return ListView.builder(
       controller: _scrollController,
       padding: const EdgeInsets.all(16),
-      itemCount: productProvider.products.length + (productProvider.isLoadingMore ? 1 : 0),
+      itemCount:
+          productProvider.products.length +
+          (productProvider.isLoadingMore ? 1 : 0),
       itemBuilder: (context, index) {
         if (index == productProvider.products.length) {
           return const Padding(

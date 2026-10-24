@@ -26,7 +26,9 @@ class OrderConfirmScreen extends StatelessWidget {
               SizedBox(height: CustomTheme.spacingMD),
               Text(
                 'Thank you for your purchase. Your order is being processed and will be delivered soon.',
-                style: CustomTextStyle.bodyLarge.copyWith(color: CustomTheme.textSecondary),
+                style: CustomTextStyle.bodyLarge.copyWith(
+                  color: CustomTheme.textSecondary,
+                ),
                 textAlign: TextAlign.center,
               ),
               if (orderId != null) ...[
@@ -70,7 +72,7 @@ class OrderConfirmScreen extends StatelessWidget {
       width: 120,
       height: 120,
       decoration: BoxDecoration(
-        color: CustomTheme.successColor.withOpacity(0.1),
+        color: CustomTheme.successColor.withValues(alpha: 0.1),
         shape: BoxShape.circle,
       ),
       child: Stack(
@@ -81,15 +83,11 @@ class OrderConfirmScreen extends StatelessWidget {
             width: 90,
             height: 90,
             decoration: BoxDecoration(
-              color: CustomTheme.successColor.withOpacity(0.2),
+              color: CustomTheme.successColor.withValues(alpha: 0.2),
               shape: BoxShape.circle,
             ),
           ),
-          Icon(
-            Icons.check_circle,
-            size: 80,
-            color: CustomTheme.successColor,
-          ),
+          Icon(Icons.check_circle, size: 80, color: CustomTheme.successColor),
         ],
       ),
     );
@@ -132,7 +130,9 @@ class OrderConfirmScreen extends StatelessWidget {
             ),
             child: Text(
               'Continue Shopping',
-              style: CustomTextStyle.button.copyWith(color: CustomTheme.primaryColor),
+              style: CustomTextStyle.button.copyWith(
+                color: CustomTheme.primaryColor,
+              ),
             ),
           ),
         ),

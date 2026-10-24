@@ -56,8 +56,7 @@ class ProfileScreen extends ConsumerWidget {
                   title: 'Order History',
                   subtitle: 'View past orders',
                   iconColor: const Color(0xFF8B5CF6),
-                  onTap: () =>
-                      Navigator.pushNamed(context, AppRoutes.myOrders),
+                  onTap: () => Navigator.pushNamed(context, AppRoutes.myOrders),
                 ),
               ]),
               const SizedBox(height: 20),
@@ -100,12 +99,12 @@ class ProfileScreen extends ConsumerWidget {
   Widget _buildProfileCard(dynamic user) {
     final initials = user?.name?.isNotEmpty == true
         ? (user!.name as String)
-            .trim()
-            .split(' ')
-            .map((e) => e[0])
-            .take(2)
-            .join()
-            .toUpperCase()
+              .trim()
+              .split(' ')
+              .map((e) => e[0])
+              .take(2)
+              .join()
+              .toUpperCase()
         : 'G';
 
     return Container(
@@ -123,9 +122,9 @@ class ProfileScreen extends ConsumerWidget {
             height: 50,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: CustomTheme.primaryColor.withOpacity(0.07),
+              color: CustomTheme.primaryColor.withValues(alpha: 0.07),
               border: Border.all(
-                color: CustomTheme.primaryColor.withOpacity(0.12),
+                color: CustomTheme.primaryColor.withValues(alpha: 0.12),
                 width: 1.5,
               ),
             ),
@@ -160,13 +159,14 @@ class ProfileScreen extends ConsumerWidget {
                     (user!.pharmacyName as String).isNotEmpty) ...[
                   const SizedBox(height: 4),
                   _buildInfoChip(
-                      Icons.local_pharmacy_outlined, user.pharmacyName!),
+                    Icons.local_pharmacy_outlined,
+                    user.pharmacyName!,
+                  ),
                 ],
                 if (user?.phoneNumber != null &&
                     (user!.phoneNumber as String).isNotEmpty) ...[
                   const SizedBox(height: 4),
-                  _buildInfoChip(
-                      Icons.phone_outlined, user.phoneNumber),
+                  _buildInfoChip(Icons.phone_outlined, user.phoneNumber),
                 ],
               ],
             ),
@@ -245,8 +245,8 @@ class ProfileScreen extends ConsumerWidget {
       child: InkWell(
         onTap: item.onTap,
         borderRadius: BorderRadius.circular(16),
-        splashColor: item.iconColor.withOpacity(0.04),
-        highlightColor: item.iconColor.withOpacity(0.02),
+        splashColor: item.iconColor.withValues(alpha: 0.04),
+        highlightColor: item.iconColor.withValues(alpha: 0.02),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
           child: Row(
@@ -255,7 +255,7 @@ class ProfileScreen extends ConsumerWidget {
                 width: 36,
                 height: 36,
                 decoration: BoxDecoration(
-                  color: item.iconColor.withOpacity(0.1),
+                  color: item.iconColor.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Icon(item.icon, size: 18, color: item.iconColor),
@@ -315,8 +315,8 @@ class ProfileScreen extends ConsumerWidget {
         child: InkWell(
           onTap: () => _showLogoutDialog(context, ref),
           borderRadius: BorderRadius.circular(16),
-          splashColor: CustomTheme.errorColor.withOpacity(0.04),
-          highlightColor: CustomTheme.errorColor.withOpacity(0.02),
+          splashColor: CustomTheme.errorColor.withValues(alpha: 0.04),
+          highlightColor: CustomTheme.errorColor.withValues(alpha: 0.02),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
             child: Row(
@@ -325,11 +325,14 @@ class ProfileScreen extends ConsumerWidget {
                   width: 36,
                   height: 36,
                   decoration: BoxDecoration(
-                    color: CustomTheme.errorColor.withOpacity(0.1),
+                    color: CustomTheme.errorColor.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: const Icon(Icons.logout_rounded,
-                      size: 18, color: CustomTheme.errorColor),
+                  child: const Icon(
+                    Icons.logout_rounded,
+                    size: 18,
+                    color: CustomTheme.errorColor,
+                  ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -348,7 +351,7 @@ class ProfileScreen extends ConsumerWidget {
                         'Sign out of your account',
                         style: CustomTextStyle.caption.copyWith(
                           fontSize: 11,
-                          color: CustomTheme.errorColor.withOpacity(0.6),
+                          color: CustomTheme.errorColor.withValues(alpha: 0.6),
                         ),
                       ),
                     ],
@@ -358,7 +361,7 @@ class ProfileScreen extends ConsumerWidget {
                   width: 28,
                   height: 28,
                   decoration: BoxDecoration(
-                    color: CustomTheme.errorColor.withOpacity(0.08),
+                    color: CustomTheme.errorColor.withValues(alpha: 0.08),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: const Icon(
@@ -379,8 +382,7 @@ class ProfileScreen extends ConsumerWidget {
     showDialog(
       context: context,
       builder: (context) => Dialog(
-        shape:
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         backgroundColor: CustomTheme.surfaceColor,
         child: Padding(
           padding: const EdgeInsets.all(24),
@@ -391,15 +393,20 @@ class ProfileScreen extends ConsumerWidget {
                 width: 52,
                 height: 52,
                 decoration: BoxDecoration(
-                  color: CustomTheme.errorColor.withOpacity(0.08),
+                  color: CustomTheme.errorColor.withValues(alpha: 0.08),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.logout_rounded,
-                    color: CustomTheme.errorColor, size: 24),
+                child: const Icon(
+                  Icons.logout_rounded,
+                  color: CustomTheme.errorColor,
+                  size: 24,
+                ),
               ),
               const SizedBox(height: 16),
-              Text('Logout',
-                  style: CustomTextStyle.heading3.copyWith(fontSize: 17)),
+              Text(
+                'Logout',
+                style: CustomTextStyle.heading3.copyWith(fontSize: 17),
+              ),
               const SizedBox(height: 8),
               Text(
                 'Are you sure you want to sign out of your account?',
@@ -439,7 +446,9 @@ class ProfileScreen extends ConsumerWidget {
                         await ref.read(authProviderNotifier).logout();
                         if (context.mounted) {
                           Navigator.pushReplacementNamed(
-                              context, AppRoutes.login);
+                            context,
+                            AppRoutes.login,
+                          );
                         }
                       },
                       child: Container(
@@ -451,8 +460,9 @@ class ProfileScreen extends ConsumerWidget {
                         child: Center(
                           child: Text(
                             'Logout',
-                            style: CustomTextStyle.button
-                                .copyWith(fontSize: 14),
+                            style: CustomTextStyle.button.copyWith(
+                              fontSize: 14,
+                            ),
                           ),
                         ),
                       ),

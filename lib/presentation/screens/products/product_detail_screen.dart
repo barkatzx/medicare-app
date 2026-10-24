@@ -51,8 +51,10 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
               const SizedBox(height: 14),
               Text(
                 'Loading product…',
-                style: CustomTextStyle.bodySmall
-                    .copyWith(fontSize: 13, color: CustomTheme.textTertiary),
+                style: CustomTextStyle.bodySmall.copyWith(
+                  fontSize: 13,
+                  color: CustomTheme.textTertiary,
+                ),
               ),
             ],
           ),
@@ -77,12 +79,17 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                     color: CustomTheme.surfaceColor,
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(Icons.search_off_rounded,
-                      size: 36, color: CustomTheme.textTertiary),
+                  child: const Icon(
+                    Icons.search_off_rounded,
+                    size: 36,
+                    color: CustomTheme.textTertiary,
+                  ),
                 ),
                 const SizedBox(height: 20),
-                Text('Product Not Found',
-                    style: CustomTextStyle.heading3.copyWith(fontSize: 17)),
+                Text(
+                  'Product Not Found',
+                  style: CustomTextStyle.heading3.copyWith(fontSize: 17),
+                ),
                 const SizedBox(height: 8),
                 Text(
                   'This product could not be loaded.\nPlease go back and try again.',
@@ -94,7 +101,9 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                   onTap: () => Navigator.pop(context),
                   child: Container(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 32, vertical: 13),
+                      horizontal: 32,
+                      vertical: 13,
+                    ),
                     decoration: BoxDecoration(
                       color: CustomTheme.primaryColor,
                       borderRadius: BorderRadius.circular(13),
@@ -160,8 +169,11 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                 color: CustomTheme.surfaceColor,
                 shape: BoxShape.circle,
               ),
-              child: const Icon(Icons.arrow_back_ios_new_rounded,
-                  color: CustomTheme.textPrimary, size: 15),
+              child: const Icon(
+                Icons.arrow_back_ios_new_rounded,
+                color: CustomTheme.textPrimary,
+                size: 15,
+              ),
             ),
           ),
         ),
@@ -175,9 +187,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
       width: double.infinity,
       decoration: BoxDecoration(
         color: CustomTheme.surfaceColor,
-        borderRadius: const BorderRadius.vertical(
-          bottom: Radius.circular(28),
-        ),
+        borderRadius: const BorderRadius.vertical(bottom: Radius.circular(28)),
       ),
       child: Stack(
         children: [
@@ -221,7 +231,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                       borderRadius: BorderRadius.circular(3.5),
                       color: _currentImageIndex == index
                           ? CustomTheme.primaryColor
-                          : CustomTheme.primaryColor.withOpacity(0.2),
+                          : CustomTheme.primaryColor.withValues(alpha: 0.2),
                     ),
                   ),
                 ),
@@ -241,10 +251,12 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
           Row(
             children: [
               Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 5,
+                ),
                 decoration: BoxDecoration(
-                  color: CustomTheme.primaryColor.withOpacity(0.08),
+                  color: CustomTheme.primaryColor.withValues(alpha: 0.08),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Text(
@@ -261,10 +273,12 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
               const SizedBox(width: 8),
               if (product.stock > 0)
                 Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 5,
+                  ),
                   decoration: BoxDecoration(
-                    color: CustomTheme.successColor.withOpacity(0.08),
+                    color: CustomTheme.successColor.withValues(alpha: 0.08),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Row(
@@ -292,10 +306,12 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                 )
               else
                 Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 5,
+                  ),
                   decoration: BoxDecoration(
-                    color: CustomTheme.errorColor.withOpacity(0.08),
+                    color: CustomTheme.errorColor.withValues(alpha: 0.08),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Row(
@@ -383,7 +399,9 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                         const SizedBox(width: 8),
                         Container(
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 8, vertical: 4),
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
                           decoration: BoxDecoration(
                             color: CustomTheme.errorColor,
                             borderRadius: BorderRadius.circular(9),
@@ -407,8 +425,10 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
             if (hasDiscount) ...[
               const SizedBox(width: 12),
               Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 10,
+                ),
                 decoration: BoxDecoration(
                   color: CustomTheme.backgroundColor,
                   borderRadius: BorderRadius.circular(12),
@@ -607,14 +627,16 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
               child: SizedBox(
                 height: 52,
                 child: ElevatedButton(
-                  onPressed: product.stock > 0 ? () => _addToCart(product) : null,
+                  onPressed: product.stock > 0
+                      ? () => _addToCart(product)
+                      : null,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: product.stock > 0
                         ? CustomTheme.primaryColor
-                        : CustomTheme.primaryColor.withOpacity(0.5),
+                        : CustomTheme.primaryColor.withValues(alpha: 0.5),
                     foregroundColor: Colors.white,
-                    disabledBackgroundColor:
-                        CustomTheme.primaryColor.withOpacity(0.5),
+                    disabledBackgroundColor: CustomTheme.primaryColor
+                        .withValues(alpha: 0.5),
                     padding: EdgeInsets.zero,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(15),
@@ -629,10 +651,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                       borderRadius: BorderRadius.circular(15),
                       gradient: product.stock > 0
                           ? const LinearGradient(
-                              colors: [
-                                Color(0xFF2A2A2A),
-                                Color(0xFF010101)
-                              ],
+                              colors: [Color(0xFF2A2A2A), Color(0xFF010101)],
                               begin: Alignment.topCenter,
                               end: Alignment.bottomCenter,
                             )
@@ -658,7 +677,8 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
   }
 
   void _addToCart(product) async {
-    final bool hasPrice = product.price > 0 ||
+    final bool hasPrice =
+        product.price > 0 ||
         (product.discountedPrice != null && product.discountedPrice! > 0);
 
     if (!hasPrice) {
@@ -669,17 +689,21 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
               children: const [
                 Icon(Icons.error_outline, color: Colors.white, size: 18),
                 SizedBox(width: 10),
-                Text('Failed to add: Product has no price',
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 13,
-                        fontWeight: FontWeight.w500)),
+                Text(
+                  'Failed to add: Product has no price',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
               ],
             ),
             backgroundColor: CustomTheme.errorColor,
             behavior: SnackBarBehavior.floating,
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
             margin: const EdgeInsets.all(16),
           ),
         );
@@ -695,17 +719,21 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
               children: const [
                 Icon(Icons.error_outline, color: Colors.white, size: 18),
                 SizedBox(width: 10),
-                Text('Out of Stock',
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 13,
-                        fontWeight: FontWeight.w500)),
+                Text(
+                  'Out of Stock',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
               ],
             ),
             backgroundColor: CustomTheme.errorColor,
             behavior: SnackBarBehavior.floating,
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
             margin: const EdgeInsets.all(16),
           ),
         );
@@ -737,11 +765,13 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
               ),
             ],
           ),
-          backgroundColor:
-              success ? CustomTheme.successColor : CustomTheme.errorColor,
+          backgroundColor: success
+              ? CustomTheme.successColor
+              : CustomTheme.errorColor,
           behavior: SnackBarBehavior.floating,
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
           margin: const EdgeInsets.all(16),
         ),
       );

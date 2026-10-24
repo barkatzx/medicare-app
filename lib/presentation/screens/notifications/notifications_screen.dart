@@ -10,7 +10,8 @@ class NotificationsScreen extends ConsumerStatefulWidget {
   const NotificationsScreen({super.key});
 
   @override
-  ConsumerState<NotificationsScreen> createState() => _NotificationsScreenState();
+  ConsumerState<NotificationsScreen> createState() =>
+      _NotificationsScreenState();
 }
 
 class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
@@ -32,7 +33,8 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
   }
 
   void _onScroll() {
-    if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 200) {
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 200) {
       ref.read(notificationProviderNotifier).loadMoreNotifications();
     }
   }
@@ -89,8 +91,10 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
             },
             icon: const Icon(Icons.done_all, size: 18),
             label: const Text('Mark all read'),
-            style: TextButton.styleFrom(foregroundColor: CustomTheme.primaryColor),
-        ),
+            style: TextButton.styleFrom(
+              foregroundColor: CustomTheme.primaryColor,
+            ),
+          ),
         const SizedBox(width: 8),
       ],
     );
@@ -108,25 +112,31 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
           child: isLoading && notifications.isEmpty
               ? const LoadingWidget(isOverlay: false)
               : notifications.isEmpty
-                  ? _buildEmptyState(provider.unreadOnly)
-                  : RefreshIndicator(
-                      onRefresh: () => provider.loadNotifications(),
-                      color: CustomTheme.primaryColor,
-                      child: ListView.builder(
-                        controller: _scrollController,
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                        itemCount: notifications.length + (provider.isLoadingMore ? 1 : 0),
-                        itemBuilder: (context, index) {
-                          if (index == notifications.length) {
-                            return const Padding(
-                              padding: EdgeInsets.symmetric(vertical: 16),
-                              child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
-                            );
-                          }
-                          return _buildNotificationCard(notifications[index]);
-                        },
-                      ),
+              ? _buildEmptyState(provider.unreadOnly)
+              : RefreshIndicator(
+                  onRefresh: () => provider.loadNotifications(),
+                  color: CustomTheme.primaryColor,
+                  child: ListView.builder(
+                    controller: _scrollController,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
                     ),
+                    itemCount:
+                        notifications.length + (provider.isLoadingMore ? 1 : 0),
+                    itemBuilder: (context, index) {
+                      if (index == notifications.length) {
+                        return const Padding(
+                          padding: EdgeInsets.symmetric(vertical: 16),
+                          child: Center(
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          ),
+                        );
+                      }
+                      return _buildNotificationCard(notifications[index]);
+                    },
+                  ),
+                ),
         ),
       ],
     );
@@ -164,19 +174,23 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(
-            isUnreadOnly ? Icons.mark_chat_read_outlined : Icons.notifications_none_outlined,
+            isUnreadOnly
+                ? Icons.mark_chat_read_outlined
+                : Icons.notifications_none_outlined,
             size: 80,
-            color: CustomTheme.textTertiary.withOpacity(0.5),
+            color: CustomTheme.textTertiary.withValues(alpha: 0.5),
           ),
           const SizedBox(height: 16),
           Text(
             isUnreadOnly ? 'No unread notifications' : 'No notifications yet',
-            style: CustomTextStyle.heading3.copyWith(color: CustomTheme.textSecondary),
+            style: CustomTextStyle.heading3.copyWith(
+              color: CustomTheme.textSecondary,
+            ),
           ),
           const SizedBox(height: 8),
           Text(
-            isUnreadOnly 
-                ? 'You\'re all caught up!' 
+            isUnreadOnly
+                ? 'You\'re all caught up!'
                 : 'We\'ll notify you when something important happens',
             style: CustomTextStyle.bodyMedium,
             textAlign: TextAlign.center,
@@ -192,26 +206,34 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: isRead ? CustomTheme.surfaceColor : CustomTheme.primaryColor.withOpacity(0.03),
+        color: isRead
+            ? CustomTheme.surfaceColor
+            : CustomTheme.primaryColor.withValues(alpha: 0.03),
         borderRadius: BorderRadius.circular(CustomTheme.radiusLG),
         border: Border.all(
-          color: isRead ? CustomTheme.borderLight : CustomTheme.primaryColor.withOpacity(0.1),
+          color: isRead
+              ? CustomTheme.borderLight
+              : CustomTheme.primaryColor.withValues(alpha: 0.1),
           width: 1,
         ),
-        boxShadow: isRead ? null : [
-          BoxShadow(
-            color: CustomTheme.primaryColor.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        boxShadow: isRead
+            ? null
+            : [
+                BoxShadow(
+                  color: CustomTheme.primaryColor.withValues(alpha: 0.05),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
       ),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
           onTap: () {
             if (!isRead) {
-              ref.read(notificationProviderNotifier).markAsRead(notification.id);
+              ref
+                  .read(notificationProviderNotifier)
+                  .markAsRead(notification.id);
             }
           },
           borderRadius: BorderRadius.circular(CustomTheme.radiusLG),
@@ -223,13 +245,17 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                 Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: isRead ? CustomTheme.backgroundColor : CustomTheme.primaryColor.withOpacity(0.1),
+                    color: isRead
+                        ? CustomTheme.backgroundColor
+                        : CustomTheme.primaryColor.withValues(alpha: 0.1),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
                     _getIcon(notification.type),
                     size: 20,
-                    color: isRead ? CustomTheme.textSecondary : CustomTheme.primaryColor,
+                    color: isRead
+                        ? CustomTheme.textSecondary
+                        : CustomTheme.primaryColor,
                   ),
                 ),
                 const SizedBox(width: 16),
@@ -244,8 +270,12 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                             child: Text(
                               notification.title,
                               style: CustomTextStyle.bodyMedium.copyWith(
-                                fontWeight: isRead ? FontWeight.w500 : FontWeight.w700,
-                                color: isRead ? CustomTheme.textSecondary : CustomTheme.textPrimary,
+                                fontWeight: isRead
+                                    ? FontWeight.w500
+                                    : FontWeight.w700,
+                                color: isRead
+                                    ? CustomTheme.textSecondary
+                                    : CustomTheme.textPrimary,
                               ),
                             ),
                           ),
@@ -262,7 +292,9 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                       Text(
                         notification.message,
                         style: CustomTextStyle.bodySmall.copyWith(
-                          color: isRead ? CustomTheme.textTertiary : CustomTheme.textSecondary,
+                          color: isRead
+                              ? CustomTheme.textTertiary
+                              : CustomTheme.textSecondary,
                         ),
                       ),
                     ],
@@ -288,11 +320,16 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
 
   IconData _getIcon(String? type) {
     switch (type?.toLowerCase()) {
-      case 'order': return Icons.shopping_bag_outlined;
-      case 'payment': return Icons.account_balance_wallet_outlined;
-      case 'promotion': return Icons.local_offer_outlined;
-      case 'alert': return Icons.error_outline;
-      default: return Icons.notifications_none_outlined;
+      case 'order':
+        return Icons.shopping_bag_outlined;
+      case 'payment':
+        return Icons.account_balance_wallet_outlined;
+      case 'promotion':
+        return Icons.local_offer_outlined;
+      case 'alert':
+        return Icons.error_outline;
+      default:
+        return Icons.notifications_none_outlined;
     }
   }
 }
@@ -318,18 +355,24 @@ class _FilterChip extends StatelessWidget {
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
-          color: isSelected ? CustomTheme.primaryColor : CustomTheme.surfaceColor,
+          color: isSelected
+              ? CustomTheme.primaryColor
+              : CustomTheme.surfaceColor,
           borderRadius: BorderRadius.circular(CustomTheme.radiusRound),
           border: Border.all(
-            color: isSelected ? CustomTheme.primaryColor : CustomTheme.borderLight,
+            color: isSelected
+                ? CustomTheme.primaryColor
+                : CustomTheme.borderLight,
           ),
-          boxShadow: isSelected ? [
-            BoxShadow(
-              color: CustomTheme.primaryColor.withOpacity(0.3),
-              blurRadius: 8,
-              offset: const Offset(0, 4),
-            )
-          ] : null,
+          boxShadow: isSelected
+              ? [
+                  BoxShadow(
+                    color: CustomTheme.primaryColor.withValues(alpha: 0.3),
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
+                  ),
+                ]
+              : null,
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -346,7 +389,9 @@ class _FilterChip extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
-                  color: isSelected ? Colors.white.withOpacity(0.2) : CustomTheme.primaryColor.withOpacity(0.1),
+                  color: isSelected
+                      ? Colors.white.withValues(alpha: 0.2)
+                      : CustomTheme.primaryColor.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Text(

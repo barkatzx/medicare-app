@@ -9,7 +9,8 @@ class PendingApprovalScreen extends ConsumerStatefulWidget {
   const PendingApprovalScreen({super.key});
 
   @override
-  ConsumerState<PendingApprovalScreen> createState() => _PendingApprovalScreenState();
+  ConsumerState<PendingApprovalScreen> createState() =>
+      _PendingApprovalScreenState();
 }
 
 class _PendingApprovalScreenState extends ConsumerState<PendingApprovalScreen> {
@@ -32,7 +33,7 @@ class _PendingApprovalScreenState extends ConsumerState<PendingApprovalScreen> {
                 Container(
                   padding: EdgeInsets.all(CustomTheme.spacingXL),
                   decoration: BoxDecoration(
-                    color: CustomTheme.warningColor.withOpacity(0.1),
+                    color: CustomTheme.warningColor.withValues(alpha: 0.1),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
@@ -68,10 +69,10 @@ class _PendingApprovalScreenState extends ConsumerState<PendingApprovalScreen> {
                 Container(
                   padding: EdgeInsets.all(CustomTheme.spacingLG),
                   decoration: BoxDecoration(
-                    color: CustomTheme.warningColor.withOpacity(0.05),
+                    color: CustomTheme.warningColor.withValues(alpha: 0.05),
                     borderRadius: BorderRadius.circular(CustomTheme.radiusLG),
                     border: Border.all(
-                      color: CustomTheme.warningColor.withOpacity(0.2),
+                      color: CustomTheme.warningColor.withValues(alpha: 0.2),
                       width: 1,
                     ),
                   ),
@@ -131,7 +132,8 @@ class _PendingApprovalScreenState extends ConsumerState<PendingApprovalScreen> {
                   onPressed: () async {
                     await ref.read(authProviderNotifier).initialize();
                     final currentAuthProvider = ref.read(authProviderNotifier);
-                    if (currentAuthProvider.isLoggedIn && currentAuthProvider.isCustomer) {
+                    if (currentAuthProvider.isLoggedIn &&
+                        currentAuthProvider.isCustomer) {
                       if (mounted) {
                         Navigator.pushReplacementNamed(context, AppRoutes.home);
                       }

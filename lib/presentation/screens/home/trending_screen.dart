@@ -12,14 +12,15 @@ class TrendingScreen extends ConsumerStatefulWidget {
   ConsumerState<TrendingScreen> createState() => _TrendingScreenState();
 }
 
-class _TrendingScreenState extends ConsumerState<TrendingScreen> with SingleTickerProviderStateMixin {
+class _TrendingScreenState extends ConsumerState<TrendingScreen>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
-    
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _loadCurrentTab();
     });
@@ -41,10 +42,14 @@ class _TrendingScreenState extends ConsumerState<TrendingScreen> with SingleTick
 
   ProductListType _getTypeForIndex(int index) {
     switch (index) {
-      case 0: return ProductListType.trending;
-      case 1: return ProductListType.featured;
-      case 2: return ProductListType.newProduct;
-      default: return ProductListType.trending;
+      case 0:
+        return ProductListType.trending;
+      case 1:
+        return ProductListType.featured;
+      case 2:
+        return ProductListType.newProduct;
+      default:
+        return ProductListType.trending;
     }
   }
 
@@ -72,7 +77,7 @@ class _TrendingScreenState extends ConsumerState<TrendingScreen> with SingleTick
                 borderRadius: BorderRadius.circular(CustomTheme.radiusRound),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.04),
+                    color: Colors.black.withValues(alpha: 0.04),
                     blurRadius: 10,
                     offset: const Offset(0, 4),
                   ),
@@ -164,7 +169,10 @@ class _ProductList extends ConsumerWidget {
     }
 
     if (errorMessage != null && products.isEmpty) {
-      return _buildErrorState(errorMessage, () => provider.loadProducts(type, refresh: true));
+      return _buildErrorState(
+        errorMessage,
+        () => provider.loadProducts(type, refresh: true),
+      );
     }
 
     if (products.isEmpty) {
@@ -215,7 +223,9 @@ class _ProductList extends ConsumerWidget {
           const SizedBox(height: 16),
           Text(
             'Loading products...',
-            style: CustomTextStyle.bodySmall.copyWith(color: CustomTheme.textTertiary),
+            style: CustomTextStyle.bodySmall.copyWith(
+              color: CustomTheme.textTertiary,
+            ),
           ),
         ],
       ),
@@ -232,10 +242,14 @@ class _ProductList extends ConsumerWidget {
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: CustomTheme.errorColor.withOpacity(0.1),
+                color: CustomTheme.errorColor.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(Icons.error_outline_rounded, size: 40, color: CustomTheme.errorColor),
+              child: const Icon(
+                Icons.error_outline_rounded,
+                size: 40,
+                color: CustomTheme.errorColor,
+              ),
             ),
             const SizedBox(height: 24),
             Text('Oops! Something went wrong', style: CustomTextStyle.heading4),
@@ -243,7 +257,9 @@ class _ProductList extends ConsumerWidget {
             Text(
               message,
               textAlign: TextAlign.center,
-              style: CustomTextStyle.bodyMedium.copyWith(color: CustomTheme.textSecondary),
+              style: CustomTextStyle.bodyMedium.copyWith(
+                color: CustomTheme.textSecondary,
+              ),
             ),
             const SizedBox(height: 24),
             ElevatedButton(
@@ -251,8 +267,13 @@ class _ProductList extends ConsumerWidget {
               style: ElevatedButton.styleFrom(
                 backgroundColor: CustomTheme.primaryColor,
                 foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(CustomTheme.radiusRound)),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 32,
+                  vertical: 12,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(CustomTheme.radiusRound),
+                ),
               ),
               child: const Text('Retry Again'),
             ),
@@ -270,17 +291,23 @@ class _ProductList extends ConsumerWidget {
           Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: CustomTheme.primaryColor.withOpacity(0.05),
+              color: CustomTheme.primaryColor.withValues(alpha: 0.05),
               shape: BoxShape.circle,
             ),
-            child: Icon(Icons.inventory_2_outlined, size: 40, color: CustomTheme.primaryColor.withOpacity(0.4)),
+            child: Icon(
+              Icons.inventory_2_outlined,
+              size: 40,
+              color: CustomTheme.primaryColor.withValues(alpha: 0.4),
+            ),
           ),
           const SizedBox(height: 24),
           Text('No products found', style: CustomTextStyle.heading4),
           const SizedBox(height: 8),
           Text(
             'We couldn\'t find any products in this category.',
-            style: CustomTextStyle.bodyMedium.copyWith(color: CustomTheme.textSecondary),
+            style: CustomTextStyle.bodyMedium.copyWith(
+              color: CustomTheme.textSecondary,
+            ),
           ),
         ],
       ),

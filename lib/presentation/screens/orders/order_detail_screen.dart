@@ -60,8 +60,11 @@ class _OrderDetailScreenState extends ConsumerState<OrderDetailScreen> {
                 color: CustomTheme.surfaceColor,
                 shape: BoxShape.circle,
               ),
-              child: const Icon(Icons.arrow_back_ios_new_rounded,
-                  color: CustomTheme.textPrimary, size: 15),
+              child: const Icon(
+                Icons.arrow_back_ios_new_rounded,
+                color: CustomTheme.textPrimary,
+                size: 15,
+              ),
             ),
           ),
         ),
@@ -90,8 +93,10 @@ class _OrderDetailScreenState extends ConsumerState<OrderDetailScreen> {
             const SizedBox(height: 14),
             Text(
               'Loading order details…',
-              style: CustomTextStyle.bodySmall
-                  .copyWith(fontSize: 13, color: CustomTheme.textTertiary),
+              style: CustomTextStyle.bodySmall.copyWith(
+                fontSize: 13,
+                color: CustomTheme.textTertiary,
+              ),
             ),
           ],
         ),
@@ -109,15 +114,20 @@ class _OrderDetailScreenState extends ConsumerState<OrderDetailScreen> {
                 width: 80,
                 height: 80,
                 decoration: BoxDecoration(
-                  color: CustomTheme.errorColor.withOpacity(0.08),
+                  color: CustomTheme.errorColor.withValues(alpha: 0.08),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.error_outline,
-                    size: 36, color: CustomTheme.errorColor),
+                child: const Icon(
+                  Icons.error_outline,
+                  size: 36,
+                  color: CustomTheme.errorColor,
+                ),
               ),
               const SizedBox(height: 20),
-              Text('Unable to Load Order',
-                  style: CustomTextStyle.heading3.copyWith(fontSize: 17)),
+              Text(
+                'Unable to Load Order',
+                style: CustomTextStyle.heading3.copyWith(fontSize: 17),
+              ),
               const SizedBox(height: 8),
               Text(
                 error,
@@ -128,14 +138,14 @@ class _OrderDetailScreenState extends ConsumerState<OrderDetailScreen> {
               GestureDetector(
                 onTap: () {
                   if (_orderId != null) {
-                    ref
-                        .read(orderProviderNotifier)
-                        .fetchOrderDetail(_orderId!);
+                    ref.read(orderProviderNotifier).fetchOrderDetail(_orderId!);
                   }
                 },
                 child: Container(
                   padding: const EdgeInsets.symmetric(
-                      horizontal: 28, vertical: 13),
+                    horizontal: 28,
+                    vertical: 13,
+                  ),
                   decoration: BoxDecoration(
                     color: CustomTheme.primaryColor,
                     borderRadius: BorderRadius.circular(13),
@@ -166,12 +176,17 @@ class _OrderDetailScreenState extends ConsumerState<OrderDetailScreen> {
                   color: CustomTheme.surfaceColor,
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.search_off_rounded,
-                    size: 36, color: CustomTheme.textTertiary),
+                child: const Icon(
+                  Icons.search_off_rounded,
+                  size: 36,
+                  color: CustomTheme.textTertiary,
+                ),
               ),
               const SizedBox(height: 20),
-              Text('Order Not Found',
-                  style: CustomTextStyle.heading3.copyWith(fontSize: 17)),
+              Text(
+                'Order Not Found',
+                style: CustomTextStyle.heading3.copyWith(fontSize: 17),
+              ),
               const SizedBox(height: 8),
               Text(
                 'This order could not be found.\nPlease go back and try again.',
@@ -183,7 +198,9 @@ class _OrderDetailScreenState extends ConsumerState<OrderDetailScreen> {
                 onTap: () => Navigator.pop(context),
                 child: Container(
                   padding: const EdgeInsets.symmetric(
-                      horizontal: 32, vertical: 13),
+                    horizontal: 32,
+                    vertical: 13,
+                  ),
                   decoration: BoxDecoration(
                     color: CustomTheme.primaryColor,
                     borderRadius: BorderRadius.circular(13),
@@ -241,8 +258,9 @@ class _OrderDetailScreenState extends ConsumerState<OrderDetailScreen> {
   }
 
   Widget _buildOrderHeader(OrderEntity order) {
-    final formattedDate =
-        DateFormat('MMM dd, yyyy • hh:mm a').format(order.createdAt);
+    final formattedDate = DateFormat(
+      'MMM dd, yyyy • hh:mm a',
+    ).format(order.createdAt);
     final statusColor = _getStatusColor(order.status);
     final statusLabel = _getStatusLabel(order.status);
 
@@ -288,13 +306,18 @@ class _OrderDetailScreenState extends ConsumerState<OrderDetailScreen> {
           const SizedBox(height: 12),
           Row(
             children: [
-              Icon(Icons.calendar_today_rounded,
-                  size: 14, color: CustomTheme.textSecondary),
+              Icon(
+                Icons.calendar_today_rounded,
+                size: 14,
+                color: CustomTheme.textSecondary,
+              ),
               const SizedBox(width: 8),
               Text(
                 formattedDate,
-                style: CustomTextStyle.bodySmall
-                    .copyWith(color: CustomTheme.textSecondary, fontSize: 12),
+                style: CustomTextStyle.bodySmall.copyWith(
+                  color: CustomTheme.textSecondary,
+                  fontSize: 12,
+                ),
               ),
             ],
           ),
@@ -307,9 +330,9 @@ class _OrderDetailScreenState extends ConsumerState<OrderDetailScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.08),
+        color: color.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: color.withOpacity(0.15), width: 1),
+        border: Border.all(color: color.withValues(alpha: 0.15), width: 1),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -368,15 +391,20 @@ class _OrderDetailScreenState extends ConsumerState<OrderDetailScreen> {
                       ? ClipRRect(
                           borderRadius: BorderRadius.circular(11),
                           child: Image.network(
-                              item.product!.images.first.url,
-                              fit: BoxFit.cover,
-                              errorBuilder: (_, __, ___) => Icon(
-                                  Icons.medical_services,
-                                  size: 22,
-                                  color: CustomTheme.textTertiary)),
+                            item.product!.images.first.url,
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, _, _) => Icon(
+                              Icons.medical_services,
+                              size: 22,
+                              color: CustomTheme.textTertiary,
+                            ),
+                          ),
                         )
-                      : Icon(Icons.medical_services,
-                          size: 22, color: CustomTheme.textTertiary),
+                      : Icon(
+                          Icons.medical_services,
+                          size: 22,
+                          color: CustomTheme.textTertiary,
+                        ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -398,7 +426,9 @@ class _OrderDetailScreenState extends ConsumerState<OrderDetailScreen> {
                         children: [
                           Container(
                             padding: const EdgeInsets.symmetric(
-                                horizontal: 7, vertical: 2),
+                              horizontal: 7,
+                              vertical: 2,
+                            ),
                             decoration: BoxDecoration(
                               color: CustomTheme.backgroundColor,
                               borderRadius: BorderRadius.circular(6),
@@ -416,8 +446,9 @@ class _OrderDetailScreenState extends ConsumerState<OrderDetailScreen> {
                           const SizedBox(width: 6),
                           Text(
                             '৳${item.price.toStringAsFixed(0)} each',
-                            style: CustomTextStyle.caption
-                                .copyWith(fontSize: 11),
+                            style: CustomTextStyle.caption.copyWith(
+                              fontSize: 11,
+                            ),
                           ),
                         ],
                       ),
@@ -465,8 +496,11 @@ class _OrderDetailScreenState extends ConsumerState<OrderDetailScreen> {
                       color: CustomTheme.backgroundColor,
                       borderRadius: BorderRadius.circular(11),
                     ),
-                    child: Icon(Icons.location_on_outlined,
-                        size: 20, color: CustomTheme.textSecondary),
+                    child: Icon(
+                      Icons.location_on_outlined,
+                      size: 20,
+                      color: CustomTheme.textSecondary,
+                    ),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
@@ -497,13 +531,11 @@ class _OrderDetailScreenState extends ConsumerState<OrderDetailScreen> {
                         const SizedBox(height: 2),
                         Text(
                           '${addr.city}, ${addr.state} ${addr.postalCode}',
-                          style: CustomTextStyle.caption
-                              .copyWith(fontSize: 11),
+                          style: CustomTextStyle.caption.copyWith(fontSize: 11),
                         ),
                         Text(
                           addr.country,
-                          style: CustomTextStyle.caption
-                              .copyWith(fontSize: 11),
+                          style: CustomTextStyle.caption.copyWith(fontSize: 11),
                         ),
                       ],
                     ),
@@ -513,7 +545,12 @@ class _OrderDetailScreenState extends ConsumerState<OrderDetailScreen> {
             ),
           ],
           if (addr != null && pay != null)
-            Divider(height: 1, color: CustomTheme.borderLight, indent: 16, endIndent: 16),
+            Divider(
+              height: 1,
+              color: CustomTheme.borderLight,
+              indent: 16,
+              endIndent: 16,
+            ),
           if (pay != null) ...[
             Padding(
               padding: const EdgeInsets.all(16),
@@ -552,9 +589,7 @@ class _OrderDetailScreenState extends ConsumerState<OrderDetailScreen> {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          pay.method == 'cod'
-                              ? 'Cash on Delivery'
-                              : pay.method,
+                          pay.method == 'cod' ? 'Cash on Delivery' : pay.method,
                           style: CustomTextStyle.bodyMedium.copyWith(
                             fontWeight: CustomTheme.fontWeightSemiBold,
                             color: CustomTheme.textPrimary,
@@ -565,7 +600,9 @@ class _OrderDetailScreenState extends ConsumerState<OrderDetailScreen> {
                     ),
                   ),
                   _buildStatusBadge(
-                      _getStatusLabel(pay.status), _getStatusColor(pay.status)),
+                    _getStatusLabel(pay.status),
+                    _getStatusColor(pay.status),
+                  ),
                 ],
               ),
             ),
@@ -601,11 +638,7 @@ class _OrderDetailScreenState extends ConsumerState<OrderDetailScreen> {
     );
   }
 
-  Widget _buildSummaryRow(
-    String label,
-    String value, {
-    bool isTotal = false,
-  }) {
+  Widget _buildSummaryRow(String label, String value, {bool isTotal = false}) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -619,7 +652,9 @@ class _OrderDetailScreenState extends ConsumerState<OrderDetailScreen> {
                   color: CustomTheme.textPrimary,
                 )
               : CustomTextStyle.bodySmall.copyWith(
-                  color: CustomTheme.textSecondary, fontSize: 12),
+                  color: CustomTheme.textSecondary,
+                  fontSize: 12,
+                ),
         ),
         Text(
           value,

@@ -60,7 +60,7 @@ class CustomTheme {
   // Shadows
   static List<BoxShadow> get boxShadowLight => [
     BoxShadow(
-      color: Colors.black.withOpacity(0.05),
+      color: Colors.black.withValues(alpha: 0.05),
       blurRadius: 8,
       offset: const Offset(0, 2),
     ),
@@ -68,7 +68,7 @@ class CustomTheme {
 
   static List<BoxShadow> get boxShadowMedium => [
     BoxShadow(
-      color: Colors.black.withOpacity(0.08),
+      color: Colors.black.withValues(alpha: 0.08),
       blurRadius: 12,
       offset: const Offset(0, 4),
     ),
@@ -76,7 +76,7 @@ class CustomTheme {
 
   static List<BoxShadow> get boxShadowHeavy => [
     BoxShadow(
-      color: Colors.black.withOpacity(0.12),
+      color: Colors.black.withValues(alpha: 0.12),
       blurRadius: 16,
       offset: const Offset(0, 6),
     ),

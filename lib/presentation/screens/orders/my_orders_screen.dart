@@ -47,8 +47,15 @@ class _MyOrdersScreenState extends ConsumerState<MyOrdersScreen> {
               child: Container(
                 width: 36,
                 height: 36,
-                decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
-                child: const Icon(Icons.arrow_back_ios_new_rounded, color: CustomTheme.textPrimary, size: 16),
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.arrow_back_ios_new_rounded,
+                  color: CustomTheme.textPrimary,
+                  size: 16,
+                ),
               ),
             ),
           ),
@@ -73,13 +80,13 @@ class _MyOrdersScreenState extends ConsumerState<MyOrdersScreen> {
               Container(
                 padding: const EdgeInsets.all(32),
                 decoration: BoxDecoration(
-                  color: CustomTheme.primaryColor.withOpacity(0.05),
+                  color: CustomTheme.primaryColor.withValues(alpha: 0.05),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
                   Icons.shopping_bag_outlined,
                   size: 64,
-                  color: CustomTheme.primaryColor.withOpacity(0.3),
+                  color: CustomTheme.primaryColor.withValues(alpha: 0.3),
                 ),
               ),
               const SizedBox(height: 32),
@@ -88,18 +95,25 @@ class _MyOrdersScreenState extends ConsumerState<MyOrdersScreen> {
               Text(
                 'Looks like you haven\'t placed any orders yet. Start your healthcare journey today!',
                 textAlign: TextAlign.center,
-                style: CustomTextStyle.bodyMedium.copyWith(color: CustomTheme.textSecondary),
+                style: CustomTextStyle.bodyMedium.copyWith(
+                  color: CustomTheme.textSecondary,
+                ),
               ),
               const SizedBox(height: 40),
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () => Navigator.pushReplacementNamed(context, AppRoutes.home),
+                  onPressed: () =>
+                      Navigator.pushReplacementNamed(context, AppRoutes.home),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: CustomTheme.primaryColor,
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(CustomTheme.radiusRound)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(
+                        CustomTheme.radiusRound,
+                      ),
+                    ),
                     elevation: 0,
                   ),
                   child: Text('Start Shopping', style: CustomTextStyle.button),
@@ -135,7 +149,11 @@ class _MyOrdersScreenState extends ConsumerState<MyOrdersScreen> {
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          onTap: () => Navigator.pushNamed(context, AppRoutes.orderDetail, arguments: order.id),
+          onTap: () => Navigator.pushNamed(
+            context,
+            AppRoutes.orderDetail,
+            arguments: order.id,
+          ),
           borderRadius: BorderRadius.circular(CustomTheme.radiusMD),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
@@ -162,17 +180,24 @@ class _MyOrdersScreenState extends ConsumerState<MyOrdersScreen> {
                       children: [
                         Text(
                           formattedDate,
-                          style: CustomTextStyle.bodySmall.copyWith(color: CustomTheme.textSecondary),
+                          style: CustomTextStyle.bodySmall.copyWith(
+                            color: CustomTheme.textSecondary,
+                          ),
                         ),
                         Container(
                           margin: const EdgeInsets.symmetric(horizontal: 8),
                           width: 3,
                           height: 3,
-                          decoration: const BoxDecoration(color: CustomTheme.textTertiary, shape: BoxShape.circle),
+                          decoration: const BoxDecoration(
+                            color: CustomTheme.textTertiary,
+                            shape: BoxShape.circle,
+                          ),
                         ),
                         Text(
                           '${order.items.length} ${order.items.length == 1 ? 'Item' : 'Items'}',
-                          style: CustomTextStyle.bodySmall.copyWith(color: CustomTheme.textSecondary),
+                          style: CustomTextStyle.bodySmall.copyWith(
+                            color: CustomTheme.textSecondary,
+                          ),
                         ),
                       ],
                     ),
@@ -197,9 +222,9 @@ class _MyOrdersScreenState extends ConsumerState<MyOrdersScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.08),
+        color: color.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(CustomTheme.radiusRound),
-        border: Border.all(color: color.withOpacity(0.1), width: 1),
+        border: Border.all(color: color.withValues(alpha: 0.1), width: 1),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,

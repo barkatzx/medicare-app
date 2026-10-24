@@ -64,11 +64,21 @@ class _CategoriesScreenState extends ConsumerState<CategoriesScreen> {
         style: CustomTextStyle.bodyMedium,
         decoration: InputDecoration(
           hintText: 'Square, Beximco, Incepta ...',
-          hintStyle: CustomTextStyle.bodyMedium.copyWith(color: CustomTheme.textTertiary),
-          prefixIcon: const Icon(Icons.search_rounded, color: CustomTheme.primaryColor, size: 22),
+          hintStyle: CustomTextStyle.bodyMedium.copyWith(
+            color: CustomTheme.textTertiary,
+          ),
+          prefixIcon: const Icon(
+            Icons.search_rounded,
+            color: CustomTheme.primaryColor,
+            size: 22,
+          ),
           suffixIcon: _searchController.text.isNotEmpty
               ? IconButton(
-                  icon: const Icon(Icons.close_rounded, size: 18, color: CustomTheme.textTertiary),
+                  icon: const Icon(
+                    Icons.close_rounded,
+                    size: 18,
+                    color: CustomTheme.textTertiary,
+                  ),
                   onPressed: () {
                     _searchController.clear();
                     provider.searchCategories('');
@@ -84,7 +94,12 @@ class _CategoriesScreenState extends ConsumerState<CategoriesScreen> {
 
   Widget _buildBody(provider) {
     if (provider.isLoading && provider.categories.isEmpty) {
-      return const Center(child: CircularProgressIndicator(color: CustomTheme.primaryColor, strokeWidth: 2));
+      return const Center(
+        child: CircularProgressIndicator(
+          color: CustomTheme.primaryColor,
+          strokeWidth: 2,
+        ),
+      );
     }
 
     if (provider.errorMessage != null && provider.categories.isEmpty) {
@@ -94,14 +109,23 @@ class _CategoriesScreenState extends ConsumerState<CategoriesScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.error_outline_rounded, size: 64, color: CustomTheme.errorColor),
+              const Icon(
+                Icons.error_outline_rounded,
+                size: 64,
+                color: CustomTheme.errorColor,
+              ),
               const SizedBox(height: 24),
-              Text('Oops! Something went wrong', style: CustomTextStyle.heading3),
+              Text(
+                'Oops! Something went wrong',
+                style: CustomTextStyle.heading3,
+              ),
               const SizedBox(height: 8),
               Text(
                 provider.errorMessage!,
                 textAlign: TextAlign.center,
-                style: CustomTextStyle.bodySmall.copyWith(color: CustomTheme.textSecondary),
+                style: CustomTextStyle.bodySmall.copyWith(
+                  color: CustomTheme.textSecondary,
+                ),
               ),
               const SizedBox(height: 32),
               SizedBox(
@@ -110,9 +134,16 @@ class _CategoriesScreenState extends ConsumerState<CategoriesScreen> {
                   onPressed: () => provider.fetchCategories(),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: CustomTheme.primaryColor,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(CustomTheme.radiusRound)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(
+                        CustomTheme.radiusRound,
+                      ),
+                    ),
                   ),
-                  child: const Text('Retry', style: TextStyle(color: Colors.white)),
+                  child: const Text(
+                    'Retry',
+                    style: TextStyle(color: Colors.white),
+                  ),
                 ),
               ),
             ],
@@ -134,14 +165,20 @@ class _CategoriesScreenState extends ConsumerState<CategoriesScreen> {
                 color: CustomTheme.backgroundColor,
                 shape: BoxShape.circle,
               ),
-              child: Icon(Icons.search_off_rounded, size: 48, color: CustomTheme.textTertiary.withOpacity(0.5)),
+              child: Icon(
+                Icons.search_off_rounded,
+                size: 48,
+                color: CustomTheme.textTertiary.withValues(alpha: 0.5),
+              ),
             ),
             const SizedBox(height: 20),
             Text('No companies found', style: CustomTextStyle.heading3),
             const SizedBox(height: 8),
             Text(
               'Try searching with a different name',
-              style: CustomTextStyle.bodySmall.copyWith(color: CustomTheme.textTertiary),
+              style: CustomTextStyle.bodySmall.copyWith(
+                color: CustomTheme.textTertiary,
+              ),
             ),
           ],
         ),
@@ -168,10 +205,7 @@ class _CategoriesScreenState extends ConsumerState<CategoriesScreen> {
         Navigator.pushNamed(
           context,
           AppRoutes.categoryProducts,
-          arguments: {
-            'id': category.id,
-            'name': category.name.trim(),
-          },
+          arguments: {'id': category.id, 'name': category.name.trim()},
         );
       },
       child: Container(
@@ -186,7 +220,7 @@ class _CategoriesScreenState extends ConsumerState<CategoriesScreen> {
               width: 30,
               height: 30,
               decoration: BoxDecoration(
-                color: CustomTheme.primaryColor.withOpacity(0.08),
+                color: CustomTheme.primaryColor.withValues(alpha: 0.08),
                 borderRadius: BorderRadius.circular(CustomTheme.radiusSM),
               ),
               child: const Icon(

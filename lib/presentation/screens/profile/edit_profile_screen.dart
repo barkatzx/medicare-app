@@ -26,8 +26,9 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     super.initState();
     final user = ref.read(authProviderNotifier).currentUser;
     _nameController = TextEditingController(text: user?.name ?? '');
-    _pharmacyNameController =
-        TextEditingController(text: user?.pharmacyName ?? '');
+    _pharmacyNameController = TextEditingController(
+      text: user?.pharmacyName ?? '',
+    );
     _phoneController = TextEditingController(text: user?.phoneNumber ?? '');
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -66,7 +67,9 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     if (!_formKey.currentState!.validate()) return;
     FocusScope.of(context).unfocus();
 
-    final success = await ref.read(authProviderNotifier).updateProfile(
+    final success = await ref
+        .read(authProviderNotifier)
+        .updateProfile(
           name: _nameController.text.trim(),
           pharmacyName: _pharmacyNameController.text.trim(),
           phoneNumber: _phoneController.text.trim(),
@@ -78,18 +81,26 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
           SnackBar(
             content: Row(
               children: [
-                const Icon(Icons.check_circle_outline,
-                    color: Colors.white, size: 18),
+                const Icon(
+                  Icons.check_circle_outline,
+                  color: Colors.white,
+                  size: 18,
+                ),
                 const SizedBox(width: 10),
-                Text('Profile updated successfully',
-                    style: CustomTextStyle.bodyMedium
-                        .copyWith(color: Colors.white, fontSize: 13)),
+                Text(
+                  'Profile updated successfully',
+                  style: CustomTextStyle.bodyMedium.copyWith(
+                    color: Colors.white,
+                    fontSize: 13,
+                  ),
+                ),
               ],
             ),
             backgroundColor: CustomTheme.successColor,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12)),
+              borderRadius: BorderRadius.circular(12),
+            ),
             margin: const EdgeInsets.all(16),
           ),
         );
@@ -102,7 +113,8 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
             backgroundColor: CustomTheme.errorColor,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12)),
+              borderRadius: BorderRadius.circular(12),
+            ),
             margin: const EdgeInsets.all(16),
           ),
         );
@@ -138,13 +150,17 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                       children: [
                         _buildProfileHeader(user),
                         const SizedBox(height: 24),
-                        _buildSectionHeader('Account Information',
-                            Icons.shield_outlined),
+                        _buildSectionHeader(
+                          'Account Information',
+                          Icons.shield_outlined,
+                        ),
                         const SizedBox(height: 12),
                         _buildAccountInfoCard(user),
                         const SizedBox(height: 24),
                         _buildSectionHeader(
-                            'Personal Details', Icons.edit_outlined),
+                          'Personal Details',
+                          Icons.edit_outlined,
+                        ),
                         const SizedBox(height: 12),
                         _buildEditCard(),
                         const SizedBox(height: 24),
@@ -152,22 +168,29 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             _buildSectionHeader(
-                                'Addresses', Icons.location_on_outlined),
+                              'Addresses',
+                              Icons.location_on_outlined,
+                            ),
                             GestureDetector(
                               onTap: () => _showAddressForm(context),
                               child: Container(
                                 padding: const EdgeInsets.symmetric(
-                                    horizontal: 12, vertical: 6),
+                                  horizontal: 12,
+                                  vertical: 6,
+                                ),
                                 decoration: BoxDecoration(
-                                  color: CustomTheme.primaryColor
-                                      .withOpacity(0.08),
+                                  color: CustomTheme.primaryColor.withValues(
+                                    alpha: 0.08,
+                                  ),
                                   borderRadius: BorderRadius.circular(10),
                                 ),
                                 child: Row(
                                   children: [
-                                    Icon(Icons.add_rounded,
-                                        size: 14,
-                                        color: CustomTheme.primaryColor),
+                                    Icon(
+                                      Icons.add_rounded,
+                                      size: 14,
+                                      color: CustomTheme.primaryColor,
+                                    ),
                                     const SizedBox(width: 4),
                                     Text(
                                       'Add New',
@@ -217,8 +240,11 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                 color: CustomTheme.surfaceColor,
                 shape: BoxShape.circle,
               ),
-              child: const Icon(Icons.arrow_back_ios_new_rounded,
-                  color: CustomTheme.textPrimary, size: 15),
+              child: const Icon(
+                Icons.arrow_back_ios_new_rounded,
+                color: CustomTheme.textPrimary,
+                size: 15,
+              ),
             ),
           ),
         ),
@@ -237,7 +263,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
           width: 32,
           height: 32,
           decoration: BoxDecoration(
-            color: CustomTheme.primaryColor.withOpacity(0.08),
+            color: CustomTheme.primaryColor.withValues(alpha: 0.08),
             borderRadius: BorderRadius.circular(9),
           ),
           child: Icon(icon, size: 16, color: CustomTheme.primaryColor),
@@ -257,12 +283,12 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   Widget _buildProfileHeader(UserEntity user) {
     final initials = user.name.isNotEmpty
         ? user.name
-            .trim()
-            .split(' ')
-            .map((e) => e[0])
-            .take(2)
-            .join()
-            .toUpperCase()
+              .trim()
+              .split(' ')
+              .map((e) => e[0])
+              .take(2)
+              .join()
+              .toUpperCase()
         : 'U';
 
     return Center(
@@ -298,10 +324,9 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
           ),
           const SizedBox(height: 6),
           Container(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
             decoration: BoxDecoration(
-              color: CustomTheme.primaryColor.withOpacity(0.08),
+              color: CustomTheme.primaryColor.withValues(alpha: 0.08),
               borderRadius: BorderRadius.circular(20),
             ),
             child: Text(
@@ -321,8 +346,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   }
 
   Widget _buildAccountInfoCard(UserEntity user) {
-    final formattedDate =
-        DateFormat('MMMM dd, yyyy').format(user.createdAt);
+    final formattedDate = DateFormat('MMMM dd, yyyy').format(user.createdAt);
 
     return Container(
       decoration: BoxDecoration(
@@ -377,8 +401,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                   color: CustomTheme.backgroundColor,
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child:
-                    Icon(icon, size: 17, color: CustomTheme.textSecondary),
+                child: Icon(icon, size: 17, color: CustomTheme.textSecondary),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -410,10 +433,11 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
         ),
         if (!isLast)
           Divider(
-              height: 1,
-              color: CustomTheme.borderLight,
-              indent: 64,
-              endIndent: 16),
+            height: 1,
+            color: CustomTheme.borderLight,
+            indent: 64,
+            endIndent: 16,
+          ),
       ],
     );
   }
@@ -440,8 +464,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
             label: 'Pharmacy Name',
             icon: Icons.local_pharmacy_outlined,
             hint: 'Your business name',
-            validator: (v) =>
-                v!.isEmpty ? 'Business name is required' : null,
+            validator: (v) => v!.isEmpty ? 'Business name is required' : null,
           ),
           const SizedBox(height: 14),
           _buildFormTextField(
@@ -450,8 +473,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
             icon: Icons.phone_android_rounded,
             hint: 'Primary contact number',
             keyboardType: TextInputType.phone,
-            validator: (v) =>
-                v!.length < 11 ? 'Enter a valid number' : null,
+            validator: (v) => v!.length < 11 ? 'Enter a valid number' : null,
           ),
         ],
       ),
@@ -490,18 +512,24 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
           ),
           decoration: InputDecoration(
             hintText: hint,
-            hintStyle: CustomTextStyle.bodySmall
-                .copyWith(color: CustomTheme.textTertiary, fontSize: 13),
+            hintStyle: CustomTextStyle.bodySmall.copyWith(
+              color: CustomTheme.textTertiary,
+              fontSize: 13,
+            ),
             prefixIcon: Padding(
               padding: const EdgeInsets.only(left: 14, right: 10),
               child: Icon(icon, size: 18, color: CustomTheme.textTertiary),
             ),
-            prefixIconConstraints:
-                const BoxConstraints(minWidth: 46, minHeight: 46),
+            prefixIconConstraints: const BoxConstraints(
+              minWidth: 46,
+              minHeight: 46,
+            ),
             filled: true,
             fillColor: CustomTheme.backgroundColor,
             contentPadding: const EdgeInsets.symmetric(
-                horizontal: 16, vertical: 14),
+              horizontal: 16,
+              vertical: 14,
+            ),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(13),
               borderSide: BorderSide.none,
@@ -509,21 +537,27 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(13),
               borderSide: BorderSide(
-                  color: CustomTheme.primaryColor.withOpacity(0.5),
-                  width: 1.5),
+                color: CustomTheme.primaryColor.withValues(alpha: 0.5),
+                width: 1.5,
+              ),
             ),
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(13),
               borderSide: const BorderSide(
-                  color: CustomTheme.errorColor, width: 1.5),
+                color: CustomTheme.errorColor,
+                width: 1.5,
+              ),
             ),
             focusedErrorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(13),
               borderSide: const BorderSide(
-                  color: CustomTheme.errorColor, width: 1.5),
+                color: CustomTheme.errorColor,
+                width: 1.5,
+              ),
             ),
-            errorStyle: CustomTextStyle.caption
-                .copyWith(color: CustomTheme.errorColor),
+            errorStyle: CustomTextStyle.caption.copyWith(
+              color: CustomTheme.errorColor,
+            ),
           ),
         ),
       ],
@@ -557,11 +591,13 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
             style: ElevatedButton.styleFrom(
               backgroundColor: CustomTheme.primaryColor,
               foregroundColor: Colors.white,
-              disabledBackgroundColor:
-                  CustomTheme.primaryColor.withOpacity(0.5),
+              disabledBackgroundColor: CustomTheme.primaryColor.withValues(
+                alpha: 0.5,
+              ),
               padding: EdgeInsets.zero,
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16)),
+                borderRadius: BorderRadius.circular(16),
+              ),
               elevation: 0,
               shadowColor: Colors.transparent,
               surfaceTintColor: Colors.transparent,
@@ -584,7 +620,9 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                         width: 24,
                         height: 24,
                         child: CircularProgressIndicator(
-                            color: Colors.white, strokeWidth: 2.5),
+                          color: Colors.white,
+                          strokeWidth: 2.5,
+                        ),
                       )
                     : Row(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -598,8 +636,11 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                             ),
                           ),
                           const SizedBox(width: 8),
-                          const Icon(Icons.check_rounded,
-                              color: Colors.white, size: 18),
+                          const Icon(
+                            Icons.check_rounded,
+                            color: Colors.white,
+                            size: 18,
+                          ),
                         ],
                       ),
               ),
@@ -648,8 +689,11 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                 color: CustomTheme.backgroundColor,
                 shape: BoxShape.circle,
               ),
-              child: const Icon(Icons.location_off_outlined,
-                  size: 26, color: CustomTheme.textTertiary),
+              child: const Icon(
+                Icons.location_off_outlined,
+                size: 26,
+                color: CustomTheme.textTertiary,
+              ),
             ),
             const SizedBox(height: 12),
             Text(
@@ -663,8 +707,10 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
             const SizedBox(height: 4),
             Text(
               'Tap "+ Add New" to add a shipping address',
-              style: CustomTextStyle.caption
-                  .copyWith(fontSize: 11, color: CustomTheme.textTertiary),
+              style: CustomTextStyle.caption.copyWith(
+                fontSize: 11,
+                color: CustomTheme.textTertiary,
+              ),
               textAlign: TextAlign.center,
             ),
           ],
@@ -680,7 +726,9 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   }
 
   Widget _buildAddressCard(
-      AddressEntity address, AddressProvider addressProvider) {
+    AddressEntity address,
+    AddressProvider addressProvider,
+  ) {
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
       decoration: BoxDecoration(
@@ -697,7 +745,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
               height: 42,
               decoration: BoxDecoration(
                 color: address.isDefault
-                    ? CustomTheme.primaryColor.withOpacity(0.08)
+                    ? CustomTheme.primaryColor.withValues(alpha: 0.08)
                     : CustomTheme.backgroundColor,
                 borderRadius: BorderRadius.circular(12),
               ),
@@ -759,8 +807,10 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                   const SizedBox(height: 2),
                   Text(
                     '${address.city}, ${address.state} ${address.postalCode}',
-                    style: CustomTextStyle.caption
-                        .copyWith(fontSize: 11, color: CustomTheme.textTertiary),
+                    style: CustomTextStyle.caption.copyWith(
+                      fontSize: 11,
+                      color: CustomTheme.textTertiary,
+                    ),
                   ),
                 ],
               ),
@@ -778,7 +828,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                 _buildIconBtn(
                   Icons.delete_outline_rounded,
                   CustomTheme.errorColor,
-                  CustomTheme.errorColor.withOpacity(0.08),
+                  CustomTheme.errorColor.withValues(alpha: 0.08),
                   () => _showDeleteConfirmation(address),
                 ),
               ],
@@ -790,7 +840,11 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   }
 
   Widget _buildIconBtn(
-      IconData icon, Color color, Color bg, VoidCallback onTap) {
+    IconData icon,
+    Color color,
+    Color bg,
+    VoidCallback onTap,
+  ) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -818,8 +872,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     showDialog(
       context: context,
       builder: (dialogContext) => Dialog(
-        shape:
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         backgroundColor: CustomTheme.surfaceColor,
         child: Padding(
           padding: const EdgeInsets.all(24),
@@ -830,21 +883,25 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                 width: 52,
                 height: 52,
                 decoration: BoxDecoration(
-                  color: CustomTheme.errorColor.withOpacity(0.08),
+                  color: CustomTheme.errorColor.withValues(alpha: 0.08),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.location_off_outlined,
-                    color: CustomTheme.errorColor, size: 24),
+                child: const Icon(
+                  Icons.location_off_outlined,
+                  color: CustomTheme.errorColor,
+                  size: 24,
+                ),
               ),
               const SizedBox(height: 16),
-              Text('Delete Address',
-                  style: CustomTextStyle.heading3.copyWith(fontSize: 17)),
+              Text(
+                'Delete Address',
+                style: CustomTextStyle.heading3.copyWith(fontSize: 17),
+              ),
               const SizedBox(height: 8),
               Text(
                 'Are you sure you want to delete this address?',
                 textAlign: TextAlign.center,
-                style:
-                    CustomTextStyle.bodyMedium.copyWith(fontSize: 13),
+                style: CustomTextStyle.bodyMedium.copyWith(fontSize: 13),
               ),
               const SizedBox(height: 20),
               Row(
@@ -877,8 +934,9 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                       onTap: () async {
                         final provider = ref.read(addressProviderNotifier);
                         await provider.deleteAddress(address.id);
-                        if (dialogContext.mounted)
+                        if (dialogContext.mounted) {
                           Navigator.pop(dialogContext);
+                        }
                       },
                       child: Container(
                         height: 44,
@@ -889,8 +947,9 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                         child: Center(
                           child: Text(
                             'Delete',
-                            style: CustomTextStyle.button
-                                .copyWith(fontSize: 14),
+                            style: CustomTextStyle.button.copyWith(
+                              fontSize: 14,
+                            ),
                           ),
                         ),
                       ),
@@ -928,16 +987,19 @@ class _AddressFormSheetState extends ConsumerState<AddressFormSheet> {
   @override
   void initState() {
     super.initState();
-    _streetController =
-        TextEditingController(text: widget.address?.street ?? '');
-    _cityController =
-        TextEditingController(text: widget.address?.city ?? '');
+    _streetController = TextEditingController(
+      text: widget.address?.street ?? '',
+    );
+    _cityController = TextEditingController(text: widget.address?.city ?? '');
     _stateController = TextEditingController(
-        text: widget.address?.state ?? 'Dhaka Division');
-    _zipController =
-        TextEditingController(text: widget.address?.postalCode ?? '');
-    _countryController =
-        TextEditingController(text: widget.address?.country ?? 'Bangladesh');
+      text: widget.address?.state ?? 'Dhaka Division',
+    );
+    _zipController = TextEditingController(
+      text: widget.address?.postalCode ?? '',
+    );
+    _countryController = TextEditingController(
+      text: widget.address?.country ?? 'Bangladesh',
+    );
     _isDefault = widget.address?.isDefault ?? false;
   }
 
@@ -966,7 +1028,8 @@ class _AddressFormSheetState extends ConsumerState<AddressFormSheet> {
         physics: const BouncingScrollPhysics(),
         child: Padding(
           padding: EdgeInsets.only(
-              bottom: MediaQuery.of(context).viewInsets.bottom + 32),
+            bottom: MediaQuery.of(context).viewInsets.bottom + 32,
+          ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -988,7 +1051,7 @@ class _AddressFormSheetState extends ConsumerState<AddressFormSheet> {
                     width: 38,
                     height: 38,
                     decoration: BoxDecoration(
-                      color: CustomTheme.primaryColor.withOpacity(0.08),
+                      color: CustomTheme.primaryColor.withValues(alpha: 0.08),
                       borderRadius: BorderRadius.circular(11),
                     ),
                     child: Icon(
@@ -1011,8 +1074,7 @@ class _AddressFormSheetState extends ConsumerState<AddressFormSheet> {
                         isEditing
                             ? 'Edit your delivery address'
                             : 'Where should we deliver?',
-                        style: CustomTextStyle.caption
-                            .copyWith(fontSize: 11),
+                        style: CustomTextStyle.caption.copyWith(fontSize: 11),
                       ),
                     ],
                   ),
@@ -1024,46 +1086,64 @@ class _AddressFormSheetState extends ConsumerState<AddressFormSheet> {
                 key: _formKey,
                 child: Column(
                   children: [
-                    _buildField('Street Address', _streetController,
-                        Icons.location_on_outlined,
-                        maxLines: 2),
+                    _buildField(
+                      'Street Address',
+                      _streetController,
+                      Icons.location_on_outlined,
+                      maxLines: 2,
+                    ),
                     const SizedBox(height: 12),
                     Row(
                       children: [
                         Expanded(
                           child: _buildField(
-                              'City', _cityController, Icons.location_city_outlined),
+                            'City',
+                            _cityController,
+                            Icons.location_city_outlined,
+                          ),
                         ),
                         const SizedBox(width: 12),
                         Expanded(
-                          child: _buildField('Postal Code', _zipController,
-                              Icons.markunread_mailbox_outlined),
+                          child: _buildField(
+                            'Postal Code',
+                            _zipController,
+                            Icons.markunread_mailbox_outlined,
+                          ),
                         ),
                       ],
                     ),
                     const SizedBox(height: 12),
-                    _buildField('State / Division', _stateController,
-                        Icons.map_outlined),
+                    _buildField(
+                      'State / Division',
+                      _stateController,
+                      Icons.map_outlined,
+                    ),
                     const SizedBox(height: 12),
                     _buildField(
-                        'Country', _countryController, Icons.public_outlined),
+                      'Country',
+                      _countryController,
+                      Icons.public_outlined,
+                    ),
                     const SizedBox(height: 16),
 
                     // Default toggle
                     GestureDetector(
-                      onTap: () =>
-                          setState(() => _isDefault = !_isDefault),
+                      onTap: () => setState(() => _isDefault = !_isDefault),
                       child: Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 14, vertical: 12),
+                          horizontal: 14,
+                          vertical: 12,
+                        ),
                         decoration: BoxDecoration(
                           color: _isDefault
-                              ? CustomTheme.primaryColor.withOpacity(0.06)
+                              ? CustomTheme.primaryColor.withValues(alpha: 0.06)
                               : CustomTheme.backgroundColor,
                           borderRadius: BorderRadius.circular(13),
                           border: Border.all(
                             color: _isDefault
-                                ? CustomTheme.primaryColor.withOpacity(0.2)
+                                ? CustomTheme.primaryColor.withValues(
+                                    alpha: 0.2,
+                                  )
                                 : Colors.transparent,
                             width: 1.5,
                           ),
@@ -1087,7 +1167,8 @@ class _AddressFormSheetState extends ConsumerState<AddressFormSheet> {
                                     style: TextStyle(
                                       fontFamily: CustomTheme.primaryFontFamily,
                                       fontSize: 13,
-                                      fontWeight: CustomTheme.fontWeightSemiBold,
+                                      fontWeight:
+                                          CustomTheme.fontWeightSemiBold,
                                       color: _isDefault
                                           ? CustomTheme.primaryColor
                                           : CustomTheme.textPrimary,
@@ -1095,8 +1176,9 @@ class _AddressFormSheetState extends ConsumerState<AddressFormSheet> {
                                   ),
                                   Text(
                                     'Used automatically at checkout',
-                                    style: CustomTextStyle.caption
-                                        .copyWith(fontSize: 10),
+                                    style: CustomTextStyle.caption.copyWith(
+                                      fontSize: 10,
+                                    ),
                                   ),
                                 ],
                               ),
@@ -1118,8 +1200,11 @@ class _AddressFormSheetState extends ConsumerState<AddressFormSheet> {
                                 ),
                               ),
                               child: _isDefault
-                                  ? const Icon(Icons.check_rounded,
-                                      size: 13, color: Colors.white)
+                                  ? const Icon(
+                                      Icons.check_rounded,
+                                      size: 13,
+                                      color: Colors.white,
+                                    )
                                   : null,
                             ),
                           ],
@@ -1138,11 +1223,12 @@ class _AddressFormSheetState extends ConsumerState<AddressFormSheet> {
                         style: ElevatedButton.styleFrom(
                           backgroundColor: CustomTheme.primaryColor,
                           foregroundColor: Colors.white,
-                          disabledBackgroundColor:
-                              CustomTheme.primaryColor.withOpacity(0.5),
+                          disabledBackgroundColor: CustomTheme.primaryColor
+                              .withValues(alpha: 0.5),
                           padding: EdgeInsets.zero,
                           shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(15)),
+                            borderRadius: BorderRadius.circular(15),
+                          ),
                           elevation: 0,
                           shadowColor: Colors.transparent,
                           surfaceTintColor: Colors.transparent,
@@ -1156,7 +1242,7 @@ class _AddressFormSheetState extends ConsumerState<AddressFormSheet> {
                                 : const LinearGradient(
                                     colors: [
                                       Color(0xFF2A2A2A),
-                                      Color(0xFF010101)
+                                      Color(0xFF010101),
                                     ],
                                     begin: Alignment.topCenter,
                                     end: Alignment.bottomCenter,
@@ -1168,7 +1254,9 @@ class _AddressFormSheetState extends ConsumerState<AddressFormSheet> {
                                     width: 22,
                                     height: 22,
                                     child: CircularProgressIndicator(
-                                        color: Colors.white, strokeWidth: 2.5),
+                                      color: Colors.white,
+                                      strokeWidth: 2.5,
+                                    ),
                                   )
                                 : Text(
                                     isEditing
@@ -1216,8 +1304,7 @@ class _AddressFormSheetState extends ConsumerState<AddressFormSheet> {
         TextFormField(
           controller: controller,
           maxLines: maxLines,
-          validator: (val) =>
-              val == null || val.isEmpty ? 'Required' : null,
+          validator: (val) => val == null || val.isEmpty ? 'Required' : null,
           style: CustomTextStyle.bodyMedium.copyWith(
             fontWeight: CustomTheme.fontWeightMedium,
             color: CustomTheme.textPrimary,
@@ -1228,12 +1315,16 @@ class _AddressFormSheetState extends ConsumerState<AddressFormSheet> {
               padding: const EdgeInsets.only(left: 14, right: 10),
               child: Icon(icon, size: 17, color: CustomTheme.textTertiary),
             ),
-            prefixIconConstraints:
-                const BoxConstraints(minWidth: 44, minHeight: 44),
+            prefixIconConstraints: const BoxConstraints(
+              minWidth: 44,
+              minHeight: 44,
+            ),
             filled: true,
             fillColor: CustomTheme.backgroundColor,
             contentPadding: const EdgeInsets.symmetric(
-                horizontal: 16, vertical: 13),
+              horizontal: 16,
+              vertical: 13,
+            ),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(13),
               borderSide: BorderSide.none,
@@ -1241,21 +1332,27 @@ class _AddressFormSheetState extends ConsumerState<AddressFormSheet> {
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(13),
               borderSide: BorderSide(
-                  color: CustomTheme.primaryColor.withOpacity(0.5),
-                  width: 1.5),
+                color: CustomTheme.primaryColor.withValues(alpha: 0.5),
+                width: 1.5,
+              ),
             ),
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(13),
               borderSide: const BorderSide(
-                  color: CustomTheme.errorColor, width: 1.5),
+                color: CustomTheme.errorColor,
+                width: 1.5,
+              ),
             ),
             focusedErrorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(13),
               borderSide: const BorderSide(
-                  color: CustomTheme.errorColor, width: 1.5),
+                color: CustomTheme.errorColor,
+                width: 1.5,
+              ),
             ),
-            errorStyle: CustomTextStyle.caption
-                .copyWith(color: CustomTheme.errorColor),
+            errorStyle: CustomTextStyle.caption.copyWith(
+              color: CustomTheme.errorColor,
+            ),
           ),
         ),
       ],
@@ -1268,16 +1365,18 @@ class _AddressFormSheetState extends ConsumerState<AddressFormSheet> {
 
     final provider = ref.read(addressProviderNotifier);
     final success = widget.address == null
-        ? await provider.addAddress(AddressEntity(
-            id: '',
-            userId: '',
-            street: _streetController.text.trim(),
-            city: _cityController.text.trim(),
-            state: _stateController.text.trim(),
-            postalCode: _zipController.text.trim(),
-            country: _countryController.text.trim(),
-            isDefault: _isDefault,
-          ))
+        ? await provider.addAddress(
+            AddressEntity(
+              id: '',
+              userId: '',
+              street: _streetController.text.trim(),
+              city: _cityController.text.trim(),
+              state: _stateController.text.trim(),
+              postalCode: _zipController.text.trim(),
+              country: _countryController.text.trim(),
+              isDefault: _isDefault,
+            ),
+          )
         : await provider.updateAddress(widget.address!.id, {
             'street': _streetController.text.trim(),
             'city': _cityController.text.trim(),
