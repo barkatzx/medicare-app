@@ -1,7 +1,12 @@
 class ApiConstants {
   ApiConstants._();
 
-  static const String baseUrl = 'https://localhost:3000/v1';
+  // Dev: run `adb reverse tcp:3000 tcp:3000` so the device's localhost reaches
+  // this computer, or pass --dart-define=API_BASE_URL=http://<LAN-IP>:3000/v1
+  static const String baseUrl = String.fromEnvironment(
+    'API_BASE_URL',
+    defaultValue: 'http://localhost:3000/v1',
+  );
 
   static const Duration connectionTimeout = Duration(seconds: 120);
   static const Duration receiveTimeout = Duration(seconds: 120);

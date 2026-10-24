@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:medicare_app/core/constants/api_constants.dart';
-import 'package:medicare_app/features/auth/data/models/user_model.dart';
+import 'package:medicare_app/features/model/user_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiService {
@@ -53,42 +53,44 @@ class ApiService {
   // GET Request
   Future<http.Response> get(String url) async {
     final token = await getToken();
-    final response = await client.get(
-      Uri.parse(url),
-      headers: ApiConstants.getHeaders(token: token),
-    ).timeout(ApiConstants.connectionTimeout);
+    final response = await client
+        .get(Uri.parse(url), headers: ApiConstants.getHeaders(token: token))
+        .timeout(ApiConstants.connectionTimeout);
     return response;
   }
 
   // POST Request
   Future<http.Response> post(String url, {dynamic body}) async {
     final token = await getToken();
-    final response = await client.post(
-      Uri.parse(url),
-      headers: ApiConstants.getHeaders(token: token),
-      body: jsonEncode(body),
-    ).timeout(ApiConstants.connectionTimeout);
+    final response = await client
+        .post(
+          Uri.parse(url),
+          headers: ApiConstants.getHeaders(token: token),
+          body: jsonEncode(body),
+        )
+        .timeout(ApiConstants.connectionTimeout);
     return response;
   }
 
   // PUT Request
   Future<http.Response> put(String url, {dynamic body}) async {
     final token = await getToken();
-    final response = await client.put(
-      Uri.parse(url),
-      headers: ApiConstants.getHeaders(token: token),
-      body: jsonEncode(body),
-    ).timeout(ApiConstants.connectionTimeout);
+    final response = await client
+        .put(
+          Uri.parse(url),
+          headers: ApiConstants.getHeaders(token: token),
+          body: jsonEncode(body),
+        )
+        .timeout(ApiConstants.connectionTimeout);
     return response;
   }
 
   // DELETE Request
   Future<http.Response> delete(String url) async {
     final token = await getToken();
-    final response = await client.delete(
-      Uri.parse(url),
-      headers: ApiConstants.getHeaders(token: token),
-    ).timeout(ApiConstants.connectionTimeout);
+    final response = await client
+        .delete(Uri.parse(url), headers: ApiConstants.getHeaders(token: token))
+        .timeout(ApiConstants.connectionTimeout);
     return response;
   }
 }

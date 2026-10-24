@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medicare_app/core/di/providers.dart';
-import '../../features/auth/presentation/screens/pending_approval_screen.dart';
+import '../../features/screen/pending_approval_screen.dart';
 
 class AuthGuard {
   static Widget protectRoute(Widget child) {
     return Consumer(
       builder: (context, ref, _) {
         final authProvider = ref.watch(authProviderNotifier);
-        
+
         if (!authProvider.isInitialized) {
           return const Scaffold(
             body: Center(

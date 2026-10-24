@@ -1,7 +1,7 @@
 name: medicare_app
 description: "MediCare PLC is a premium, modern healthcare and pharmacy application designed for seamless medical shopping. It features a high-performance search engine, real-time inventory updates, and a secure checkout system. With a state-of-the-art UI, automated background notifications for order updates, and optimized performance for all mobile devices, MediCare provides a reliable and industry-standard experience for accessing essential healthcare products anytime, anywhere."
 publish_to: "none"
-version: 1.0.0
+version: 2.0.0
 
 environment:
   sdk: ^3.11.4

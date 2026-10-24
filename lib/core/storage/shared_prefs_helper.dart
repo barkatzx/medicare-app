@@ -1,6 +1,6 @@
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
-import '../../features/auth/domain/entities/user_entity.dart';
+import '../../features/entity/user_entity.dart';
 
 class SharedPrefsHelper {
   static const String _tokenKey = 'auth_token';

@@ -3,35 +3,35 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../storage/shared_prefs_helper.dart';
-import '../../features/auth/domain/repositories/auth_repository.dart';
-import '../../features/auth/data/repositories/auth_repository_impl.dart';
-import '../../features/cart/domain/repositories/cart_repository.dart';
-import '../../features/cart/data/repositories/cart_repository_impl.dart';
-import '../../features/notifications/domain/repositories/notification_repository.dart';
-import '../../features/notifications/data/repositories/notification_repository_impl.dart';
-import '../../features/products/domain/repositories/product_repository.dart';
-import '../../features/products/data/repositories/product_repository_impl.dart';
-import '../../features/categories/domain/repositories/category_repository.dart';
-import '../../features/categories/data/repositories/category_repository_impl.dart';
-import '../../features/address/domain/repositories/address_repository.dart';
-import '../../features/address/data/repositories/address_repository_impl.dart';
-import '../../features/orders/domain/repositories/order_repository.dart';
-import '../../features/orders/data/repositories/order_repository_impl.dart';
-import '../../features/auth/domain/usecases/login_usecase.dart';
-import '../../features/auth/domain/usecases/register_usecase.dart';
-import '../../features/auth/domain/usecases/verify_auth_usecase.dart';
-import '../../features/profile/domain/usecases/get_profile_usecase.dart';
-import '../../features/profile/domain/usecases/update_profile_usecase.dart';
-import '../../features/profile/domain/usecases/change_password_usecase.dart';
-import '../../features/auth/presentation/providers/auth_provider.dart';
-import '../../features/cart/presentation/providers/cart_provider.dart';
-import '../../features/notifications/presentation/providers/notification_provider.dart';
-import '../../features/products/presentation/providers/product_provider.dart';
-import '../../features/categories/presentation/providers/category_provider.dart';
-import '../../features/categories/presentation/providers/category_products_provider.dart';
-import '../../features/home/presentation/providers/special_products_provider.dart';
-import '../../features/address/presentation/providers/address_provider.dart';
-import '../../features/orders/presentation/providers/order_provider.dart';
+import '../../features/repository/auth_repository.dart';
+import '../../features/repository/auth_repository_impl.dart';
+import '../../features/repository/cart_repository.dart';
+import '../../features/repository/cart_repository_impl.dart';
+import '../../features/repository/notification_repository.dart';
+import '../../features/repository/notification_repository_impl.dart';
+import '../../features/repository/product_repository.dart';
+import '../../features/repository/product_repository_impl.dart';
+import '../../features/repository/category_repository.dart';
+import '../../features/repository/category_repository_impl.dart';
+import '../../features/repository/address_repository.dart';
+import '../../features/repository/address_repository_impl.dart';
+import '../../features/repository/order_repository.dart';
+import '../../features/repository/order_repository_impl.dart';
+import '../../features/usecases/login_usecase.dart';
+import '../../features/usecases/register_usecase.dart';
+import '../../features/usecases/verify_auth_usecase.dart';
+import '../../features/usecases/get_profile_usecase.dart';
+import '../../features/usecases/update_profile_usecase.dart';
+import '../../features/usecases/change_password_usecase.dart';
+import '../../features/provider/auth_provider.dart';
+import '../../features/provider/cart_provider.dart';
+import '../../features/provider/notification_provider.dart';
+import '../../features/provider/product_provider.dart';
+import '../../features/provider/category_provider.dart';
+import '../../features/provider/category_products_provider.dart';
+import '../../features/provider/special_products_provider.dart';
+import '../../features/provider/address_provider.dart';
+import '../../features/provider/order_provider.dart';
 
 // Navigation Provider
 class NavigationProvider extends ChangeNotifier {
@@ -44,7 +44,9 @@ class NavigationProvider extends ChangeNotifier {
   }
 }
 
-final navigationProvider = ChangeNotifierProvider<NavigationProvider>((ref) => NavigationProvider());
+final navigationProvider = ChangeNotifierProvider<NavigationProvider>(
+  (ref) => NavigationProvider(),
+);
 
 // Core
 final sharedPreferencesProvider = Provider<SharedPreferences>((ref) {
@@ -162,35 +164,38 @@ final productProviderNotifier = ChangeNotifierProvider<ProductProvider>((ref) {
 });
 
 final cartProviderNotifier = ChangeNotifierProvider<CartProvider>((ref) {
-  return CartProvider(
-    cartRepository: ref.watch(cartRepositoryProvider),
-  );
+  return CartProvider(cartRepository: ref.watch(cartRepositoryProvider));
 });
 
-final notificationProviderNotifier = ChangeNotifierProvider<NotificationProvider>((ref) {
-  return NotificationProvider(
-    notificationRepository: ref.watch(notificationRepositoryProvider),
-  );
-});
+final notificationProviderNotifier =
+    ChangeNotifierProvider<NotificationProvider>((ref) {
+      return NotificationProvider(
+        notificationRepository: ref.watch(notificationRepositoryProvider),
+      );
+    });
 
-final categoryProviderNotifier = ChangeNotifierProvider<CategoryProvider>((ref) {
+final categoryProviderNotifier = ChangeNotifierProvider<CategoryProvider>((
+  ref,
+) {
   return CategoryProvider(
     categoryRepository: ref.watch(categoryRepositoryProvider),
   );
 });
 
-final categoryProductsProviderFamily = ChangeNotifierProvider.autoDispose.family<CategoryProductsProvider, String>((ref, categoryId) {
-  return CategoryProductsProvider(
-    productRepository: ref.watch(productRepositoryProvider),
-    categoryId: categoryId,
-  );
-});
+final categoryProductsProviderFamily = ChangeNotifierProvider.autoDispose
+    .family<CategoryProductsProvider, String>((ref, categoryId) {
+      return CategoryProductsProvider(
+        productRepository: ref.watch(productRepositoryProvider),
+        categoryId: categoryId,
+      );
+    });
 
-final specialProductsProviderNotifier = ChangeNotifierProvider<SpecialProductsProvider>((ref) {
-  return SpecialProductsProvider(
-    productRepository: ref.watch(productRepositoryProvider),
-  );
-});
+final specialProductsProviderNotifier =
+    ChangeNotifierProvider<SpecialProductsProvider>((ref) {
+      return SpecialProductsProvider(
+        productRepository: ref.watch(productRepositoryProvider),
+      );
+    });
 
 final addressProviderNotifier = ChangeNotifierProvider<AddressProvider>((ref) {
   return AddressProvider(
@@ -199,7 +204,5 @@ final addressProviderNotifier = ChangeNotifierProvider<AddressProvider>((ref) {
 });
 
 final orderProviderNotifier = ChangeNotifierProvider<OrderProvider>((ref) {
-  return OrderProvider(
-    orderRepository: ref.watch(orderRepositoryProvider),
-  );
+  return OrderProvider(orderRepository: ref.watch(orderRepositoryProvider));
 });
