@@ -5,16 +5,13 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../storage/shared_prefs_helper.dart';
 import '../../features/repository/auth_repository.dart';
 import '../../features/repository/auth_repository_impl.dart';
+import '../../features/repository/location_repository.dart';
 import '../../features/repository/cart_repository.dart';
 import '../../features/repository/cart_repository_impl.dart';
-import '../../features/repository/notification_repository.dart';
-import '../../features/repository/notification_repository_impl.dart';
 import '../../features/repository/product_repository.dart';
 import '../../features/repository/product_repository_impl.dart';
 import '../../features/repository/category_repository.dart';
 import '../../features/repository/category_repository_impl.dart';
-import '../../features/repository/address_repository.dart';
-import '../../features/repository/address_repository_impl.dart';
 import '../../features/repository/order_repository.dart';
 import '../../features/repository/order_repository_impl.dart';
 import '../../features/usecases/login_usecase.dart';
@@ -25,12 +22,10 @@ import '../../features/usecases/update_profile_usecase.dart';
 import '../../features/usecases/change_password_usecase.dart';
 import '../../features/provider/auth_provider.dart';
 import '../../features/provider/cart_provider.dart';
-import '../../features/provider/notification_provider.dart';
 import '../../features/provider/product_provider.dart';
 import '../../features/provider/category_provider.dart';
 import '../../features/provider/category_products_provider.dart';
 import '../../features/provider/special_products_provider.dart';
-import '../../features/provider/address_provider.dart';
 import '../../features/provider/order_provider.dart';
 
 // Navigation Provider
@@ -62,6 +57,10 @@ final httpClientProvider = Provider<http.Client>((ref) {
 });
 
 // Repositories
+final locationRepositoryProvider = Provider<LocationRepository>((ref) {
+  return LocationRepository(client: ref.watch(httpClientProvider));
+});
+
 final authRepositoryProvider = Provider<AuthRepository>((ref) {
   return AuthRepositoryImpl(
     client: ref.watch(httpClientProvider),
@@ -83,22 +82,8 @@ final cartRepositoryProvider = Provider<CartRepository>((ref) {
   );
 });
 
-final notificationRepositoryProvider = Provider<NotificationRepository>((ref) {
-  return NotificationRepositoryImpl(
-    client: ref.watch(httpClientProvider),
-    prefsHelper: ref.watch(sharedPrefsHelperProvider),
-  );
-});
-
 final categoryRepositoryProvider = Provider<CategoryRepository>((ref) {
   return CategoryRepositoryImpl(
-    client: ref.watch(httpClientProvider),
-    prefsHelper: ref.watch(sharedPrefsHelperProvider),
-  );
-});
-
-final addressRepositoryProvider = Provider<AddressRepository>((ref) {
-  return AddressRepositoryImpl(
     client: ref.watch(httpClientProvider),
     prefsHelper: ref.watch(sharedPrefsHelperProvider),
   );
@@ -167,13 +152,6 @@ final cartProviderNotifier = ChangeNotifierProvider<CartProvider>((ref) {
   return CartProvider(cartRepository: ref.watch(cartRepositoryProvider));
 });
 
-final notificationProviderNotifier =
-    ChangeNotifierProvider<NotificationProvider>((ref) {
-      return NotificationProvider(
-        notificationRepository: ref.watch(notificationRepositoryProvider),
-      );
-    });
-
 final categoryProviderNotifier = ChangeNotifierProvider<CategoryProvider>((
   ref,
 ) {
@@ -196,12 +174,6 @@ final specialProductsProviderNotifier =
         productRepository: ref.watch(productRepositoryProvider),
       );
     });
-
-final addressProviderNotifier = ChangeNotifierProvider<AddressProvider>((ref) {
-  return AddressProvider(
-    addressRepository: ref.watch(addressRepositoryProvider),
-  );
-});
 
 final orderProviderNotifier = ChangeNotifierProvider<OrderProvider>((ref) {
   return OrderProvider(orderRepository: ref.watch(orderRepositoryProvider));

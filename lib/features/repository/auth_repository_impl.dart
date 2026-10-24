@@ -96,6 +96,11 @@ class AuthRepositoryImpl implements AuthRepository {
     required String email,
     required String phoneNumber,
     required String password,
+    required String pharmacyName,
+    required String fullAddress,
+    required String divisionId,
+    required String districtId,
+    required String upazilaId,
   }) async {
     try {
       final requestBody = {
@@ -103,6 +108,11 @@ class AuthRepositoryImpl implements AuthRepository {
         'email': email,
         'phone_number': phoneNumber,
         'password': password,
+        'pharmacy_name': pharmacyName,
+        'fullAddress': fullAddress,
+        'divisionId': divisionId,
+        'districtId': districtId,
+        'upazilaId': upazilaId,
       };
 
       final response = await client
@@ -149,6 +159,7 @@ class AuthRepositoryImpl implements AuthRepository {
             name: name,
             email: email,
             phoneNumber: phoneNumber,
+            pharmacyName: pharmacyName,
             role: 'customer',
             isApproved: false,
             createdAt: DateTime.now(),
@@ -301,6 +312,10 @@ class AuthRepositoryImpl implements AuthRepository {
     required String name,
     required String pharmacyName,
     required String phoneNumber,
+    String? fullAddress,
+    String? divisionId,
+    String? districtId,
+    String? upazilaId,
   }) async {
     try {
       final token = await sharedPreferencesHelper.getToken();
@@ -310,6 +325,10 @@ class AuthRepositoryImpl implements AuthRepository {
         'name': name,
         'pharmacy_name': pharmacyName,
         'phone_number': phoneNumber,
+        'fullAddress': ?fullAddress,
+        'divisionId': ?divisionId,
+        'districtId': ?districtId,
+        'upazilaId': ?upazilaId,
       };
 
       final response = await client
@@ -331,7 +350,11 @@ class AuthRepositoryImpl implements AuthRepository {
         }
       } else {
         final errorBody = json.decode(response.body);
-        throw Exception(errorBody['message'] ?? 'Failed to update profile');
+        throw Exception(
+          errorBody['error'] ??
+              errorBody['message'] ??
+              'Failed to update profile',
+        );
       }
     } catch (e) {
       debugPrint('Update profile error: $e');

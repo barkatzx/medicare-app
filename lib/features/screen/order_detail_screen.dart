@@ -525,16 +525,14 @@ class _OrderDetailScreenState extends ConsumerState<OrderDetailScreen> {
                             color: CustomTheme.textPrimary,
                             fontSize: 13,
                           ),
-                          maxLines: 1,
+                          maxLines: 3,
                           overflow: TextOverflow.ellipsis,
                         ),
                         const SizedBox(height: 2),
                         Text(
-                          '${addr.city}, ${addr.state} ${addr.postalCode}',
-                          style: CustomTextStyle.caption.copyWith(fontSize: 11),
-                        ),
-                        Text(
-                          addr.country,
+                          [addr.city, addr.state]
+                              .where((e) => e.trim().isNotEmpty)
+                              .join(', '),
                           style: CustomTextStyle.caption.copyWith(fontSize: 11),
                         ),
                       ],

@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medicare_app/core/di/providers.dart';
 import 'package:medicare_app/features/entity/cart_entity.dart';
-import 'package:medicare_app/features/entity/address_entity.dart';
+import 'package:medicare_app/features/entity/user_entity.dart';
+import 'package:medicare_app/features/screen/addresses_screen.dart';
 import 'package:medicare_app/features/provider/cart_provider.dart';
 import 'package:medicare_app/features/screen/order_confirm_screen.dart';
 import 'package:medicare_app/core/theme/custom_theme.dart';
@@ -21,8 +22,6 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen>
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _phoneController = TextEditingController();
-  final _addressController = TextEditingController();
-  final _cityController = TextEditingController();
 
   String _selectedPayment = 'cash_on_delivery';
   bool _isPlacingOrder = false;
@@ -57,7 +56,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen>
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _prefillUserData();
-      ref.read(addressProviderNotifier).loadAddresses();
+      ref.read(authProviderNotifier).getProfile();
     });
   }
 
@@ -73,8 +72,6 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen>
   void dispose() {
     _nameController.dispose();
     _phoneController.dispose();
-    _addressController.dispose();
-    _cityController.dispose();
     _stepAnimController?.dispose();
     _pulseController?.dispose();
     super.dispose();
@@ -488,7 +485,8 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen>
     );
   }
 
-  Widget _buildAddressCard(dynamic address) {
+  Widget _buildAddressCard(UserEntity? user) {
+    final hasAddress = user?.hasAddress ?? false;
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -518,7 +516,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen>
                 Row(
                   children: [
                     Text(
-                      'Default Address',
+                      'Delivery Address',
                       style: TextStyle(
                         fontFamily: CustomTheme.primaryFontFamily,
                         fontSize: 10,
@@ -540,7 +538,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen>
                 ),
                 const SizedBox(height: 3),
                 Text(
-                  address.street,
+                  hasAddress ? user!.fullAddress! : 'No address added yet',
                   style: CustomTextStyle.bodyMedium.copyWith(
                     color: CustomTheme.textPrimary,
                     fontWeight: CustomTheme.fontWeightMedium,
@@ -549,15 +547,16 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen>
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
-                Text(
-                  '${address.city}, ${address.state}',
-                  style: CustomTextStyle.caption.copyWith(fontSize: 11),
-                ),
+                if (hasAddress)
+                  Text(
+                    '${user!.upazila!.label}, ${user.district!.label}, ${user.division!.label}',
+                    style: CustomTextStyle.caption.copyWith(fontSize: 11),
+                  ),
               ],
             ),
           ),
           GestureDetector(
-            onTap: () => Navigator.pushNamed(context, '/addresses'),
+            onTap: () => _editAddress(user),
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
               decoration: BoxDecoration(
@@ -565,7 +564,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen>
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Text(
-                'Change',
+                hasAddress ? 'Change' : 'Add',
                 style: TextStyle(
                   fontFamily: CustomTheme.primaryFontFamily,
                   fontSize: 11,
@@ -576,82 +575,6 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen>
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildTextField(
-    TextEditingController controller,
-    String label,
-    IconData icon, {
-    int maxLines = 1,
-    TextInputType? keyboardType,
-    String? Function(String?)? validator,
-    bool isRequired = true,
-  }) {
-    return Container(
-      decoration: BoxDecoration(
-        color: CustomTheme.surfaceColor,
-        borderRadius: BorderRadius.circular(14),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: TextFormField(
-        controller: controller,
-        maxLines: maxLines,
-        keyboardType: keyboardType,
-        style: CustomTextStyle.bodyMedium.copyWith(
-          color: CustomTheme.textPrimary,
-          fontSize: 14,
-        ),
-        decoration: InputDecoration(
-          labelText: label,
-          labelStyle: CustomTextStyle.bodySmall.copyWith(fontSize: 13),
-          prefixIcon: Padding(
-            padding: const EdgeInsets.only(left: 14, right: 10),
-            child: Icon(icon, size: 19, color: CustomTheme.textTertiary),
-          ),
-          prefixIconConstraints: const BoxConstraints(
-            minWidth: 48,
-            minHeight: 48,
-          ),
-          border: InputBorder.none,
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 16,
-            vertical: 14,
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(14),
-            borderSide: BorderSide(
-              color: CustomTheme.primaryColor.withValues(alpha: 0.4),
-              width: 1.5,
-            ),
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(14),
-            borderSide: BorderSide(color: Colors.transparent),
-          ),
-          errorBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(14),
-            borderSide: const BorderSide(
-              color: CustomTheme.errorColor,
-              width: 1.5,
-            ),
-          ),
-          focusedErrorBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(14),
-            borderSide: const BorderSide(
-              color: CustomTheme.errorColor,
-              width: 1.5,
-            ),
-          ),
-        ),
-        validator: isRequired ? validator : null,
       ),
     );
   }
@@ -759,19 +682,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen>
 
   // ─── Step 2: Order Review ───
   Widget _buildOrderReview(CartProvider cartProvider) {
-    final addressProvider = ref.watch(addressProviderNotifier);
     final user = ref.watch(authProviderNotifier).currentUser;
-
-    final defaultAddress =
-        addressProvider.addresses.where((a) => a.isDefault).firstOrNull ??
-        (addressProvider.addresses.isNotEmpty
-            ? addressProvider.addresses.first
-            : null);
-
-    if (defaultAddress != null && _addressController.text.isEmpty) {
-      _addressController.text = defaultAddress.street;
-      _cityController.text = defaultAddress.city;
-    }
 
     return Form(
       key: _formKey,
@@ -796,26 +707,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen>
           ),
           const SizedBox(height: 12),
 
-          if (defaultAddress != null)
-            _buildAddressCard(defaultAddress)
-          else ...[
-            _buildTextField(
-              _addressController,
-              'Full Address',
-              Icons.home_outlined,
-              maxLines: 2,
-              validator: (v) =>
-                  (v == null || v.isEmpty) ? 'Address is required' : null,
-            ),
-            const SizedBox(height: 10),
-            _buildTextField(
-              _cityController,
-              'City / Area',
-              Icons.location_city_outlined,
-              validator: (v) =>
-                  (v == null || v.isEmpty) ? 'City is required' : null,
-            ),
-          ],
+          _buildAddressCard(user),
 
           const SizedBox(height: 20),
 
@@ -1151,61 +1043,41 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen>
       _goToStep(1);
     } else {
       if (_formKey.currentState?.validate() ?? false) {
-        final addressProvider = ref.read(addressProviderNotifier);
-
-        if (addressProvider.addresses.isEmpty) {
-          setState(() => _isPlacingOrder = true);
-          final success = await addressProvider.addAddress(
-            AddressEntity(
-              id: '',
-              userId: '',
-              street: _addressController.text.trim(),
-              city: _cityController.text.trim(),
-              state: 'Dhaka Division',
-              postalCode: '1000',
-              country: 'Bangladesh',
-              isDefault: true,
+        final user = ref.read(authProviderNotifier).currentUser;
+        if (user == null || !user.hasAddress) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Please add your delivery address first'),
             ),
           );
-          setState(() => _isPlacingOrder = false);
-
-          if (!success) {
-            if (mounted) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(
-                    addressProvider.error ?? 'Failed to save address',
-                  ),
-                ),
-              );
-            }
-            return;
+          await _editAddress(user);
+          final updated = ref.read(authProviderNotifier).currentUser;
+          if (mounted && (updated?.hasAddress ?? false)) {
+            _placeOrder(cartProvider);
           }
+          return;
         }
-
         _placeOrder(cartProvider);
       }
     }
+  }
+
+  Future<void> _editAddress(UserEntity? user) async {
+    if (user == null) return;
+    await showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => AddressFormSheet(user: user),
+    );
   }
 
   Future<void> _placeOrder(CartProvider cartProvider) async {
     setState(() => _isPlacingOrder = true);
 
     try {
-      final addressProvider = ref.read(addressProviderNotifier);
-      final defaultAddress =
-          addressProvider.addresses.where((a) => a.isDefault).firstOrNull ??
-          (addressProvider.addresses.isNotEmpty
-              ? addressProvider.addresses.first
-              : null);
-
-      if (defaultAddress == null) {
-        throw Exception('Please select or add a shipping address first');
-      }
-
       final orderProvider = ref.read(orderProviderNotifier);
       final orderId = await orderProvider.placeOrder(
-        shippingAddressId: defaultAddress.id,
         paymentMethod: _selectedPayment == 'cash_on_delivery'
             ? 'cod'
             : _selectedPayment,
@@ -1224,7 +1096,9 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen>
       }
     } catch (e) {
       if (mounted) {
-        final errorMessage = friendlyErrorMessage(e).replaceAll('Exception: ', '');
+        final errorMessage = friendlyErrorMessage(
+          e,
+        ).replaceAll('Exception: ', '');
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Failed to place order: $errorMessage'),

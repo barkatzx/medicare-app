@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medicare_app/core/di/providers.dart';
 import 'package:medicare_app/core/theme/custom_theme.dart';
-import '../entity/address_entity.dart';
 
 class HomeAppBar extends ConsumerStatefulWidget implements PreferredSizeWidget {
   const HomeAppBar({super.key});
@@ -19,8 +18,7 @@ class _HomeAppBarState extends ConsumerState<HomeAppBar> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(notificationProviderNotifier).loadUnreadCount();
-      ref.read(addressProviderNotifier).loadAddresses();
+      ref.read(authProviderNotifier).getProfile();
     });
   }
 
@@ -34,15 +32,6 @@ class _HomeAppBarState extends ConsumerState<HomeAppBar> {
   @override
   Widget build(BuildContext context) {
     final user = ref.watch(authProviderNotifier).currentUser;
-    final unreadCount = ref.watch(notificationProviderNotifier).unreadCount;
-    final addresses = ref.watch(addressProviderNotifier).addresses;
-
-    AddressEntity? defaultAddress;
-    try {
-      defaultAddress = addresses.firstWhere((a) => a.isDefault);
-    } catch (_) {
-      if (addresses.isNotEmpty) defaultAddress = addresses.first;
-    }
 
     return AppBar(
       elevation: 0,
@@ -130,8 +119,8 @@ class _HomeAppBarState extends ConsumerState<HomeAppBar> {
                       const SizedBox(width: 2),
                       Flexible(
                         child: Text(
-                          defaultAddress != null
-                              ? '${defaultAddress.city}, ${defaultAddress.state}'
+                          user?.hasAddress == true
+                              ? '${user!.district!.name}, ${user.division!.name}'
                               : 'Add Location',
                           style: CustomTextStyle.caption.copyWith(
                             color: CustomTheme.textTertiary,
@@ -154,11 +143,6 @@ class _HomeAppBarState extends ConsumerState<HomeAppBar> {
           icon: Icons.search_rounded,
           onTap: () => Navigator.pushNamed(context, '/search'),
         ),
-        _buildActionButton(
-          icon: Icons.notifications_none_rounded,
-          badgeCount: unreadCount,
-          onTap: () => Navigator.pushNamed(context, '/notifications'),
-        ),
         const SizedBox(width: 8),
       ],
     );
@@ -174,7 +158,6 @@ class _HomeAppBarState extends ConsumerState<HomeAppBar> {
   Widget _buildActionButton({
     required IconData icon,
     required VoidCallback onTap,
-    int badgeCount = 0,
   }) {
     return Center(
       child: Padding(
@@ -205,32 +188,6 @@ class _HomeAppBarState extends ConsumerState<HomeAppBar> {
                 alignment: Alignment.center,
                 children: [
                   Icon(icon, color: CustomTheme.textPrimary, size: 22),
-                  if (badgeCount > 0)
-                    Positioned(
-                      top: 8,
-                      right: 8,
-                      child: Container(
-                        padding: const EdgeInsets.all(4),
-                        decoration: BoxDecoration(
-                          color: CustomTheme.errorColor,
-                          shape: BoxShape.circle,
-                          border: Border.all(color: Colors.white, width: 1.5),
-                        ),
-                        constraints: const BoxConstraints(
-                          minWidth: 16,
-                          minHeight: 16,
-                        ),
-                        child: Text(
-                          badgeCount > 9 ? '9+' : badgeCount.toString(),
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 8,
-                            fontWeight: FontWeight.bold,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                    ),
                 ],
               ),
             ),

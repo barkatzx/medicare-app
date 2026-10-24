@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/di/providers.dart';
-import '../entity/address_entity.dart';
-import '../provider/address_provider.dart';
 import '../../core/theme/custom_theme.dart';
+import '../entity/location_entity.dart';
+import '../entity/user_entity.dart';
 
 class AddressesScreen extends ConsumerStatefulWidget {
   const AddressesScreen({super.key});
@@ -18,21 +18,32 @@ class _AddressesScreenState extends ConsumerState<AddressesScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(addressProviderNotifier).loadAddresses();
+      ref.read(authProviderNotifier).getProfile();
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final addressProvider = ref.watch(addressProviderNotifier);
-    final addresses = addressProvider.addresses;
-    final isLoading = addressProvider.isLoading;
+    final auth = ref.watch(authProviderNotifier);
+    final user = auth.currentUser;
 
     return Scaffold(
       backgroundColor: CustomTheme.backgroundColor,
       appBar: _buildAppBar(),
-      body: _buildBody(isLoading, addresses, addressProvider),
-      bottomNavigationBar: _buildBottomAction(),
+      body: user == null
+          ? const Center(child: CircularProgressIndicator())
+          : RefreshIndicator(
+              onRefresh: () => ref.read(authProviderNotifier).getProfile(),
+              color: CustomTheme.primaryColor,
+              child: ListView(
+                physics: const AlwaysScrollableScrollPhysics(
+                  parent: BouncingScrollPhysics(),
+                ),
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+                children: [_buildAddressCard(user)],
+              ),
+            ),
+      bottomNavigationBar: user == null ? null : _buildBottomAction(user),
     );
   }
 
@@ -64,13 +75,13 @@ class _AddressesScreenState extends ConsumerState<AddressesScreen> {
         ),
       ),
       title: Text(
-        'My Addresses',
+        'My Address',
         style: CustomTextStyle.heading2.copyWith(fontSize: 19),
       ),
     );
   }
 
-  Widget _buildBottomAction() {
+  Widget _buildBottomAction(UserEntity user) {
     return Container(
       padding: EdgeInsets.fromLTRB(
         16,
@@ -78,9 +89,9 @@ class _AddressesScreenState extends ConsumerState<AddressesScreen> {
         16,
         MediaQuery.of(context).padding.bottom + 16,
       ),
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         color: CustomTheme.surfaceColor,
-        borderRadius: const BorderRadius.only(
+        borderRadius: BorderRadius.only(
           topLeft: Radius.circular(24),
           topRight: Radius.circular(24),
         ),
@@ -88,415 +99,156 @@ class _AddressesScreenState extends ConsumerState<AddressesScreen> {
       child: SizedBox(
         width: double.infinity,
         height: 54,
-        child: ElevatedButton(
-          onPressed: () => _showAddressForm(context),
+        child: ElevatedButton.icon(
+          onPressed: () => _showAddressForm(user),
+          icon: Icon(
+            user.hasAddress ? Icons.edit_outlined : Icons.add_rounded,
+            color: Colors.white,
+            size: 20,
+          ),
+          label: Text(
+            user.hasAddress ? 'Edit Address' : 'Add Address',
+            style: CustomTextStyle.button.copyWith(
+              fontSize: 15,
+              fontWeight: CustomTheme.fontWeightBold,
+              color: Colors.white,
+              letterSpacing: 0.3,
+            ),
+          ),
           style: ElevatedButton.styleFrom(
             backgroundColor: CustomTheme.primaryColor,
             foregroundColor: Colors.white,
             elevation: 0,
             shadowColor: Colors.transparent,
             surfaceTintColor: Colors.transparent,
-            overlayColor: Colors.transparent,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(16),
             ),
           ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(Icons.add_rounded, color: Colors.white, size: 20),
-              const SizedBox(width: 8),
-              Text(
-                'Add New Address',
-                style: CustomTextStyle.button.copyWith(
-                  fontSize: 15,
-                  fontWeight: CustomTheme.fontWeightBold,
-                  color: Colors.white,
-                  letterSpacing: 0.3,
-                ),
-              ),
-            ],
-          ),
         ),
       ),
     );
   }
 
-  Widget _buildBody(
-    bool isLoading,
-    List<AddressEntity> addresses,
-    AddressProvider addressProvider,
-  ) {
-    if (isLoading && addresses.isEmpty) {
-      return Center(
+  Widget _buildAddressCard(UserEntity user) {
+    if (!user.hasAddress) {
+      return Padding(
+        padding: const EdgeInsets.only(top: 80),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            SizedBox(
-              width: 32,
-              height: 32,
-              child: CircularProgressIndicator(
-                strokeWidth: 2.5,
-                color: CustomTheme.primaryColor,
+            Container(
+              width: 90,
+              height: 90,
+              decoration: const BoxDecoration(
+                color: CustomTheme.surfaceColor,
+                shape: BoxShape.circle,
               ),
-            ),
-            const SizedBox(height: 14),
-            Text(
-              'Loading addresses…',
-              style: CustomTextStyle.bodySmall.copyWith(
-                fontSize: 13,
+              child: const Icon(
+                Icons.location_off_outlined,
+                size: 40,
                 color: CustomTheme.textTertiary,
               ),
             ),
+            const SizedBox(height: 20),
+            Text(
+              'No Address Added',
+              style: CustomTextStyle.heading3.copyWith(
+                fontSize: 17,
+                letterSpacing: -0.3,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Add your address for\na faster checkout experience.',
+              textAlign: TextAlign.center,
+              style: CustomTextStyle.bodyMedium.copyWith(
+                fontSize: 13,
+                height: 1.6,
+              ),
+            ),
           ],
         ),
       );
     }
 
-    if (addresses.isEmpty) {
-      return Center(
-        child: Padding(
-          padding: const EdgeInsets.all(40),
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: CustomTheme.surfaceColor,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Column(
+        children: [
+          _infoRow(Icons.home_outlined, 'Full Address', user.fullAddress!),
+          _divider(),
+          _infoRow(Icons.map_outlined, 'Division', user.division!.label),
+          _divider(),
+          _infoRow(
+            Icons.location_city_outlined,
+            'District',
+            user.district!.label,
+          ),
+          _divider(),
+          _infoRow(Icons.pin_drop_outlined, 'Upazila', user.upazila!.label),
+        ],
+      ),
+    );
+  }
+
+  Widget _divider() => Padding(
+    padding: const EdgeInsets.symmetric(vertical: 12),
+    child: Divider(height: 1, color: CustomTheme.borderLight),
+  );
+
+  Widget _infoRow(IconData icon, String label, String value) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          width: 38,
+          height: 38,
+          decoration: BoxDecoration(
+            color: CustomTheme.primaryColor.withValues(alpha: 0.08),
+            borderRadius: BorderRadius.circular(11),
+          ),
+          child: Icon(icon, size: 18, color: CustomTheme.primaryColor),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                width: 90,
-                height: 90,
-                decoration: BoxDecoration(
-                  color: CustomTheme.surfaceColor,
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  Icons.location_off_outlined,
-                  size: 40,
+              Text(
+                label,
+                style: CustomTextStyle.caption.copyWith(
+                  fontSize: 11,
+                  letterSpacing: 0.3,
                   color: CustomTheme.textTertiary,
+                  fontWeight: CustomTheme.fontWeightSemiBold,
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 3),
               Text(
-                'No Addresses Saved',
-                style: CustomTextStyle.heading3.copyWith(
-                  fontSize: 17,
-                  letterSpacing: -0.3,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Add a shipping address for\na faster checkout experience.',
-                textAlign: TextAlign.center,
+                value,
                 style: CustomTextStyle.bodyMedium.copyWith(
-                  fontSize: 13,
-                  height: 1.6,
+                  color: CustomTheme.textPrimary,
+                  fontWeight: CustomTheme.fontWeightMedium,
+                  fontSize: 14,
                 ),
               ),
             ],
           ),
         ),
-      );
-    }
-
-    return RefreshIndicator(
-      onRefresh: () => ref.read(addressProviderNotifier).loadAddresses(),
-      color: CustomTheme.primaryColor,
-      backgroundColor: CustomTheme.surfaceColor,
-      strokeWidth: 2,
-      child: ListView.builder(
-        physics: const BouncingScrollPhysics(),
-        padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
-        itemCount: addresses.length,
-        itemBuilder: (context, index) {
-          return _buildAddressCard(addresses[index], addressProvider);
-        },
-      ),
+      ],
     );
   }
 
-  Widget _buildAddressCard(
-    AddressEntity address,
-    AddressProvider addressProvider,
-  ) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 10),
-      decoration: BoxDecoration(
-        color: CustomTheme.surfaceColor,
-        borderRadius: BorderRadius.circular(16),
-        border: address.isDefault
-            ? Border.all(
-                color: CustomTheme.primaryColor.withValues(alpha: 0.2),
-                width: 1.5,
-              )
-            : null,
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(14),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Header row
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  width: 42,
-                  height: 42,
-                  decoration: BoxDecoration(
-                    color: address.isDefault
-                        ? CustomTheme.primaryColor.withValues(alpha: 0.08)
-                        : CustomTheme.backgroundColor,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Icon(
-                    address.isDefault
-                        ? Icons.home_rounded
-                        : Icons.location_on_outlined,
-                    size: 20,
-                    color: address.isDefault
-                        ? CustomTheme.primaryColor
-                        : CustomTheme.textTertiary,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Text(
-                            address.isDefault
-                                ? 'Default Address'
-                                : 'Shipping Address',
-                            style: TextStyle(
-                              fontFamily: CustomTheme.primaryFontFamily,
-                              fontSize: 11,
-                              fontWeight: CustomTheme.fontWeightSemiBold,
-                              color: address.isDefault
-                                  ? CustomTheme.primaryColor
-                                  : CustomTheme.textSecondary,
-                              letterSpacing: 0.2,
-                            ),
-                          ),
-                          if (address.isDefault) ...[
-                            const SizedBox(width: 6),
-                            Container(
-                              width: 5,
-                              height: 5,
-                              decoration: const BoxDecoration(
-                                color: CustomTheme.successColor,
-                                shape: BoxShape.circle,
-                              ),
-                            ),
-                          ],
-                        ],
-                      ),
-                      const SizedBox(height: 3),
-                      Text(
-                        address.street,
-                        style: CustomTextStyle.bodyMedium.copyWith(
-                          color: CustomTheme.textPrimary,
-                          fontWeight: CustomTheme.fontWeightMedium,
-                          fontSize: 13,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        '${address.city}, ${address.state} ${address.postalCode}',
-                        style: CustomTextStyle.caption.copyWith(
-                          fontSize: 11,
-                          color: CustomTheme.textTertiary,
-                        ),
-                      ),
-                      Text(
-                        address.country,
-                        style: CustomTextStyle.caption.copyWith(
-                          fontSize: 11,
-                          color: CustomTheme.textTertiary,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Row(
-                  children: [
-                    _buildIconBtn(
-                      Icons.edit_outlined,
-                      CustomTheme.textSecondary,
-                      CustomTheme.backgroundColor,
-                      () => _showAddressForm(context, address: address),
-                    ),
-                    const SizedBox(width: 6),
-                    _buildIconBtn(
-                      Icons.delete_outline_rounded,
-                      CustomTheme.errorColor,
-                      CustomTheme.errorColor.withValues(alpha: 0.08),
-                      () => _showDeleteConfirmation(address),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-
-            // Set as default
-            if (!address.isDefault) ...[
-              const SizedBox(height: 12),
-              Divider(height: 1, color: CustomTheme.borderLight),
-              const SizedBox(height: 10),
-              GestureDetector(
-                onTap: () => addressProvider.setDefaultAddress(address.id),
-                child: Row(
-                  children: [
-                    const SizedBox(width: 54),
-                    Icon(
-                      Icons.check_circle_outline,
-                      size: 14,
-                      color: CustomTheme.primaryColor,
-                    ),
-                    const SizedBox(width: 6),
-                    Text(
-                      'Set as default address',
-                      style: TextStyle(
-                        fontFamily: CustomTheme.primaryFontFamily,
-                        fontSize: 12,
-                        fontWeight: CustomTheme.fontWeightSemiBold,
-                        color: CustomTheme.primaryColor,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildIconBtn(
-    IconData icon,
-    Color color,
-    Color bg,
-    VoidCallback onTap,
-  ) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: 32,
-        height: 32,
-        decoration: BoxDecoration(
-          color: bg,
-          borderRadius: BorderRadius.circular(9),
-        ),
-        child: Icon(icon, size: 16, color: color),
-      ),
-    );
-  }
-
-  void _showAddressForm(BuildContext context, {AddressEntity? address}) {
+  void _showAddressForm(UserEntity user) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => AddressFormSheet(address: address),
-    );
-  }
-
-  void _showDeleteConfirmation(AddressEntity address) {
-    showDialog(
-      context: context,
-      builder: (dialogContext) => Dialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        backgroundColor: CustomTheme.surfaceColor,
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 52,
-                height: 52,
-                decoration: BoxDecoration(
-                  color: CustomTheme.errorColor.withValues(alpha: 0.08),
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  Icons.location_off_outlined,
-                  color: CustomTheme.errorColor,
-                  size: 24,
-                ),
-              ),
-              const SizedBox(height: 16),
-              Text(
-                'Delete Address',
-                style: CustomTextStyle.heading3.copyWith(fontSize: 17),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'This address will be permanently removed. This action cannot be undone.',
-                textAlign: TextAlign.center,
-                style: CustomTextStyle.bodyMedium.copyWith(fontSize: 13),
-              ),
-              const SizedBox(height: 20),
-              Row(
-                children: [
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () => Navigator.pop(dialogContext),
-                      child: Container(
-                        height: 44,
-                        decoration: BoxDecoration(
-                          color: CustomTheme.backgroundColor,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Center(
-                          child: Text(
-                            'Cancel',
-                            style: CustomTextStyle.bodyMedium.copyWith(
-                              color: CustomTheme.textSecondary,
-                              fontWeight: CustomTheme.fontWeightMedium,
-                              fontSize: 14,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () async {
-                        final provider = ref.read(addressProviderNotifier);
-                        await provider.deleteAddress(address.id);
-                        if (dialogContext.mounted) {
-                          Navigator.pop(dialogContext);
-                        }
-                      },
-                      child: Container(
-                        height: 44,
-                        decoration: BoxDecoration(
-                          color: CustomTheme.errorColor,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Center(
-                          child: Text(
-                            'Delete',
-                            style: CustomTextStyle.button.copyWith(
-                              fontSize: 14,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ),
+      builder: (context) => AddressFormSheet(user: user),
     );
   }
 }
@@ -504,8 +256,8 @@ class _AddressesScreenState extends ConsumerState<AddressesScreen> {
 // ─── Address Form Bottom Sheet ────────────────────────────────────────────────
 
 class AddressFormSheet extends ConsumerStatefulWidget {
-  final AddressEntity? address;
-  const AddressFormSheet({super.key, this.address});
+  final UserEntity user;
+  const AddressFormSheet({super.key, required this.user});
 
   @override
   ConsumerState<AddressFormSheet> createState() => _AddressFormSheetState();
@@ -513,46 +265,102 @@ class AddressFormSheet extends ConsumerStatefulWidget {
 
 class _AddressFormSheetState extends ConsumerState<AddressFormSheet> {
   final _formKey = GlobalKey<FormState>();
-  late TextEditingController _streetController;
-  late TextEditingController _cityController;
-  late TextEditingController _stateController;
-  late TextEditingController _zipController;
-  late TextEditingController _countryController;
-  bool _isDefault = false;
+  late final TextEditingController _addressController;
+
+  List<LocationEntity> _divisions = [];
+  List<LocationEntity> _districts = [];
+  List<LocationEntity> _upazilas = [];
+  String? _divisionId;
+  String? _districtId;
+  String? _upazilaId;
+  bool _loadingLocations = false;
+  String? _locationError;
 
   @override
   void initState() {
     super.initState();
-    _streetController = TextEditingController(
-      text: widget.address?.street ?? '',
-    );
-    _cityController = TextEditingController(text: widget.address?.city ?? '');
-    _stateController = TextEditingController(
-      text: widget.address?.state ?? 'Dhaka Division',
-    );
-    _zipController = TextEditingController(
-      text: widget.address?.postalCode ?? '',
-    );
-    _countryController = TextEditingController(
-      text: widget.address?.country ?? 'Bangladesh',
-    );
-    _isDefault = widget.address?.isDefault ?? false;
+    final user = widget.user;
+    _addressController = TextEditingController(text: user.fullAddress ?? '');
+    _divisionId = user.division?.id;
+    _districtId = user.district?.id;
+    _upazilaId = user.upazila?.id;
+    _loadInitialLocations();
   }
 
   @override
   void dispose() {
-    _streetController.dispose();
-    _cityController.dispose();
-    _stateController.dispose();
-    _zipController.dispose();
-    _countryController.dispose();
+    _addressController.dispose();
     super.dispose();
+  }
+
+  Future<void> _loadInitialLocations() async {
+    final repo = ref.read(locationRepositoryProvider);
+    setState(() {
+      _loadingLocations = true;
+      _locationError = null;
+    });
+    try {
+      final divisions = await repo.getDivisions();
+      final districts = _divisionId != null
+          ? await repo.getDistricts(_divisionId!)
+          : <LocationEntity>[];
+      final upazilas = _districtId != null
+          ? await repo.getUpazilas(_districtId!)
+          : <LocationEntity>[];
+      if (!mounted) return;
+      setState(() {
+        _divisions = divisions;
+        _districts = districts;
+        _upazilas = upazilas;
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _locationError = 'Could not load locations');
+    } finally {
+      if (mounted) setState(() => _loadingLocations = false);
+    }
+  }
+
+  Future<void> _onDivisionChanged(String? id) async {
+    setState(() {
+      _divisionId = id;
+      _districtId = null;
+      _upazilaId = null;
+      _districts = [];
+      _upazilas = [];
+      _locationError = null;
+    });
+    if (id == null) return;
+    try {
+      final data = await ref.read(locationRepositoryProvider).getDistricts(id);
+      if (!mounted || _divisionId != id) return;
+      setState(() => _districts = data);
+    } catch (_) {
+      if (mounted) setState(() => _locationError = 'Could not load districts');
+    }
+  }
+
+  Future<void> _onDistrictChanged(String? id) async {
+    setState(() {
+      _districtId = id;
+      _upazilaId = null;
+      _upazilas = [];
+      _locationError = null;
+    });
+    if (id == null) return;
+    try {
+      final data = await ref.read(locationRepositoryProvider).getUpazilas(id);
+      if (!mounted || _districtId != id) return;
+      setState(() => _upazilas = data);
+    } catch (_) {
+      if (mounted) setState(() => _locationError = 'Could not load upazilas');
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    final isLoading = ref.watch(addressProviderNotifier).isLoading;
-    final isEditing = widget.address != null;
+    final isLoading = ref.watch(authProviderNotifier).isLoading;
+    final isEditing = widget.user.hasAddress;
 
     return Container(
       decoration: const BoxDecoration(
@@ -569,7 +377,6 @@ class _AddressFormSheetState extends ConsumerState<AddressFormSheet> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // Drag handle
               Container(
                 width: 36,
                 height: 4,
@@ -579,8 +386,6 @@ class _AddressFormSheetState extends ConsumerState<AddressFormSheet> {
                 ),
               ),
               const SizedBox(height: 20),
-
-              // Header
               Row(
                 children: [
                   Container(
@@ -603,13 +408,11 @@ class _AddressFormSheetState extends ConsumerState<AddressFormSheet> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        isEditing ? 'Update Address' : 'Add New Address',
+                        isEditing ? 'Update Address' : 'Add Address',
                         style: CustomTextStyle.heading3.copyWith(fontSize: 17),
                       ),
                       Text(
-                        isEditing
-                            ? 'Edit your delivery address'
-                            : 'Where should we deliver?',
+                        'Where should we deliver?',
                         style: CustomTextStyle.caption.copyWith(fontSize: 11),
                       ),
                     ],
@@ -617,140 +420,46 @@ class _AddressFormSheetState extends ConsumerState<AddressFormSheet> {
                 ],
               ),
               const SizedBox(height: 24),
-
               Form(
                 key: _formKey,
                 child: Column(
                   children: [
-                    _buildField(
-                      'Street Address',
-                      _streetController,
-                      Icons.location_on_outlined,
-                    ),
+                    _buildAddressField(),
                     const SizedBox(height: 12),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: _buildField(
-                            'City',
-                            _cityController,
-                            Icons.location_city_outlined,
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: _buildField(
-                            'Postal Code',
-                            _zipController,
-                            Icons.markunread_mailbox_outlined,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-                    _buildField(
-                      'State / Division',
-                      _stateController,
+                    _buildDropdown(
+                      'Division',
                       Icons.map_outlined,
+                      _divisions,
+                      _divisionId,
+                      _onDivisionChanged,
                     ),
                     const SizedBox(height: 12),
-                    _buildField(
-                      'Country',
-                      _countryController,
-                      Icons.public_outlined,
+                    _buildDropdown(
+                      'District',
+                      Icons.location_city_outlined,
+                      _districts,
+                      _districtId,
+                      _onDistrictChanged,
                     ),
-                    const SizedBox(height: 16),
-
-                    // Default toggle
-                    GestureDetector(
-                      onTap: () => setState(() => _isDefault = !_isDefault),
-                      child: AnimatedContainer(
-                        duration: const Duration(milliseconds: 200),
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 14,
-                          vertical: 12,
-                        ),
-                        decoration: BoxDecoration(
-                          color: _isDefault
-                              ? CustomTheme.primaryColor.withValues(alpha: 0.06)
-                              : CustomTheme.backgroundColor,
-                          borderRadius: BorderRadius.circular(13),
-                          border: Border.all(
-                            color: _isDefault
-                                ? CustomTheme.primaryColor.withValues(
-                                    alpha: 0.2,
-                                  )
-                                : Colors.transparent,
-                            width: 1.5,
+                    const SizedBox(height: 12),
+                    _buildDropdown(
+                      'Upazila',
+                      Icons.pin_drop_outlined,
+                      _upazilas,
+                      _upazilaId,
+                      (id) => setState(() => _upazilaId = id),
+                    ),
+                    if (_locationError != null)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 8),
+                        child: Text(
+                          _locationError!,
+                          style: CustomTextStyle.caption.copyWith(
+                            color: CustomTheme.errorColor,
                           ),
-                        ),
-                        child: Row(
-                          children: [
-                            Icon(
-                              Icons.home_outlined,
-                              size: 18,
-                              color: _isDefault
-                                  ? CustomTheme.primaryColor
-                                  : CustomTheme.textTertiary,
-                            ),
-                            const SizedBox(width: 10),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Set as default address',
-                                    style: TextStyle(
-                                      fontFamily: CustomTheme.primaryFontFamily,
-                                      fontSize: 13,
-                                      fontWeight:
-                                          CustomTheme.fontWeightSemiBold,
-                                      color: _isDefault
-                                          ? CustomTheme.primaryColor
-                                          : CustomTheme.textPrimary,
-                                    ),
-                                  ),
-                                  Text(
-                                    'Used automatically at checkout',
-                                    style: CustomTextStyle.caption.copyWith(
-                                      fontSize: 10,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            AnimatedContainer(
-                              duration: const Duration(milliseconds: 200),
-                              width: 22,
-                              height: 22,
-                              decoration: BoxDecoration(
-                                color: _isDefault
-                                    ? CustomTheme.primaryColor
-                                    : Colors.transparent,
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                  color: _isDefault
-                                      ? CustomTheme.primaryColor
-                                      : CustomTheme.borderMedium,
-                                  width: 2,
-                                ),
-                              ),
-                              child: _isDefault
-                                  ? const Icon(
-                                      Icons.check_rounded,
-                                      size: 13,
-                                      color: Colors.white,
-                                    )
-                                  : null,
-                            ),
-                          ],
                         ),
                       ),
-                    ),
-
                     const SizedBox(height: 20),
-
-                    // Submit button
                     SizedBox(
                       width: double.infinity,
                       height: 52,
@@ -761,51 +470,28 @@ class _AddressFormSheetState extends ConsumerState<AddressFormSheet> {
                           foregroundColor: Colors.white,
                           disabledBackgroundColor: CustomTheme.primaryColor
                               .withValues(alpha: 0.5),
-                          padding: EdgeInsets.zero,
+                          elevation: 0,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(15),
                           ),
-                          elevation: 0,
-                          shadowColor: Colors.transparent,
-                          surfaceTintColor: Colors.transparent,
-                          overlayColor: Colors.transparent,
                         ),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(15),
-                            gradient: isLoading
-                                ? null
-                                : const LinearGradient(
-                                    colors: [
-                                      Color(0xFF2A2A2A),
-                                      Color(0xFF010101),
-                                    ],
-                                    begin: Alignment.topCenter,
-                                    end: Alignment.bottomCenter,
-                                  ),
-                          ),
-                          child: Center(
-                            child: isLoading
-                                ? const SizedBox(
-                                    width: 22,
-                                    height: 22,
-                                    child: CircularProgressIndicator(
-                                      color: Colors.white,
-                                      strokeWidth: 2.5,
-                                    ),
-                                  )
-                                : Text(
-                                    isEditing
-                                        ? 'Update Address'
-                                        : 'Save Address',
-                                    style: CustomTextStyle.button.copyWith(
-                                      fontSize: 14,
-                                      fontWeight: CustomTheme.fontWeightBold,
-                                      letterSpacing: 0.3,
-                                    ),
-                                  ),
-                          ),
-                        ),
+                        child: isLoading
+                            ? const SizedBox(
+                                width: 22,
+                                height: 22,
+                                child: CircularProgressIndicator(
+                                  color: Colors.white,
+                                  strokeWidth: 2.5,
+                                ),
+                              )
+                            : Text(
+                                isEditing ? 'Update Address' : 'Save Address',
+                                style: CustomTextStyle.button.copyWith(
+                                  fontSize: 14,
+                                  fontWeight: CustomTheme.fontWeightBold,
+                                  letterSpacing: 0.3,
+                                ),
+                              ),
                       ),
                     ),
                   ],
@@ -818,107 +504,137 @@ class _AddressFormSheetState extends ConsumerState<AddressFormSheet> {
     );
   }
 
-  Widget _buildField(
-    String label,
-    TextEditingController controller,
-    IconData icon,
-  ) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: CustomTextStyle.caption.copyWith(
-            fontSize: 11,
-            letterSpacing: 0.3,
-            color: CustomTheme.textTertiary,
-            fontWeight: CustomTheme.fontWeightSemiBold,
-          ),
+  InputDecoration _decoration(String? hint, IconData icon) {
+    OutlineInputBorder border([Color? color]) => OutlineInputBorder(
+      borderRadius: BorderRadius.circular(13),
+      borderSide: color == null
+          ? BorderSide.none
+          : BorderSide(color: color, width: 1.5),
+    );
+    return InputDecoration(
+      hintText: hint,
+      prefixIcon: Padding(
+        padding: const EdgeInsets.only(left: 14, right: 10),
+        child: Icon(icon, size: 17, color: CustomTheme.textTertiary),
+      ),
+      prefixIconConstraints: const BoxConstraints(minWidth: 44, minHeight: 44),
+      filled: true,
+      fillColor: CustomTheme.backgroundColor,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
+      border: border(),
+      focusedBorder: border(CustomTheme.primaryColor.withValues(alpha: 0.5)),
+      errorBorder: border(CustomTheme.errorColor),
+      focusedErrorBorder: border(CustomTheme.errorColor),
+      errorStyle: CustomTextStyle.caption.copyWith(
+        color: CustomTheme.errorColor,
+      ),
+    );
+  }
+
+  Widget _label(String text) => Padding(
+    padding: const EdgeInsets.only(bottom: 6),
+    child: Align(
+      alignment: Alignment.centerLeft,
+      child: Text(
+        text,
+        style: CustomTextStyle.caption.copyWith(
+          fontSize: 11,
+          letterSpacing: 0.3,
+          color: CustomTheme.textTertiary,
+          fontWeight: CustomTheme.fontWeightSemiBold,
         ),
-        const SizedBox(height: 6),
+      ),
+    ),
+  );
+
+  TextStyle get _valueStyle => CustomTextStyle.bodyMedium.copyWith(
+    fontWeight: CustomTheme.fontWeightMedium,
+    color: CustomTheme.textPrimary,
+    fontSize: 14,
+  );
+
+  Widget _buildAddressField() {
+    return Column(
+      children: [
+        _label('Full Address'),
         TextFormField(
-          controller: controller,
-          validator: (val) => val == null || val.isEmpty ? 'Required' : null,
-          style: CustomTextStyle.bodyMedium.copyWith(
-            fontWeight: CustomTheme.fontWeightMedium,
-            color: CustomTheme.textPrimary,
-            fontSize: 14,
-          ),
-          decoration: InputDecoration(
-            prefixIcon: Padding(
-              padding: const EdgeInsets.only(left: 14, right: 10),
-              child: Icon(icon, size: 17, color: CustomTheme.textTertiary),
-            ),
-            prefixIconConstraints: const BoxConstraints(
-              minWidth: 44,
-              minHeight: 44,
-            ),
-            filled: true,
-            fillColor: CustomTheme.backgroundColor,
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 16,
-              vertical: 13,
-            ),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(13),
-              borderSide: BorderSide.none,
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(13),
-              borderSide: BorderSide(
-                color: CustomTheme.primaryColor.withValues(alpha: 0.5),
-                width: 1.5,
-              ),
-            ),
-            errorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(13),
-              borderSide: const BorderSide(
-                color: CustomTheme.errorColor,
-                width: 1.5,
-              ),
-            ),
-            focusedErrorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(13),
-              borderSide: const BorderSide(
-                color: CustomTheme.errorColor,
-                width: 1.5,
-              ),
-            ),
-            errorStyle: CustomTextStyle.caption.copyWith(
-              color: CustomTheme.errorColor,
-            ),
-          ),
+          controller: _addressController,
+          maxLines: 3,
+          style: _valueStyle,
+          decoration: _decoration('House, road, area', Icons.home_outlined),
+          validator: (v) =>
+              v == null || v.trim().isEmpty ? 'Full address is required' : null,
         ),
       ],
     );
   }
 
-  void _submit() async {
+  Widget _buildDropdown(
+    String label,
+    IconData icon,
+    List<LocationEntity> items,
+    String? value,
+    ValueChanged<String?> onChanged,
+  ) {
+    final selected = items.any((e) => e.id == value) ? value : null;
+    return Column(
+      children: [
+        _label(label),
+        DropdownButtonFormField<String>(
+          key: ValueKey('$label-${items.length}-$selected'),
+          initialValue: selected,
+          isExpanded: true,
+          icon: _loadingLocations
+              ? const SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+              : const Icon(Icons.keyboard_arrow_down_rounded),
+          style: _valueStyle,
+          decoration: _decoration('Select ${label.toLowerCase()}', icon),
+          items: items
+              .map(
+                (e) => DropdownMenuItem<String>(
+                  value: e.id,
+                  child: Text(e.label, overflow: TextOverflow.ellipsis),
+                ),
+              )
+              .toList(),
+          onChanged: items.isEmpty ? null : onChanged,
+          validator: (v) => v == null ? '$label is required' : null,
+        ),
+      ],
+    );
+  }
+
+  Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
     FocusScope.of(context).unfocus();
 
-    final provider = ref.read(addressProviderNotifier);
-    final success = widget.address == null
-        ? await provider.addAddress(
-            AddressEntity(
-              id: '',
-              userId: '',
-              street: _streetController.text.trim(),
-              city: _cityController.text.trim(),
-              state: _stateController.text.trim(),
-              postalCode: _zipController.text.trim(),
-              country: _countryController.text.trim(),
-              isDefault: _isDefault,
-            ),
-          )
-        : await provider.updateAddress(widget.address!.id, {
-            'street': _streetController.text.trim(),
-            'city': _cityController.text.trim(),
-            'state': _stateController.text.trim(),
-            'postalCode': _zipController.text.trim(),
-            'country': _countryController.text.trim(),
-            'isDefault': _isDefault,
-          });
-    if (success && mounted) Navigator.of(context).pop();
+    final auth = ref.read(authProviderNotifier);
+    final user = widget.user;
+    final success = await auth.updateProfile(
+      name: user.name,
+      pharmacyName: user.pharmacyName ?? '',
+      phoneNumber: user.phoneNumber,
+      fullAddress: _addressController.text.trim(),
+      divisionId: _divisionId,
+      districtId: _districtId,
+      upazilaId: _upazilaId,
+    );
+
+    if (!mounted) return;
+    if (success) {
+      await auth.getProfile();
+      if (mounted) Navigator.of(context).pop();
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(auth.errorMessage ?? 'Failed to update address'),
+          backgroundColor: CustomTheme.errorColor,
+        ),
+      );
+    }
   }
 }

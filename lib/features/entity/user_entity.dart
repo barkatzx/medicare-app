@@ -1,3 +1,5 @@
+import 'location_entity.dart';
+
 class UserEntity {
   final String id;
   final String name;
@@ -8,9 +10,10 @@ class UserEntity {
   final bool isApproved;
   final String? pharmacyName;
   final DateTime createdAt;
-  final String? defaultAddressId;
-  final List<dynamic> addresses;
-  final List<dynamic> notifications;
+  final String? fullAddress;
+  final LocationEntity? division;
+  final LocationEntity? district;
+  final LocationEntity? upazila;
 
   UserEntity({
     required this.id,
@@ -22,9 +25,10 @@ class UserEntity {
     required this.isApproved,
     this.pharmacyName,
     required this.createdAt,
-    this.defaultAddressId,
-    this.addresses = const [],
-    this.notifications = const [],
+    this.fullAddress,
+    this.division,
+    this.district,
+    this.upazila,
   });
 
   factory UserEntity.fromJson(Map<String, dynamic> json) {
@@ -40,10 +44,16 @@ class UserEntity {
       createdAt: DateTime.parse(
         json['createdAt'] ?? DateTime.now().toIso8601String(),
       ),
-      defaultAddressId: json['defaultAddressId'],
-      addresses: json['addresses'] ?? [],
-      notifications: json['notifications'] ?? [],
+      fullAddress: json['fullAddress'],
+      division: _location(json['division']),
+      district: _location(json['district']),
+      upazila: _location(json['upazila']),
     );
+  }
+
+  static LocationEntity? _location(dynamic obj) {
+    if (obj is Map<String, dynamic>) return LocationEntity.fromJson(obj);
+    return null;
   }
 
   Map<String, dynamic> toJson() {
@@ -57,11 +67,21 @@ class UserEntity {
       'isApproved': isApproved,
       'pharmacy_name': pharmacyName,
       'createdAt': createdAt.toIso8601String(),
-      'defaultAddressId': defaultAddressId,
-      'addresses': addresses,
-      'notifications': notifications,
+      'fullAddress': fullAddress,
+      'divisionId': division?.id,
+      'districtId': district?.id,
+      'upazilaId': upazila?.id,
+      'division': division?.toJson(),
+      'district': district?.toJson(),
+      'upazila': upazila?.toJson(),
     };
   }
+
+  bool get hasAddress =>
+      (fullAddress?.trim().isNotEmpty ?? false) &&
+      division != null &&
+      district != null &&
+      upazila != null;
 
   bool get isCustomer => role.toLowerCase() == 'customer';
   bool get isAdmin => role.toLowerCase() == 'admin';

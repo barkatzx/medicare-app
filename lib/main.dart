@@ -1,73 +1,12 @@
 import 'dart:io';
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:medicare_app/core/services/notification_service.dart';
 import 'package:medicare_app/core/theme/custom_theme.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medicare_app/core/di/providers.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:workmanager/workmanager.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
 import 'core/routes/app_routes.dart';
 import 'core/routes/route_generator.dart';
-
-import 'package:medicare_app/core/constants/api_constants.dart';
-
-// Background task for notifications
-@pragma('vm:entry-point')
-void callbackDispatcher() {
-  Workmanager().executeTask((task, inputData) async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('auth_token');
-
-      if (token == null) return true;
-
-      // Use production API constants and headers
-      final uri = Uri.parse(
-        ApiConstants.notifications,
-      ).replace(queryParameters: {'unreadOnly': 'true', 'limit': '1'});
-
-      final response = await http.get(
-        uri,
-        headers: ApiConstants.getHeaders(token: token),
-      );
-
-      if (response.statusCode == 200) {
-        final responseData = json.decode(response.body);
-
-        // Correctly parse the "data" -> "notifications" structure
-        if (responseData['data'] != null &&
-            responseData['data']['notifications'] != null) {
-          final List notifications = responseData['data']['notifications'];
-
-          if (notifications.isNotEmpty) {
-            final latest = notifications.first;
-            final lastId = prefs.getString('last_notif_id');
-
-            // Only show if it's a new unread notification
-            if (latest['id'] != lastId) {
-              await LocalNotificationService.initialize();
-              await LocalNotificationService.showNotification(
-                id: latest['id'].hashCode,
-                title: latest['title'] ?? 'New Notification',
-                body:
-                    latest['message'] ??
-                    'You have a new update from MediCare PLC.',
-              );
-              // Store the ID so we don't notify for the same one again
-              await prefs.setString('last_notif_id', latest['id']);
-            }
-          }
-        }
-      }
-    } catch (e) {
-      debugPrint('Background Notification Task Error: $e');
-    }
-    return true;
-  });
-}
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -85,20 +24,6 @@ void main() async {
 
   // Handle network issues on Wi-Fi/Broadband
   HttpOverrides.global = MyHttpOverrides();
-
-  // Initialize Local Notifications
-  await LocalNotificationService.initialize();
-
-  // Initialize Background Workmanager
-  await Workmanager().initialize(callbackDispatcher);
-
-  // Register periodic task (checks every 15 minutes)
-  await Workmanager().registerPeriodicTask(
-    "medicare_notif_task",
-    "fetch_notifications",
-    frequency: const Duration(minutes: 15),
-    constraints: Constraints(networkType: NetworkType.connected),
-  );
 
   final prefs = await SharedPreferences.getInstance();
   final container = ProviderContainer(

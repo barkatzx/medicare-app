@@ -120,6 +120,11 @@ class AuthProvider extends ChangeNotifier {
     required String email,
     required String phoneNumber,
     required String password,
+    required String pharmacyName,
+    required String fullAddress,
+    required String divisionId,
+    required String districtId,
+    required String upazilaId,
   }) async {
     _setLoading(true);
     _clearError();
@@ -131,6 +136,11 @@ class AuthProvider extends ChangeNotifier {
         email: email,
         phoneNumber: phoneNumber,
         password: password,
+        pharmacyName: pharmacyName,
+        fullAddress: fullAddress,
+        divisionId: divisionId,
+        districtId: districtId,
+        upazilaId: upazilaId,
       );
 
       _currentUser = user;
@@ -177,6 +187,10 @@ class AuthProvider extends ChangeNotifier {
     required String name,
     required String pharmacyName,
     required String phoneNumber,
+    String? fullAddress,
+    String? divisionId,
+    String? districtId,
+    String? upazilaId,
   }) async {
     _setLoading(true);
     _clearError();
@@ -185,6 +199,10 @@ class AuthProvider extends ChangeNotifier {
         name: name,
         pharmacyName: pharmacyName,
         phoneNumber: phoneNumber,
+        fullAddress: fullAddress,
+        divisionId: divisionId,
+        districtId: districtId,
+        upazilaId: upazilaId,
       );
       _currentUser = user;
       notifyListeners();

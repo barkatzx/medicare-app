@@ -85,7 +85,6 @@ class OrderProvider extends ChangeNotifier {
   }
 
   Future<String> placeOrder({
-    required String shippingAddressId,
     required String paymentMethod,
     String? notes,
   }) async {
@@ -95,7 +94,6 @@ class OrderProvider extends ChangeNotifier {
 
     try {
       final orderId = await orderRepository.createOrder(
-        shippingAddressId: shippingAddressId,
         paymentMethod: paymentMethod,
         notes: notes,
       );
