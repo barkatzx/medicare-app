@@ -1,16 +1,16 @@
- import 'dart:io';
+import 'dart:io';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:medicare_app/core/services/notification_service.dart';
-import 'package:medicare_app/presentation/widgets/common/custom_theme.dart';
+import 'package:medicare_app/core/theme/custom_theme.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:medicare_app/core/providers.dart';
+import 'package:medicare_app/core/di/providers.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:workmanager/workmanager.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'routes/app_routes.dart';
-import 'routes/route_generator.dart';
+import 'core/routes/app_routes.dart';
+import 'core/routes/route_generator.dart';
 
 import 'package:medicare_app/core/constants/api_constants.dart';
 
@@ -21,14 +21,14 @@ void callbackDispatcher() {
     try {
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('auth_token');
-      
+
       if (token == null) return true;
 
       // Use production API constants and headers
-      final uri = Uri.parse(ApiConstants.notifications).replace(
-        queryParameters: {'unreadOnly': 'true', 'limit': '1'},
-      );
-      
+      final uri = Uri.parse(
+        ApiConstants.notifications,
+      ).replace(queryParameters: {'unreadOnly': 'true', 'limit': '1'});
+
       final response = await http.get(
         uri,
         headers: ApiConstants.getHeaders(token: token),
@@ -36,22 +36,25 @@ void callbackDispatcher() {
 
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);
-        
+
         // Correctly parse the "data" -> "notifications" structure
-        if (responseData['data'] != null && responseData['data']['notifications'] != null) {
+        if (responseData['data'] != null &&
+            responseData['data']['notifications'] != null) {
           final List notifications = responseData['data']['notifications'];
-          
+
           if (notifications.isNotEmpty) {
             final latest = notifications.first;
             final lastId = prefs.getString('last_notif_id');
-            
+
             // Only show if it's a new unread notification
             if (latest['id'] != lastId) {
               await LocalNotificationService.initialize();
               await LocalNotificationService.showNotification(
                 id: latest['id'].hashCode,
                 title: latest['title'] ?? 'New Notification',
-                body: latest['message'] ?? 'You have a new update from MediCare PLC.',
+                body:
+                    latest['message'] ??
+                    'You have a new update from MediCare PLC.',
               );
               // Store the ID so we don't notify for the same one again
               await prefs.setString('last_notif_id', latest['id']);
@@ -88,7 +91,7 @@ void main() async {
 
   // Initialize Background Workmanager
   await Workmanager().initialize(callbackDispatcher, isInDebugMode: false);
-  
+
   // Register periodic task (checks every 15 minutes)
   await Workmanager().registerPeriodicTask(
     "medicare_notif_task",
@@ -99,19 +102,12 @@ void main() async {
 
   final prefs = await SharedPreferences.getInstance();
   final container = ProviderContainer(
-    overrides: [
-      sharedPreferencesProvider.overrideWithValue(prefs),
-    ],
+    overrides: [sharedPreferencesProvider.overrideWithValue(prefs)],
   );
 
   await container.read(authProviderNotifier).initialize();
 
-  runApp(
-    UncontrolledProviderScope(
-      container: container,
-      child: const MyApp(),
-    ),
-  );
+  runApp(UncontrolledProviderScope(container: container, child: const MyApp()));
 }
 
 class MyApp extends ConsumerWidget {
@@ -127,43 +123,101 @@ class MyApp extends ConsumerWidget {
       theme: ThemeData(
         useMaterial3: false,
         scaffoldBackgroundColor: CustomTheme.backgroundColor,
-          fontFamily: CustomTheme.primaryFontFamily,
-          textTheme: const TextTheme(
-            displayLarge: TextStyle(fontFamily: 'Outfit', fontSize: 24, fontWeight: FontWeight.w700, color: Color(0xFF1F2937), letterSpacing: -0.5, height: 1.2),
-            displayMedium: TextStyle(fontFamily: 'Outfit', fontSize: 20, fontWeight: FontWeight.w600, color: Color(0xFF1F2937), letterSpacing: -0.3, height: 1.3),
-            displaySmall: TextStyle(fontFamily: 'Outfit', fontSize: 18, fontWeight: FontWeight.w600, color: Color(0xFF1F2937), height: 1.4),
-            headlineMedium: TextStyle(fontFamily: 'Outfit', fontSize: 16, fontWeight: FontWeight.w600, color: Color(0xFF1F2937), height: 1.4),
-            bodyLarge: TextStyle(fontFamily: 'Outfit', fontSize: 16, fontWeight: FontWeight.w400, color: Color(0xFF1F2937), height: 1.5),
-            bodyMedium: TextStyle(fontFamily: 'Outfit', fontSize: 14, fontWeight: FontWeight.w400, color: Color(0xFF6B7280), height: 1.5),
-            bodySmall: TextStyle(fontFamily: 'Outfit', fontSize: 12, fontWeight: FontWeight.w400, color: Color(0xFF9CA3AF), height: 1.5),
-            labelLarge: TextStyle(fontFamily: 'Outfit', fontSize: 14, fontWeight: FontWeight.w600, color: Colors.white, letterSpacing: 0.5),
+        fontFamily: CustomTheme.primaryFontFamily,
+        textTheme: const TextTheme(
+          displayLarge: TextStyle(
+            fontFamily: 'Outfit',
+            fontSize: 24,
+            fontWeight: FontWeight.w700,
+            color: Color(0xFF1F2937),
+            letterSpacing: -0.5,
+            height: 1.2,
           ),
-          appBarTheme: const AppBarTheme(
-            backgroundColor: Colors.white,
-            foregroundColor: Color(0xFF1F2937),
-            elevation: 0,
-            centerTitle: false,
-            titleTextStyle: TextStyle(fontFamily: 'Outfit', fontSize: 18, fontWeight: FontWeight.w600, color: Color(0xFF1F2937), height: 1.4),
+          displayMedium: TextStyle(
+            fontFamily: 'Outfit',
+            fontSize: 20,
+            fontWeight: FontWeight.w600,
+            color: Color(0xFF1F2937),
+            letterSpacing: -0.3,
+            height: 1.3,
           ),
-          elevatedButtonTheme: ElevatedButtonThemeData(
-            style: ElevatedButton.styleFrom(
-              textStyle: const TextStyle(fontFamily: 'Outfit', fontSize: 14, fontWeight: FontWeight.w600, color: Colors.white, letterSpacing: 0.5),
+          displaySmall: TextStyle(
+            fontFamily: 'Outfit',
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+            color: Color(0xFF1F2937),
+            height: 1.4,
+          ),
+          headlineMedium: TextStyle(
+            fontFamily: 'Outfit',
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+            color: Color(0xFF1F2937),
+            height: 1.4,
+          ),
+          bodyLarge: TextStyle(
+            fontFamily: 'Outfit',
+            fontSize: 16,
+            fontWeight: FontWeight.w400,
+            color: Color(0xFF1F2937),
+            height: 1.5,
+          ),
+          bodyMedium: TextStyle(
+            fontFamily: 'Outfit',
+            fontSize: 14,
+            fontWeight: FontWeight.w400,
+            color: Color(0xFF6B7280),
+            height: 1.5,
+          ),
+          bodySmall: TextStyle(
+            fontFamily: 'Outfit',
+            fontSize: 12,
+            fontWeight: FontWeight.w400,
+            color: Color(0xFF9CA3AF),
+            height: 1.5,
+          ),
+          labelLarge: TextStyle(
+            fontFamily: 'Outfit',
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+            color: Colors.white,
+            letterSpacing: 0.5,
+          ),
+        ),
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Colors.white,
+          foregroundColor: Color(0xFF1F2937),
+          elevation: 0,
+          centerTitle: false,
+          titleTextStyle: TextStyle(
+            fontFamily: 'Outfit',
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+            color: Color(0xFF1F2937),
+            height: 1.4,
+          ),
+        ),
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            textStyle: const TextStyle(
+              fontFamily: 'Outfit',
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: Colors.white,
+              letterSpacing: 0.5,
             ),
           ),
         ),
-        initialRoute: authProvider.isLoggedIn && authProvider.isCustomer
-            ? AppRoutes.home
-            : (authProvider.pendingApprovalMessage != null || authProvider.isPendingApproval)
-                ? AppRoutes.pendingApproval
-                : AppRoutes.login,
-        onGenerateRoute: RouteGenerator.generateRoute,
-      );
+      ),
+      initialRoute: authProvider.isLoggedIn && authProvider.isCustomer
+          ? AppRoutes.home
+          : (authProvider.pendingApprovalMessage != null ||
+                authProvider.isPendingApproval)
+          ? AppRoutes.pendingApproval
+          : AppRoutes.login,
+      onGenerateRoute: RouteGenerator.generateRoute,
+    );
   }
 }
 
-class MyHttpOverrides extends HttpOverrides {
-  @override
-  HttpClient createHttpClient(SecurityContext? context) {
-    return super.createHttpClient(context);
-  }
-}
+class MyHttpOverrides extends HttpOverrides {}

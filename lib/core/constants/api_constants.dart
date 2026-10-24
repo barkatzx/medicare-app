@@ -1,8 +1,7 @@
 class ApiConstants {
   ApiConstants._();
 
-  // ✅ Single Render URL for all platforms since it's deployed
-  static const String baseUrl = 'https://medicare-server-9je0.onrender.com/v1';
+  static const String baseUrl = 'https://localhost:3000/v1';
 
   static const Duration connectionTimeout = Duration(seconds: 120);
   static const Duration receiveTimeout = Duration(seconds: 120);
@@ -32,8 +31,7 @@ class ApiConstants {
   static String get cart => '$baseUrl/users/cart';
   static String get cartCount => '$baseUrl/users/cart/count';
   static String get addToCart => '$baseUrl/users/cart/add';
-  static String cartItem(String itemId) =>
-      '$baseUrl/users/cart/item/$itemId';
+  static String cartItem(String itemId) => '$baseUrl/users/cart/item/$itemId';
   static String get clearCart => '$baseUrl/users/cart/clear';
   static String removeFromCart(String itemId) =>
       '$baseUrl/users/cart/item/$itemId';
@@ -74,7 +72,10 @@ class ApiConstants {
   static const String methodDelete = 'DELETE';
 
   // ==================== HEADERS ====================
-  static Map<String, String> getHeaders({String? token, bool includeContentType = true}) {
+  static Map<String, String> getHeaders({
+    String? token,
+    bool includeContentType = true,
+  }) {
     return {
       'User-Agent': 'MediCare/1.0.0 (Flutter; Android/iOS)',
       if (includeContentType) 'Content-Type': 'application/json',

@@ -1,0 +1,126 @@
+import 'package:flutter/material.dart';
+import 'package:medicare_app/features/products/presentation/screens/product_detail_screen.dart';
+import '../../features/auth/presentation/screens/login_screen.dart';
+import '../../features/auth/presentation/screens/register_screen.dart';
+import '../../features/auth/presentation/screens/forgot_password_screen.dart';
+import '../../features/auth/presentation/screens/pending_approval_screen.dart';
+import '../../features/home/presentation/screens/home_screen.dart';
+import '../../features/categories/presentation/screens/categories_screen.dart';
+import '../../features/categories/presentation/screens/category_products_screen.dart';
+import '../../features/search/presentation/screens/search_screen.dart';
+import '../../features/home/presentation/screens/trending_screen.dart';
+import '../../features/cart/presentation/screens/cart_screen.dart';
+import '../../features/cart/presentation/screens/checkout_screen.dart';
+import '../../features/orders/presentation/screens/my_orders_screen.dart';
+import '../../features/orders/presentation/screens/order_detail_screen.dart';
+import '../../features/profile/presentation/screens/profile_screen.dart';
+import '../../features/profile/presentation/screens/edit_profile_screen.dart';
+import '../../features/profile/presentation/screens/change_password_screen.dart';
+import '../../features/address/presentation/screens/addresses_screen.dart';
+import '../../features/profile/presentation/screens/about_screen.dart';
+import '../../features/notifications/presentation/screens/notifications_screen.dart';
+import 'app_routes.dart';
+import 'auth_guard.dart';
+
+class RouteGenerator {
+  static Route<dynamic> generateRoute(RouteSettings settings) {
+    switch (settings.name) {
+      case AppRoutes.login:
+        return MaterialPageRoute(builder: (_) => const LoginScreen());
+      case AppRoutes.register:
+        return MaterialPageRoute(builder: (_) => const RegisterScreen());
+      case AppRoutes.forgotPassword:
+        return MaterialPageRoute(builder: (_) => const ForgotPasswordScreen());
+      case AppRoutes.pendingApproval:
+        return MaterialPageRoute(builder: (_) => const PendingApprovalScreen());
+      case AppRoutes.productDetail:
+        return MaterialPageRoute(
+          builder: (_) => const ProductDetailScreen(),
+          settings: settings,
+        );
+
+      // Protected Routes
+      case AppRoutes.home:
+        return MaterialPageRoute(
+          builder: (_) => AuthGuard.protectRoute(const HomeScreen()),
+        );
+      case AppRoutes.categories:
+        return MaterialPageRoute(
+          builder: (_) => AuthGuard.protectRoute(const CategoriesScreen()),
+        );
+      case AppRoutes.categoryProducts:
+        final args = settings.arguments as Map<String, dynamic>;
+        return MaterialPageRoute(
+          builder: (_) => AuthGuard.protectRoute(
+            CategoryProductsScreen(
+              categoryId: args['id'] as String,
+              categoryName: args['name'] as String,
+            ),
+          ),
+        );
+      case AppRoutes.trending:
+        return MaterialPageRoute(
+          builder: (_) => AuthGuard.protectRoute(const TrendingScreen()),
+        );
+      case AppRoutes.cart:
+        return MaterialPageRoute(
+          builder: (_) => AuthGuard.protectRoute(const CartScreen()),
+        );
+      case AppRoutes.checkout:
+        return MaterialPageRoute(
+          builder: (_) => AuthGuard.protectRoute(const CheckoutScreen()),
+        );
+      case AppRoutes.search:
+        return MaterialPageRoute(
+          builder: (_) => AuthGuard.protectRoute(const SearchScreen()),
+        );
+      case AppRoutes.myOrders:
+        return MaterialPageRoute(
+          builder: (_) => AuthGuard.protectRoute(const MyOrdersScreen()),
+          settings: settings,
+        );
+      case AppRoutes.orderDetail:
+        return MaterialPageRoute(
+          builder: (_) => AuthGuard.protectRoute(const OrderDetailScreen()),
+          settings: settings,
+        );
+      case AppRoutes.profile:
+        return MaterialPageRoute(
+          builder: (_) => AuthGuard.protectRoute(const ProfileScreen()),
+          settings: settings,
+        );
+      case AppRoutes.editProfile:
+        return MaterialPageRoute(
+          builder: (_) => AuthGuard.protectRoute(const EditProfileScreen()),
+          settings: settings,
+        );
+      case AppRoutes.changePassword:
+        return MaterialPageRoute(
+          builder: (_) => AuthGuard.protectRoute(const ChangePasswordScreen()),
+          settings: settings,
+        );
+      case AppRoutes.addresses:
+        return MaterialPageRoute(
+          builder: (_) => AuthGuard.protectRoute(const AddressesScreen()),
+          settings: settings,
+        );
+      case AppRoutes.about:
+        return MaterialPageRoute(
+          builder: (_) => AuthGuard.protectRoute(const AboutScreen()),
+          settings: settings,
+        );
+      case AppRoutes.notifications:
+        return MaterialPageRoute(
+          builder: (_) => AuthGuard.protectRoute(const NotificationsScreen()),
+          settings: settings,
+        );
+
+      default:
+        return MaterialPageRoute(
+          builder: (_) => Scaffold(
+            body: Center(child: Text('No route defined for ${settings.name}')),
+          ),
+        );
+    }
+  }
+}
