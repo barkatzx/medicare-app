@@ -90,7 +90,7 @@ void main() async {
   await LocalNotificationService.initialize();
 
   // Initialize Background Workmanager
-  await Workmanager().initialize(callbackDispatcher, isInDebugMode: false);
+  await Workmanager().initialize(callbackDispatcher);
 
   // Register periodic task (checks every 15 minutes)
   await Workmanager().registerPeriodicTask(
