@@ -2,15 +2,15 @@ import 'dart:io';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:medicare_app/core/services/notification_service.dart';
-import 'package:medicare_app/presentation/widgets/common/custom_theme.dart';
+import 'package:medicare_app/core/theme/custom_theme.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:medicare_app/core/providers.dart';
+import 'package:medicare_app/core/di/providers.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:workmanager/workmanager.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'routes/app_routes.dart';
-import 'routes/route_generator.dart';
+import 'core/routes/app_routes.dart';
+import 'core/routes/route_generator.dart';
 
 import 'package:medicare_app/core/constants/api_constants.dart';
 
