@@ -120,18 +120,22 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
               mainAxisSize: MainAxisSize.min,
               children: [
                 _buildNavItem(0, Icons.home_rounded, selectedIndex),
-                _buildNavItem(1, Icons.add_box_outlined, selectedIndex),
+                const SizedBox(width: 5),
+                _buildNavItem(1, Icons.all_inclusive_outlined, selectedIndex),
+                const SizedBox(width: 5),
                 _buildNavItem(
                   2,
                   Icons.medical_services_outlined,
                   selectedIndex,
                 ),
+                const SizedBox(width: 5),
                 _buildNavItem(
                   3,
-                  Icons.shopping_bag_outlined,
+                  Icons.local_mall_outlined,
                   selectedIndex,
                   badgeCount: cartItemCount,
                 ),
+                const SizedBox(width: 5),
                 _buildNavItem(4, Icons.person_outline, selectedIndex),
               ],
             ),
@@ -157,7 +161,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
         curve: Curves.easeInOut,
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         decoration: BoxDecoration(
-          color: isSelected ? CustomTheme.primaryColor : Colors.transparent,
+          color: isSelected ? CustomTheme.primaryColor : Colors.white,
           borderRadius: BorderRadius.circular(CustomTheme.radiusRound),
           boxShadow: isSelected
               ? [
@@ -177,9 +181,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
               child: Icon(
                 icon,
                 key: ValueKey('$index-$isSelected'),
-                color: isSelected
-                    ? Colors.white
-                    : CustomTheme.textSecondary.withValues(alpha: 0.75),
+                color: isSelected ? Colors.white : Colors.black,
                 size: 24,
               ),
             ),
@@ -192,12 +194,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                   decoration: BoxDecoration(
                     color: CustomTheme.errorColor,
                     shape: BoxShape.circle,
-                    border: Border.all(
-                      color: isSelected
-                          ? Colors.white
-                          : CustomTheme.primaryColor,
-                      width: 1.5,
-                    ),
                   ),
                   constraints: const BoxConstraints(
                     minWidth: 16,

@@ -13,39 +13,17 @@ class CartScreen extends ConsumerStatefulWidget {
   ConsumerState<CartScreen> createState() => _CartScreenState();
 }
 
-class _CartScreenState extends ConsumerState<CartScreen>
-    with TickerProviderStateMixin {
-  AnimationController? _listAnimController;
-
+class _CartScreenState extends ConsumerState<CartScreen> {
   @override
   void initState() {
     super.initState();
-    _listAnimController = AnimationController(
-      duration: const Duration(milliseconds: 500),
-      vsync: this,
-    )..forward();
-
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       ref.read(cartProviderNotifier).loadCart();
       final categoryProv = ref.read(categoryProviderNotifier);
       if (categoryProv.categories.isEmpty) {
-        debugPrint('CartScreen DEBUG: Fetching categories...');
         await categoryProv.fetchCategories();
-        debugPrint(
-          'CartScreen DEBUG: Fetching categories complete. Error: ${categoryProv.errorMessage}. Count: ${categoryProv.categories.length}',
-        );
-      } else {
-        debugPrint(
-          'CartScreen DEBUG: Categories already loaded. Count: ${categoryProv.categories.length}',
-        );
       }
     });
-  }
-
-  @override
-  void dispose() {
-    _listAnimController?.dispose();
-    super.dispose();
   }
 
   @override
@@ -75,7 +53,7 @@ class _CartScreenState extends ConsumerState<CartScreen>
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'My Shopping Bag',
+              'Bag',
               style: CustomTextStyle.heading2.copyWith(
                 fontSize: 20,
                 letterSpacing: -0.5,
@@ -143,38 +121,15 @@ class _CartScreenState extends ConsumerState<CartScreen>
               padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
               itemCount: cartItems.length,
               itemBuilder: (context, index) {
-                final item = cartItems[index];
-                final delay = index * 60;
-                return AnimatedBuilder(
-                  animation:
-                      _listAnimController ?? const AlwaysStoppedAnimation(1.0),
-                  builder: (context, child) {
-                    final anim = _listAnimController;
-                    final progress = anim == null
-                        ? 1.0
-                        : CurvedAnimation(
-                            parent: anim,
-                            curve: Interval(
-                              (delay / 500).clamp(0.0, 1.0),
-                              ((delay + 300) / 500).clamp(0.0, 1.0),
-                              curve: Curves.easeOut,
-                            ),
-                          ).value;
-                    return Opacity(
-                      opacity: progress,
-                      child: Transform.translate(
-                        offset: Offset(0, 20 * (1 - progress)),
-                        child: child,
-                      ),
-                    );
-                  },
-                  child: _buildCartItem(item, provider),
-                );
+                return _buildCartItem(cartItems[index], provider);
               },
             ),
           ),
         ),
-        _buildBottomBar(provider),
+        Padding(
+          padding: const EdgeInsets.only(bottom: 68),
+          child: _buildBottomBar(provider),
+        ),
       ],
     );
   }
