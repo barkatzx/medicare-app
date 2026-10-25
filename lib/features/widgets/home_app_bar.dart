@@ -6,14 +6,25 @@ import 'package:medicare_app/core/theme/custom_theme.dart';
 class HomeAppBar extends ConsumerStatefulWidget implements PreferredSizeWidget {
   const HomeAppBar({super.key});
 
+  // 64dp is the standard comfortable app bar height for a two-line header.
+  static const double height = 64;
+
   @override
   ConsumerState<HomeAppBar> createState() => _HomeAppBarState();
 
   @override
-  Size get preferredSize => const Size.fromHeight(70);
+  Size get preferredSize => const Size.fromHeight(height);
 }
 
 class _HomeAppBarState extends ConsumerState<HomeAppBar> {
+  // ── Sizing (Material standard) ──
+  static const double _sidePadding = 16; // screen edge gutter
+  static const double _avatarSize = 48; // visual avatar
+  static const double _avatarRing = 1; // border thickness
+  static const double _touchTarget = 48; // minimum touch target (48dp)
+  static const double _actionSize = 44; // visual action button
+  static const double _iconSize = 22;
+
   @override
   void initState() {
     super.initState();
@@ -22,173 +33,133 @@ class _HomeAppBarState extends ConsumerState<HomeAppBar> {
     });
   }
 
-  String _getGreeting() {
-    final hour = DateTime.now().hour;
-    if (hour < 12) return 'Good Morning';
-    if (hour < 17) return 'Good Afternoon';
-    return 'Good Evening';
-  }
-
   @override
   Widget build(BuildContext context) {
     final user = ref.watch(authProviderNotifier).currentUser;
 
+    final hasName = user?.name.isNotEmpty == true;
+    final displayName = user?.name ?? 'Guest User';
+
     return AppBar(
       elevation: 0,
-      toolbarHeight: 70,
+      scrolledUnderElevation: 0,
+      surfaceTintColor: Colors.transparent,
+      toolbarHeight: HomeAppBar.height,
       backgroundColor: CustomTheme.backgroundColor,
       automaticallyImplyLeading: false,
-      title: Padding(
-        padding: const EdgeInsets.only(top: 8.0),
-        child: Row(
-          children: [
-            // Premium Avatar with Gradient Border
-            GestureDetector(
-              onTap: () => Navigator.pushNamed(context, '/profile'),
-              child: Container(
-                padding: const EdgeInsets.all(2),
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  gradient: LinearGradient(
-                    colors: [
-                      CustomTheme.primaryColor,
-                      CustomTheme.primaryColor.withValues(alpha: 0.4),
-                    ],
+      titleSpacing: _sidePadding,
+      title: Row(
+        children: [
+          _buildAvatar(hasName ? user!.name[0].toUpperCase() : 'G'),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'Welcome Back,',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: CustomTextStyle.bodySmall.copyWith(
+                    fontSize: 12,
+                    height: 1.2,
+                    color: CustomTheme.textSecondary,
+                    fontWeight: CustomTheme.fontWeightMedium,
                   ),
                 ),
-                child: Container(
-                  width: 42,
-                  height: 42,
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
-                    shape: BoxShape.circle,
-                  ),
-                  child: Center(
-                    child: Text(
-                      user?.name.isNotEmpty == true
-                          ? user!.name[0].toUpperCase()
-                          : 'G',
-                      style: CustomTextStyle.heading3.copyWith(
-                        fontSize: 18,
-                        color: CustomTheme.primaryColor,
-                      ),
-                    ),
+                const SizedBox(height: 1),
+                Text(
+                  displayName,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: CustomTextStyle.heading4.copyWith(
+                    fontSize: 16,
+                    height: 1.25,
                   ),
                 ),
-              ),
+              ],
             ),
-            const SizedBox(width: 12),
-            // User Info & Location
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Row(
-                    children: [
-                      Text(
-                        _getGreeting(),
-                        style: CustomTextStyle.bodySmall.copyWith(
-                          color: CustomTheme.textSecondary,
-                          fontWeight: CustomTheme.fontWeightMedium,
-                        ),
-                      ),
-                      const SizedBox(width: 4),
-                      Icon(
-                        _getGreetingIcon(),
-                        size: 14,
-                        color: Colors.orangeAccent,
-                      ),
-                    ],
-                  ),
-                  Text(
-                    user?.name ?? 'Guest User',
-                    style: CustomTextStyle.heading4.copyWith(
-                      fontSize: 16,
-                      height: 1.2,
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.location_on,
-                        size: 12,
-                        color: CustomTheme.primaryColor.withValues(alpha: 0.7),
-                      ),
-                      const SizedBox(width: 2),
-                      Flexible(
-                        child: Text(
-                          user?.hasAddress == true
-                              ? '${user!.district!.name}, ${user.division!.name}'
-                              : 'Add Location',
-                          style: CustomTextStyle.caption.copyWith(
-                            color: CustomTheme.textTertiary,
-                            fontSize: 11,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
       actions: [
         _buildActionButton(
           icon: Icons.search_rounded,
+          label: 'Search',
           onTap: () => Navigator.pushNamed(context, '/search'),
         ),
-        const SizedBox(width: 8),
+        // Right gutter matches the left gutter (16dp total with the 48dp slot).
+        const SizedBox(width: _sidePadding - 2),
       ],
     );
   }
 
-  IconData _getGreetingIcon() {
-    final hour = DateTime.now().hour;
-    if (hour < 12) return Icons.wb_sunny_outlined;
-    if (hour < 17) return Icons.wb_cloudy_outlined;
-    return Icons.nightlight_round_outlined;
+  Widget _buildAvatar(String initial) {
+    return Container(
+      width: _avatarSize,
+      height: _avatarSize,
+      padding: const EdgeInsets.all(_avatarRing),
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        border: Border.all(
+          color: CustomTheme.secondaryColor,
+          width: _avatarRing,
+        ),
+      ),
+      child: Container(
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          shape: BoxShape.circle,
+        ),
+        alignment: Alignment.center,
+        child: Text(
+          initial,
+          style: CustomTextStyle.heading3.copyWith(
+            fontSize: 20,
+            height: 1,
+            color: CustomTheme.primaryColor,
+          ),
+        ),
+      ),
+    );
   }
 
   Widget _buildActionButton({
     required IconData icon,
+    required String label,
     required VoidCallback onTap,
   }) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.only(right: 12.0),
-        child: Container(
-          width: 42,
-          height: 42,
-          decoration: BoxDecoration(
-            color: Colors.white,
-            shape: BoxShape.circle,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.04),
-                blurRadius: 10,
-                offset: const Offset(0, 4),
-              ),
-            ],
-            border: Border.all(
-              color: CustomTheme.borderLight.withValues(alpha: 0.5),
+    // Outer SizedBox gives a full 48dp touch area around the 44dp visual.
+    return SizedBox(
+      width: _touchTarget,
+      height: _touchTarget,
+      child: Center(
+        child: Semantics(
+          button: true,
+          label: label,
+          child: Container(
+            width: _actionSize,
+            height: _actionSize,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              shape: BoxShape.circle,
             ),
-          ),
-          child: Material(
-            color: Colors.transparent,
-            child: InkWell(
-              onTap: onTap,
-              customBorder: const CircleBorder(),
-              child: Stack(
-                alignment: Alignment.center,
-                children: [
-                  Icon(icon, color: CustomTheme.textPrimary, size: 22),
-                ],
+            child: Material(
+              color: Colors.transparent,
+              shape: const CircleBorder(),
+              clipBehavior: Clip.antiAlias,
+              child: InkWell(
+                onTap: onTap,
+                customBorder: const CircleBorder(),
+                child: Center(
+                  child: Icon(
+                    icon,
+                    color: CustomTheme.textPrimary,
+                    size: _iconSize,
+                  ),
+                ),
               ),
             ),
           ),

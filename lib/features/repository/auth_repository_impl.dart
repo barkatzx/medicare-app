@@ -122,7 +122,7 @@ class AuthRepositoryImpl implements AuthRepository {
             body: json.encode(requestBody),
           )
           .timeout(
-            ApiConstants.connectionTimeout,
+            const Duration(seconds: 8),
             onTimeout: () {
               throw Exception(
                 'Connection timeout. Please check your internet connection.',

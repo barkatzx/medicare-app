@@ -1,15 +1,20 @@
+import 'dart:io';
+
 class ApiConstants {
   ApiConstants._();
 
-  // Dev: run `adb reverse tcp:3000 tcp:3000` so the device's localhost reaches
-  // this computer, or pass --dart-define=API_BASE_URL=http://<LAN-IP>:3000/v1
-  static const String baseUrl = String.fromEnvironment(
+  // Android emulators reach the host machine through 10.0.2.2. A physical
+  // device needs the backend's LAN/public URL supplied with API_BASE_URL.
+  static final String baseUrl = _configuredBaseUrl.isNotEmpty
+      ? _configuredBaseUrl
+      : 'http://${Platform.isAndroid ? '10.0.2.2' : 'localhost'}:3000/v1';
+
+  static const String _configuredBaseUrl = String.fromEnvironment(
     'API_BASE_URL',
-    defaultValue: 'http://localhost:3000/v1',
   );
 
-  static const Duration connectionTimeout = Duration(seconds: 120);
-  static const Duration receiveTimeout = Duration(seconds: 120);
+  static const Duration connectionTimeout = Duration(seconds: 20);
+  static const Duration receiveTimeout = Duration(seconds: 20);
 
   // ==================== AUTHENTICATION ROUTES ====================
   static String get register => '$baseUrl/users/register';
