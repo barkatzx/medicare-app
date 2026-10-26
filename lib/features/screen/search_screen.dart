@@ -83,41 +83,69 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   PreferredSizeWidget _buildAppBar() {
     return AppBar(
       elevation: 0,
-      backgroundColor: Colors.white,
+      backgroundColor: CustomTheme.backgroundColor,
       scrolledUnderElevation: 0,
-      leading: IconButton(
-        icon: Icon(Icons.arrow_back, color: CustomTheme.textPrimary),
-        onPressed: () {
-          ref.read(productProviderNotifier).clearSearch();
-          Navigator.pop(context);
-        },
+      leading: Padding(
+        padding: const EdgeInsets.only(left: 16),
+        child: Center(
+          child: GestureDetector(
+            onTap: () {
+              ref.read(productProviderNotifier).clearSearch();
+              Navigator.pop(context);
+            },
+            child: Container(
+              width: 38,
+              height: 38,
+              decoration: BoxDecoration(
+                color: CustomTheme.surfaceColor,
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.arrow_back_ios_new_rounded,
+                color: CustomTheme.textPrimary,
+                size: 15,
+              ),
+            ),
+          ),
+        ),
       ),
-      titleSpacing: 0,
+      leadingWidth: 54,
+      titleSpacing: 12,
       title: Container(
         height: 45,
         margin: const EdgeInsets.only(right: 16),
         decoration: BoxDecoration(
-          color: CustomTheme.secondaryColor.withValues(alpha: 0.5),
-          borderRadius: BorderRadius.circular(CustomTheme.radiusMD),
-          border: Border.all(color: CustomTheme.borderLight),
+          color: CustomTheme.surfaceColor,
+          borderRadius: BorderRadius.circular(CustomTheme.radiusSM),
         ),
         child: TextField(
           controller: _searchController,
           focusNode: _searchFocusNode,
           onChanged: _onSearchChanged,
           decoration: InputDecoration(
-            hintText: 'Search medicines, health products...',
+            hintText: 'Type Medicine Name',
             hintStyle: CustomTextStyle.bodySmall.copyWith(
               color: CustomTheme.textTertiary,
             ),
-            prefixIcon: Icon(
-              Icons.search,
-              size: 20,
-              color: CustomTheme.primaryColor,
+            prefixIcon: Container(
+              margin: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: CustomTheme.secondaryColor,
+                borderRadius: BorderRadius.circular(5),
+              ),
+              child: Icon(
+                Icons.search,
+                size: 20,
+                color: CustomTheme.primaryColor,
+              ),
             ),
             suffixIcon: _searchController.text.isNotEmpty
                 ? IconButton(
-                    icon: const Icon(Icons.cancel, size: 18),
+                    icon: Icon(
+                      Icons.cancel,
+                      size: 18,
+                      color: CustomTheme.primaryColor,
+                    ),
                     onPressed: () {
                       _searchController.clear();
                       ref.read(productProviderNotifier).clearSearch();
@@ -128,7 +156,9 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
             border: InputBorder.none,
             contentPadding: const EdgeInsets.symmetric(vertical: 10),
           ),
-          style: CustomTextStyle.bodyMedium,
+          style: CustomTextStyle.bodyMedium.copyWith(
+            color: CustomTheme.textSecondary,
+          ),
           textInputAction: TextInputAction.search,
         ),
       ),
@@ -176,7 +206,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
           Text('Quick Search', style: CustomTextStyle.heading3),
           const SizedBox(height: 8),
           Text(
-            'Find medicines, health products, and more',
+            'Search Medicines with Brand name, Generic name.',
             style: CustomTextStyle.bodyMedium.copyWith(
               color: CustomTheme.textTertiary,
             ),

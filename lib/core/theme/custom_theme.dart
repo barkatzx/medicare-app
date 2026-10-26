@@ -6,12 +6,12 @@ class CustomTheme {
   static const String secondaryFontFamily = 'Outfit';
 
   // Colors
-  static const Color primaryColor = Color(0xFF010101);
+  static const Color primaryColor = Color(0xFFff5e01);
   static const Color secondaryColor = Color(0xFFF2F2F2);
-  static const Color backgroundColor = Color(0xFFF7F7F7);
+  static const Color backgroundColor = Color(0xFFf5f5f5);
   static const Color surfaceColor = Colors.white;
   static const Color errorColor = Color(0xFFDC2626);
-  static const Color successColor = Color(0xFF10B981);
+  static const Color successColor = Color(0xFF009900);
   static const Color warningColor = Color(0xFFF59E0B);
 
   // Text Colors

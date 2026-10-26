@@ -86,6 +86,50 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
     }
   }
 
+  // ─── Strength helpers (visual only) ───
+  int _strengthOf(String v) {
+    if (v.isEmpty) return 0;
+    if (v.length < 6) return 1;
+    int score = 2;
+    if (v.length >= 10) score++;
+    final hasMixedCase =
+        RegExp(r'[A-Z]').hasMatch(v) && RegExp(r'[a-z]').hasMatch(v);
+    final hasDigitAndSymbol =
+        RegExp(r'[0-9]').hasMatch(v) && RegExp(r'[^A-Za-z0-9]').hasMatch(v);
+    if (hasMixedCase && hasDigitAndSymbol) score++;
+    return score.clamp(1, 4);
+  }
+
+  String _strengthLabel(int s) {
+    switch (s) {
+      case 1:
+        return 'Weak';
+      case 2:
+        return 'Fair';
+      case 3:
+        return 'Good';
+      case 4:
+        return 'Strong';
+      default:
+        return '';
+    }
+  }
+
+  Color _strengthColor(int s) {
+    switch (s) {
+      case 1:
+        return CustomTheme.errorColor;
+      case 2:
+        return const Color(0xFFF59E0B);
+      case 3:
+        return CustomTheme.primaryColor;
+      case 4:
+        return CustomTheme.successColor;
+      default:
+        return CustomTheme.borderLight;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final isLoading = ref.watch(authProviderNotifier).isLoading;
@@ -98,185 +142,239 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 40),
         child: Form(
           key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 24),
-
-              // Header
-              Text(
-                'Update Your Password',
-                style: CustomTextStyle.heading2.copyWith(
-                  fontSize: 20,
-                  letterSpacing: -0.4,
+          child: TweenAnimationBuilder<double>(
+            tween: Tween(begin: 0.0, end: 1.0),
+            duration: const Duration(milliseconds: 600),
+            curve: Curves.easeOutCubic,
+            builder: (context, value, child) {
+              return Opacity(
+                opacity: value,
+                child: Transform.translate(
+                  offset: Offset(0, 20 * (1 - value)),
+                  child: child,
                 ),
-              ),
-              const SizedBox(height: 6),
-              Text(
-                'Keep your account secure with a strong password.',
-                style: CustomTextStyle.bodyMedium.copyWith(
-                  fontSize: 14,
-                  color: CustomTheme.textSecondary,
-                ),
-              ),
-              const SizedBox(height: 28),
+              );
+            },
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const SizedBox(height: 16),
 
-              // Info card
-              Container(
-                padding: const EdgeInsets.all(14),
-                decoration: BoxDecoration(
-                  color: CustomTheme.primaryColor.withValues(alpha: 0.04),
-                  borderRadius: BorderRadius.circular(14),
-                  border: Border.all(
-                    color: CustomTheme.primaryColor.withValues(alpha: 0.1),
+                Text(
+                  'Update Your Password',
+                  textAlign: TextAlign.center,
+                  style: CustomTextStyle.heading2.copyWith(
+                    fontSize: 22,
+                    letterSpacing: -0.6,
                   ),
                 ),
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.shield_outlined,
-                      size: 18,
-                      color: CustomTheme.primaryColor,
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: Text(
-                        'Use a strong password with at least 6 characters.',
-                        style: CustomTextStyle.bodySmall.copyWith(
-                          fontSize: 12,
-                          height: 1.4,
+                const SizedBox(height: 6),
+                Text(
+                  'Keep your account secure with a strong password.',
+                  textAlign: TextAlign.center,
+                  style: CustomTextStyle.bodyMedium.copyWith(
+                    fontSize: 14,
+                    color: CustomTheme.textSecondary,
+                  ),
+                ),
+                const SizedBox(height: 28),
+
+                // ── Password fields card ──
+                Container(
+                  padding: const EdgeInsets.all(18),
+                  decoration: BoxDecoration(
+                    color: CustomTheme.surfaceColor,
+                    borderRadius: BorderRadius.circular(22),
+                    border: Border.all(color: CustomTheme.borderLight),
+                  ),
+                  child: Column(
+                    children: [
+                      _buildPasswordField(
+                        label: 'CURRENT PASSWORD',
+                        controller: _oldPasswordController,
+                        hint: 'Enter your current password',
+                        obscure: _obscureOld,
+                        onToggle: () =>
+                            setState(() => _obscureOld = !_obscureOld),
+                      ),
+
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 18),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Divider(
+                                color: CustomTheme.borderLight,
+                                height: 1,
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                              ),
+                              child: Icon(
+                                Icons.south_rounded,
+                                size: 16,
+                                color: CustomTheme.textTertiary,
+                              ),
+                            ),
+                            Expanded(
+                              child: Divider(
+                                color: CustomTheme.borderLight,
+                                height: 1,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 24),
 
-              // Password fields container
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: CustomTheme.surfaceColor,
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Column(
-                  children: [
-                    _buildPasswordField(
-                      label: 'Current Password',
-                      controller: _oldPasswordController,
-                      hint: 'Enter your current password',
-                      obscure: _obscureOld,
-                      onToggle: () =>
-                          setState(() => _obscureOld = !_obscureOld),
-                    ),
-                    const SizedBox(height: 14),
-                    _buildPasswordField(
-                      label: 'New Password',
-                      controller: _newPasswordController,
-                      hint: 'Choose a new password',
-                      obscure: _obscureNew,
-                      onToggle: () =>
-                          setState(() => _obscureNew = !_obscureNew),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'New password is required';
-                        }
-                        if (value.length < 6) {
-                          return 'Password must be at least 6 characters';
-                        }
-                        return null;
-                      },
-                    ),
-                    const SizedBox(height: 14),
-                    _buildPasswordField(
-                      label: 'Confirm New Password',
-                      controller: _confirmPasswordController,
-                      hint: 'Repeat your new password',
-                      obscure: _obscureConfirm,
-                      onToggle: () =>
-                          setState(() => _obscureConfirm = !_obscureConfirm),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please confirm your new password';
-                        }
-                        if (value != _newPasswordController.text) {
-                          return 'Passwords do not match';
-                        }
-                        return null;
-                      },
-                    ),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 32),
-
-              // Submit button
-              SizedBox(
-                width: double.infinity,
-                height: 54,
-                child: ElevatedButton(
-                  onPressed: isLoading ? null : _handleSubmit,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: CustomTheme.primaryColor,
-                    foregroundColor: Colors.white,
-                    disabledBackgroundColor: CustomTheme.primaryColor
-                        .withValues(alpha: 0.5),
-                    padding: EdgeInsets.zero,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    elevation: 0,
-                    shadowColor: Colors.transparent,
-                    surfaceTintColor: Colors.transparent,
-                    overlayColor: Colors.transparent,
+                      _buildPasswordField(
+                        label: 'NEW PASSWORD',
+                        controller: _newPasswordController,
+                        hint: 'Choose a new password',
+                        obscure: _obscureNew,
+                        onToggle: () =>
+                            setState(() => _obscureNew = !_obscureNew),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'New password is required';
+                          }
+                          if (value.length < 6) {
+                            return 'Password must be at least 6 characters';
+                          }
+                          return null;
+                        },
+                      ),
+                      _buildStrengthMeter(),
+                      const SizedBox(height: 16),
+                      _buildPasswordField(
+                        label: 'CONFIRM NEW PASSWORD',
+                        controller: _confirmPasswordController,
+                        hint: 'Repeat your new password',
+                        obscure: _obscureConfirm,
+                        onToggle: () =>
+                            setState(() => _obscureConfirm = !_obscureConfirm),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please confirm your new password';
+                          }
+                          if (value != _newPasswordController.text) {
+                            return 'Passwords do not match';
+                          }
+                          return null;
+                        },
+                      ),
+                    ],
                   ),
+                ),
+
+                const SizedBox(height: 16),
+
+                // ── Tip card ──
+                Container(
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    color: CustomTheme.primaryColor.withValues(alpha: 0.05),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: CustomTheme.primaryColor.withValues(alpha: 0.12),
+                    ),
+                  ),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        width: 30,
+                        height: 30,
+                        decoration: BoxDecoration(
+                          color: CustomTheme.primaryColor.withValues(
+                            alpha: 0.12,
+                          ),
+                          borderRadius: BorderRadius.circular(9),
+                        ),
+                        child: Icon(
+                          Icons.tips_and_updates_outlined,
+                          size: 16,
+                          color: CustomTheme.primaryColor,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.only(top: 1),
+                          child: Text(
+                            'Use at least 6 characters. Mixing upper and lower case letters, numbers and symbols makes it stronger.',
+                            style: CustomTextStyle.bodySmall.copyWith(
+                              fontSize: 12,
+                              color: CustomTheme.textPrimary,
+                              height: 1.5,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 28),
+
+                // ── Submit button ──
+                SizedBox(
+                  width: double.infinity,
+                  height: 56,
                   child: Container(
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(16),
-                      gradient: isLoading
-                          ? null
-                          : const LinearGradient(
-                              colors: [Color(0xFF2A2A2A), Color(0xFF010101)],
-                              begin: Alignment.topCenter,
-                              end: Alignment.bottomCenter,
-                            ),
+                      borderRadius: BorderRadius.circular(12),
                     ),
-                    child: Center(
-                      child: isLoading
-                          ? const SizedBox(
-                              width: 24,
-                              height: 24,
-                              child: CircularProgressIndicator(
-                                color: Colors.white,
-                                strokeWidth: 2.5,
-                              ),
-                            )
-                          : Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                  'Save New Password',
-                                  style: CustomTextStyle.button.copyWith(
-                                    fontSize: 15,
-                                    fontWeight: CustomTheme.fontWeightBold,
-                                    letterSpacing: 0.3,
-                                  ),
-                                ),
-                                const SizedBox(width: 8),
-                                const Icon(
-                                  Icons.lock_rounded,
+                    child: ElevatedButton(
+                      onPressed: isLoading ? null : _handleSubmit,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: CustomTheme.primaryColor,
+                        foregroundColor: Colors.white,
+                        disabledBackgroundColor: CustomTheme.primaryColor
+                            .withValues(alpha: 0.5),
+                        padding: EdgeInsets.zero,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        elevation: 0,
+                        surfaceTintColor: Colors.transparent,
+                      ),
+                      child: Center(
+                        child: isLoading
+                            ? const SizedBox(
+                                width: 24,
+                                height: 24,
+                                child: CircularProgressIndicator(
                                   color: Colors.white,
-                                  size: 18,
+                                  strokeWidth: 2.5,
                                 ),
-                              ],
-                            ),
+                              )
+                            : Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    'Save New Password',
+                                    style: CustomTextStyle.button.copyWith(
+                                      fontSize: 15,
+                                      fontWeight: CustomTheme.fontWeightBold,
+                                      letterSpacing: 0.3,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  const Icon(
+                                    Icons.lock_rounded,
+                                    color: Colors.white,
+                                    size: 18,
+                                  ),
+                                ],
+                              ),
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -288,6 +386,7 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
       elevation: 0,
       backgroundColor: CustomTheme.backgroundColor,
       scrolledUnderElevation: 0,
+      centerTitle: true,
       systemOverlayStyle: SystemUiOverlayStyle.dark,
       leading: Padding(
         padding: const EdgeInsets.only(left: 16),
@@ -317,6 +416,55 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
     );
   }
 
+  // ─── Strength meter ───
+  Widget _buildStrengthMeter() {
+    return ValueListenableBuilder<TextEditingValue>(
+      valueListenable: _newPasswordController,
+      builder: (context, value, _) {
+        final strength = _strengthOf(value.text);
+        if (strength == 0) return const SizedBox(height: 0);
+        final color = _strengthColor(strength);
+
+        return Padding(
+          padding: const EdgeInsets.only(top: 12),
+          child: Row(
+            children: [
+              Expanded(
+                child: Row(
+                  children: List.generate(4, (i) {
+                    final active = i < strength;
+                    return Expanded(
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 250),
+                        height: 4,
+                        margin: EdgeInsets.only(right: i == 3 ? 0 : 5),
+                        decoration: BoxDecoration(
+                          color: active ? color : CustomTheme.borderLight,
+                          borderRadius: BorderRadius.circular(2),
+                        ),
+                      ),
+                    );
+                  }),
+                ),
+              ),
+              const SizedBox(width: 12),
+              AnimatedDefaultTextStyle(
+                duration: const Duration(milliseconds: 250),
+                style: TextStyle(
+                  fontFamily: CustomTheme.primaryFontFamily,
+                  fontSize: 11.5,
+                  fontWeight: CustomTheme.fontWeightBold,
+                  color: color,
+                ),
+                child: Text(_strengthLabel(strength)),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   Widget _buildPasswordField({
     required String label,
     required TextEditingController controller,
@@ -331,13 +479,13 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
         Text(
           label,
           style: CustomTextStyle.caption.copyWith(
-            fontSize: 11,
-            letterSpacing: 0.3,
+            fontSize: 10,
+            letterSpacing: 0.9,
             color: CustomTheme.textTertiary,
             fontWeight: CustomTheme.fontWeightSemiBold,
           ),
         ),
-        const SizedBox(height: 6),
+        const SizedBox(height: 8),
         TextFormField(
           controller: controller,
           obscureText: obscure,
@@ -387,28 +535,32 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
             fillColor: CustomTheme.backgroundColor,
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 16,
-              vertical: 14,
+              vertical: 15,
             ),
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(13),
-              borderSide: BorderSide.none,
+              borderRadius: BorderRadius.circular(14),
+              borderSide: BorderSide(color: CustomTheme.borderLight),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(14),
+              borderSide: BorderSide(color: CustomTheme.borderLight),
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(13),
+              borderRadius: BorderRadius.circular(14),
               borderSide: BorderSide(
-                color: CustomTheme.primaryColor.withValues(alpha: 0.5),
+                color: CustomTheme.primaryColor,
                 width: 1.5,
               ),
             ),
             errorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(13),
+              borderRadius: BorderRadius.circular(14),
               borderSide: const BorderSide(
                 color: CustomTheme.errorColor,
                 width: 1.5,
               ),
             ),
             focusedErrorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(13),
+              borderRadius: BorderRadius.circular(14),
               borderSide: const BorderSide(
                 color: CustomTheme.errorColor,
                 width: 1.5,

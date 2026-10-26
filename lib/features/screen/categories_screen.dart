@@ -58,21 +58,28 @@ class _CategoriesScreenState extends ConsumerState<CategoriesScreen> {
       height: 46,
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(CustomTheme.radiusMD),
+        borderRadius: BorderRadius.circular(CustomTheme.radiusSM),
       ),
       child: TextField(
         controller: _searchController,
         onChanged: (value) => provider.searchCategories(value),
         style: CustomTextStyle.bodyMedium,
         decoration: InputDecoration(
-          hintText: 'Square, Beximco, Incepta ...',
+          hintText: 'Square, Beximco, Incepta .....',
           hintStyle: CustomTextStyle.bodyMedium.copyWith(
             color: CustomTheme.textTertiary,
           ),
-          prefixIcon: const Icon(
-            Icons.search_rounded,
-            color: CustomTheme.primaryColor,
-            size: 22,
+          prefixIcon: Container(
+            margin: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: CustomTheme.secondaryColor,
+              borderRadius: BorderRadius.circular(5),
+            ),
+            child: const Icon(
+              Icons.search_rounded,
+              color: CustomTheme.primaryColor,
+              size: 22,
+            ),
           ),
           suffixIcon: _searchController.text.isNotEmpty
               ? IconButton(
@@ -214,13 +221,13 @@ class _CategoriesScreenState extends ConsumerState<CategoriesScreen> {
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(CustomTheme.radiusMD),
+          borderRadius: BorderRadius.circular(CustomTheme.radiusSM),
         ),
         child: Row(
           children: [
             Container(
-              width: 30,
-              height: 30,
+              width: 35,
+              height: 35,
               decoration: BoxDecoration(
                 color: CustomTheme.primaryColor.withValues(alpha: 0.08),
                 borderRadius: BorderRadius.circular(CustomTheme.radiusSM),
@@ -228,10 +235,10 @@ class _CategoriesScreenState extends ConsumerState<CategoriesScreen> {
               child: const Icon(
                 Icons.medical_services_outlined,
                 color: CustomTheme.primaryColor,
-                size: 14,
+                size: 25,
               ),
             ),
-            const SizedBox(width: 15),
+            const SizedBox(width: 20),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -240,6 +247,7 @@ class _CategoriesScreenState extends ConsumerState<CategoriesScreen> {
                   Text(
                     category.name.trim(),
                     style: CustomTextStyle.bodyLarge.copyWith(
+                      fontSize: 15,
                       fontWeight: CustomTheme.fontWeightBold,
                       color: CustomTheme.textPrimary,
                     ),
@@ -248,8 +256,9 @@ class _CategoriesScreenState extends ConsumerState<CategoriesScreen> {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    '${category.productCount} Products Available',
+                    '${category.productCount} Products',
                     style: CustomTextStyle.caption.copyWith(
+                      fontSize: 13,
                       color: CustomTheme.textTertiary,
                     ),
                   ),

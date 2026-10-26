@@ -10,6 +10,8 @@ class CustomButton extends StatelessWidget {
   final Color? textColor;
   final double? width;
   final double? height;
+  final double? fontSize;
+  final FontWeight? fontWeight;
 
   const CustomButton({
     super.key,
@@ -21,6 +23,8 @@ class CustomButton extends StatelessWidget {
     this.textColor,
     this.width,
     this.height,
+    this.fontSize,
+    this.fontWeight,
   });
 
   @override
@@ -59,8 +63,8 @@ class CustomButton extends StatelessWidget {
               : Text(
                   text,
                   style: TextStyle(
-                    fontSize: CustomTheme.fontSizeMD,
-                    fontWeight: CustomTheme.fontWeightSemiBold,
+                    fontSize: fontSize ?? CustomTheme.fontSizeMD,
+                    fontWeight: fontWeight ?? CustomTheme.fontWeightSemiBold,
                     color: isOutlined
                         ? (textColor ??
                               backgroundColor ??

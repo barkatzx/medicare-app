@@ -75,13 +75,6 @@ class _TrendingScreenState extends ConsumerState<TrendingScreen>
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(CustomTheme.radiusRound),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.04),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
               ),
               child: TabBar(
                 controller: _tabController,
@@ -95,10 +88,10 @@ class _TrendingScreenState extends ConsumerState<TrendingScreen>
                 labelPadding: EdgeInsets.zero,
                 labelStyle: CustomTextStyle.bodySmall.copyWith(
                   fontWeight: CustomTheme.fontWeightBold,
-                  fontSize: 10,
+                  fontSize: 15,
                 ),
                 unselectedLabelStyle: CustomTextStyle.bodySmall.copyWith(
-                  fontSize: 10,
+                  fontSize: 15,
                 ),
                 tabs: const [
                   Tab(

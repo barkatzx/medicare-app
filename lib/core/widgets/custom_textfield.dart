@@ -12,6 +12,9 @@ class CustomTextField extends StatefulWidget {
   final String? Function(String?)? validator;
   final bool enabled;
   final double? fontSize;
+  final double? labelFontSize;
+  final FontWeight? labelFontWeight;
+  final FontWeight? inputFontWeight;
   final int maxLines;
 
   const CustomTextField({
@@ -26,6 +29,9 @@ class CustomTextField extends StatefulWidget {
     this.validator,
     this.enabled = true,
     this.fontSize,
+    this.labelFontSize,
+    this.labelFontWeight,
+    this.inputFontWeight,
     this.maxLines = 1,
   });
 
@@ -75,8 +81,9 @@ class _CustomTextFieldState extends State<CustomTextField> {
         Text(
           widget.label,
           style: TextStyle(
-            fontSize: CustomTheme.fontSizeSM,
-            fontWeight: CustomTheme.fontWeightMedium,
+            fontSize: widget.labelFontSize ?? CustomTheme.fontSizeSM,
+            fontWeight:
+                widget.labelFontWeight ?? CustomTheme.fontWeightMedium,
             color: CustomTheme.textSecondary,
           ),
         ),
@@ -93,13 +100,21 @@ class _CustomTextFieldState extends State<CustomTextField> {
             ),
           ),
           child: Row(
+            crossAxisAlignment: widget.maxLines > 1
+                ? CrossAxisAlignment.start
+                : CrossAxisAlignment.center,
             children: [
               if (widget.prefixIcon != null) ...[
-                SizedBox(width: CustomTheme.spacingMD),
-                Icon(
-                  widget.prefixIcon,
-                  size: 20,
-                  color: CustomTheme.textTertiary,
+                Padding(
+                  padding: EdgeInsets.only(
+                    left: CustomTheme.spacingMD,
+                    top: widget.maxLines > 1 ? CustomTheme.spacingMD : 0,
+                  ),
+                  child: Icon(
+                    widget.prefixIcon,
+                    size: 20,
+                    color: CustomTheme.textTertiary,
+                  ),
                 ),
               ],
               Expanded(
@@ -111,6 +126,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
                   maxLines: widget.maxLines,
                   style: TextStyle(
                     fontSize: widget.fontSize ?? CustomTheme.fontSizeMD,
+                    fontWeight: widget.inputFontWeight,
                     color: CustomTheme.textSecondary,
                   ),
                   decoration: InputDecoration(
@@ -121,8 +137,8 @@ class _CustomTextFieldState extends State<CustomTextField> {
                     ),
                     border: InputBorder.none,
                     contentPadding: EdgeInsets.symmetric(
-                      horizontal: CustomTheme.spacingXL,
-                      vertical: CustomTheme.spacingXL,
+                      horizontal: CustomTheme.spacingMD,
+                      vertical: CustomTheme.spacingMD,
                     ),
                     isDense: true,
                     errorText: null, // No error inside the field

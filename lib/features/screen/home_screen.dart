@@ -1,3 +1,5 @@
+import 'dart:ui' show ImageFilter;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medicare_app/core/di/providers.dart';
@@ -54,51 +56,91 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
 
     return Scaffold(
       backgroundColor: CustomTheme.backgroundColor,
-      body: _screens[selectedIndex],
-      bottomNavigationBar: _buildBottomNav(selectedIndex, cartItemCount),
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          _screens[selectedIndex],
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: Padding(
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.of(context).padding.bottom + 12,
+              ),
+              child: _buildBottomNav(selectedIndex, cartItemCount),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
   Widget _buildBottomNav(int selectedIndex, int cartItemCount) {
+    final borderRadius = BorderRadius.circular(CustomTheme.radiusRound);
+
     return Container(
-      margin: EdgeInsets.fromLTRB(
-        16,
-        0,
-        16,
-        MediaQuery.of(context).padding.bottom + 16,
-      ),
-      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
       decoration: BoxDecoration(
-        color: CustomTheme.primaryColor,
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: borderRadius,
         boxShadow: [
           BoxShadow(
-            color: CustomTheme.primaryColor.withValues(alpha: 0.25),
-            blurRadius: 20,
-            offset: const Offset(0, 8),
+            color: const Color(0xFF29354D).withValues(alpha: 0.14),
+            blurRadius: 30,
+            offset: const Offset(0, 12),
+          ),
+          BoxShadow(
+            color: Colors.white.withValues(alpha: 0.8),
+            blurRadius: 12,
+            spreadRadius: -4,
+            offset: const Offset(0, -3),
           ),
         ],
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          _buildNavItem(0, Icons.home_rounded, 'Home', selectedIndex),
-          _buildNavItem(1, Icons.add_box_outlined, 'Shortcuts', selectedIndex),
-          _buildNavItem(
-            2,
-            Icons.medical_services_outlined,
-            'Company',
-            selectedIndex,
+      child: ClipRRect(
+        borderRadius: borderRadius,
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 28, sigmaY: 28),
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 7, horizontal: 7),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  Colors.white.withValues(alpha: 0.68),
+                  const Color(0xFFF4F7FC).withValues(alpha: 0.48),
+                  Colors.white.withValues(alpha: 0.62),
+                ],
+              ),
+              borderRadius: borderRadius,
+              border: Border.all(
+                color: Colors.white.withValues(alpha: 0.96),
+                width: 1,
+              ),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _buildNavItem(0, Icons.home_rounded, selectedIndex),
+                const SizedBox(width: 5),
+                _buildNavItem(1, Icons.all_inclusive_outlined, selectedIndex),
+                const SizedBox(width: 5),
+                _buildNavItem(
+                  2,
+                  Icons.medical_services_outlined,
+                  selectedIndex,
+                ),
+                const SizedBox(width: 5),
+                _buildNavItem(
+                  3,
+                  Icons.local_mall_outlined,
+                  selectedIndex,
+                  badgeCount: cartItemCount,
+                ),
+                const SizedBox(width: 5),
+                _buildNavItem(4, Icons.person_outline, selectedIndex),
+              ],
+            ),
           ),
-          _buildNavItem(
-            3,
-            Icons.shopping_bag_outlined,
-            'Bag',
-            selectedIndex,
-            badgeCount: cartItemCount,
-          ),
-          _buildNavItem(4, Icons.person_outline, 'Profile', selectedIndex),
-        ],
+        ),
       ),
     );
   }
@@ -106,7 +148,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   Widget _buildNavItem(
     int index,
     IconData icon,
-    String label,
     int selectedIndex, {
     int? badgeCount,
   }) {
@@ -118,85 +159,58 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 250),
         curve: Curves.easeInOut,
-        padding: EdgeInsets.symmetric(
-          horizontal: isSelected ? 14 : 12,
-          vertical: 8,
-        ),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         decoration: BoxDecoration(
-          color: isSelected ? Colors.white : Colors.transparent,
-          borderRadius: BorderRadius.circular(999),
+          color: isSelected ? CustomTheme.primaryColor : Colors.white,
+          borderRadius: BorderRadius.circular(CustomTheme.radiusRound),
+          boxShadow: isSelected
+              ? [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.2),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ]
+              : null,
         ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
+        child: Stack(
+          clipBehavior: Clip.none,
           children: [
-            Stack(
-              clipBehavior: Clip.none,
-              children: [
-                AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 200),
-                  child: Icon(
-                    icon,
-                    key: ValueKey('$index-$isSelected'),
-                    color: isSelected
-                        ? CustomTheme.primaryColor
-                        : Colors.white.withValues(alpha: 0.65),
-                    size: 22,
+            AnimatedSwitcher(
+              duration: const Duration(milliseconds: 200),
+              child: Icon(
+                icon,
+                key: ValueKey('$index-$isSelected'),
+                color: isSelected ? Colors.white : Colors.black,
+                size: 24,
+              ),
+            ),
+            if (badgeCount != null && badgeCount > 0)
+              Positioned(
+                top: -5,
+                right: -5,
+                child: Container(
+                  padding: const EdgeInsets.all(3),
+                  decoration: BoxDecoration(
+                    color: CustomTheme.errorColor,
+                    shape: BoxShape.circle,
+                  ),
+                  constraints: const BoxConstraints(
+                    minWidth: 16,
+                    minHeight: 16,
+                  ),
+                  child: Text(
+                    badgeCount > 9 ? '9+' : '$badgeCount',
+                    style: const TextStyle(
+                      fontFamily: CustomTheme.primaryFontFamily,
+                      color: Colors.white,
+                      fontSize: 8,
+                      fontWeight: FontWeight.w700,
+                    ),
+                    textAlign: TextAlign.center,
                   ),
                 ),
-                if (badgeCount != null && badgeCount > 0)
-                  Positioned(
-                    top: -5,
-                    right: -5,
-                    child: Container(
-                      padding: const EdgeInsets.all(3),
-                      decoration: BoxDecoration(
-                        color: CustomTheme.errorColor,
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: isSelected
-                              ? Colors.white
-                              : CustomTheme.primaryColor,
-                          width: 1.5,
-                        ),
-                      ),
-                      constraints: const BoxConstraints(
-                        minWidth: 16,
-                        minHeight: 16,
-                      ),
-                      child: Text(
-                        badgeCount > 9 ? '9+' : '$badgeCount',
-                        style: const TextStyle(
-                          fontFamily: CustomTheme.primaryFontFamily,
-                          color: Colors.white,
-                          fontSize: 8,
-                          fontWeight: FontWeight.w700,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                  ),
-              ],
-            ),
-            AnimatedSize(
-              duration: const Duration(milliseconds: 250),
-              curve: Curves.easeInOut,
-              child: isSelected
-                  ? Row(
-                      children: [
-                        const SizedBox(width: 6),
-                        Text(
-                          label,
-                          style: TextStyle(
-                            fontFamily: CustomTheme.primaryFontFamily,
-                            fontSize: 12,
-                            fontWeight: CustomTheme.fontWeightBold,
-                            color: CustomTheme.primaryColor,
-                          ),
-                        ),
-                      ],
-                    )
-                  : const SizedBox.shrink(),
-            ),
+              ),
           ],
         ),
       ),
@@ -278,7 +292,12 @@ class _HomeContentScreenState extends ConsumerState<HomeContentScreen> {
         physics: const AlwaysScrollableScrollPhysics(
           parent: BouncingScrollPhysics(),
         ),
-        padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+        padding: EdgeInsets.fromLTRB(
+          16,
+          8,
+          16,
+          MediaQuery.of(context).padding.bottom + 112,
+        ),
         itemCount:
             productProvider.products.length +
             (productProvider.isLoadingMore ? 1 : 0) +

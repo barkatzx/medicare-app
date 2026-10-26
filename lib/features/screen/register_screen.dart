@@ -111,6 +111,43 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     }
   }
 
+  // ─── Section label ───
+  Widget _buildSectionLabel(IconData icon, String title, Color accentColor) {
+    return Row(
+      children: [
+        Container(
+          width: 32,
+          height: 32,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                accentColor.withValues(alpha: 0.16),
+                accentColor.withValues(alpha: 0.06),
+              ],
+            ),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Icon(icon, size: 18, color: accentColor),
+        ),
+        const SizedBox(width: 10),
+        Text(
+          title,
+          style: TextStyle(
+            fontFamily: CustomTheme.primaryFontFamily,
+            fontSize: 18,
+            fontWeight: CustomTheme.fontWeightBold,
+            color: CustomTheme.textPrimary,
+            letterSpacing: -0.2,
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(child: Divider(color: CustomTheme.borderLight, height: 1)),
+      ],
+    );
+  }
+
   Widget _buildDropdown({
     required String label,
     required String hint,
@@ -127,8 +164,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         Text(
           label,
           style: TextStyle(
-            fontSize: CustomTheme.fontSizeSM,
-            fontWeight: CustomTheme.fontWeightMedium,
+            fontSize: 15,
+            fontWeight: CustomTheme.fontWeightBold,
             color: CustomTheme.textSecondary,
           ),
         ),
@@ -137,35 +174,67 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
           key: ValueKey('$label-${items.length}-$value'),
           initialValue: value,
           isExpanded: true,
+          borderRadius: BorderRadius.circular(CustomTheme.radiusMD),
+          dropdownColor: CustomTheme.surfaceColor,
           icon: isLoading
-              ? const SizedBox(
+              ? SizedBox(
                   width: 16,
                   height: 16,
-                  child: CircularProgressIndicator(strokeWidth: 2),
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: CustomTheme.primaryColor,
+                  ),
                 )
-              : const Icon(Icons.keyboard_arrow_down_rounded),
-          style: TextStyle(fontSize: 15, color: CustomTheme.textSecondary),
+              : Icon(
+                  Icons.keyboard_arrow_down_rounded,
+                  color: CustomTheme.textTertiary,
+                ),
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: CustomTheme.fontWeightBold,
+            color: CustomTheme.textPrimary,
+            fontFamily: CustomTheme.primaryFontFamily,
+          ),
           decoration: InputDecoration(
             hintText: hint,
-            hintStyle: TextStyle(fontSize: 15, color: CustomTheme.textTertiary),
+            hintStyle: TextStyle(
+              fontSize: 18,
+              fontWeight: CustomTheme.fontWeightBold,
+              color: CustomTheme.textTertiary,
+            ),
             prefixIcon: Icon(icon, size: 20, color: CustomTheme.textTertiary),
             filled: true,
-            fillColor: CustomTheme.surfaceColor,
+            fillColor: CustomTheme.backgroundColor,
             contentPadding: EdgeInsets.symmetric(
               horizontal: CustomTheme.spacingMD,
-              vertical: CustomTheme.spacingLG,
+              vertical: CustomTheme.spacingMD,
             ),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(CustomTheme.radiusMD),
-              borderSide: BorderSide(color: CustomTheme.secondaryColor),
+              borderSide: BorderSide(color: CustomTheme.borderLight),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(CustomTheme.radiusMD),
-              borderSide: BorderSide(color: CustomTheme.secondaryColor),
+              borderSide: BorderSide(color: CustomTheme.borderLight),
+            ),
+            disabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(CustomTheme.radiusMD),
+              borderSide: BorderSide(color: CustomTheme.borderLight),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(CustomTheme.radiusMD),
-              borderSide: BorderSide(color: CustomTheme.secondaryColor),
+              borderSide: BorderSide(
+                color: CustomTheme.primaryColor,
+                width: 1.5,
+              ),
+            ),
+            errorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(CustomTheme.radiusMD),
+              borderSide: BorderSide(color: CustomTheme.errorColor),
+            ),
+            focusedErrorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(CustomTheme.radiusMD),
+              borderSide: BorderSide(color: CustomTheme.errorColor, width: 1.5),
             ),
           ),
           items: items
@@ -203,16 +272,21 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       backgroundColor: CustomTheme.backgroundColor,
       body: Stack(
         children: [
-          // Background Decorative Elements
+          // ── Background decoration ──
           Positioned(
-            top: -size.height * 0.1,
-            right: -size.width * 0.2,
+            top: -size.height * 0.12,
+            right: -size.width * 0.25,
             child: Container(
-              width: size.width * 0.8,
-              height: size.width * 0.8,
+              width: size.width * 0.85,
+              height: size.width * 0.85,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: CustomTheme.primaryColor.withValues(alpha: 0.05),
+                gradient: RadialGradient(
+                  colors: [
+                    CustomTheme.primaryColor.withValues(alpha: 0.14),
+                    CustomTheme.primaryColor.withValues(alpha: 0.0),
+                  ],
+                ),
               ),
             ),
           ),
@@ -220,285 +294,373 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             bottom: -size.height * 0.1,
             left: -size.width * 0.2,
             child: Container(
-              width: size.width * 0.7,
-              height: size.width * 0.7,
+              width: size.width * 0.75,
+              height: size.width * 0.75,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: CustomTheme.primaryColor.withValues(alpha: 0.03),
+                gradient: RadialGradient(
+                  colors: [
+                    CustomTheme.primaryColor.withValues(alpha: 0.10),
+                    CustomTheme.primaryColor.withValues(alpha: 0.0),
+                  ],
+                ),
               ),
             ),
           ),
 
           SafeArea(
             child: SingleChildScrollView(
-              padding: EdgeInsets.symmetric(horizontal: CustomTheme.spacingXXL),
+              physics: const BouncingScrollPhysics(),
+              padding: EdgeInsets.symmetric(horizontal: CustomTheme.spacingMD),
               child: Form(
                 key: _formKey,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    SizedBox(height: size.height * 0.05),
-                    SizedBox(height: CustomTheme.spacingXL),
-                    Text(
-                      'Join MediCarePLC',
-                      style: CustomTextStyle.heading1.copyWith(
-                        fontSize: 28,
-                        letterSpacing: -0.5,
+                child: TweenAnimationBuilder<double>(
+                  tween: Tween(begin: 0.0, end: 1.0),
+                  duration: const Duration(milliseconds: 700),
+                  curve: Curves.easeOutCubic,
+                  builder: (context, value, child) {
+                    return Opacity(
+                      opacity: value,
+                      child: Transform.translate(
+                        offset: Offset(0, 24 * (1 - value)),
+                        child: child,
                       ),
-                      textAlign: TextAlign.center,
-                    ),
-                    SizedBox(height: CustomTheme.spacingXS),
-                    Text(
-                      'Create an account to start ordering',
-                      style: CustomTextStyle.bodyMedium,
-                      textAlign: TextAlign.center,
-                    ),
-                    SizedBox(height: CustomTheme.spacingXL * 1.5),
+                    );
+                  },
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      const SizedBox(height: 12),
 
-                    // Registration Form Card
-                    Container(
-                      padding: EdgeInsets.all(CustomTheme.spacingXXL),
-                      decoration: BoxDecoration(
-                        color: CustomTheme.surfaceColor,
-                        borderRadius: BorderRadius.circular(
-                          CustomTheme.radiusXL,
+                      // ── Back button ──
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: GestureDetector(
+                          onTap: () => Navigator.maybePop(context),
+                          child: Container(
+                            width: 40,
+                            height: 40,
+                            decoration: BoxDecoration(
+                              color: CustomTheme.surfaceColor,
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(
+                              Icons.arrow_back_ios_new_rounded,
+                              size: 16,
+                              color: CustomTheme.textPrimary,
+                            ),
+                          ),
                         ),
-                        boxShadow: CustomTheme.boxShadowLight,
                       ),
-                      child: Column(
-                        children: [
-                          CustomTextField(
-                            controller: _nameController,
-                            label: 'Full Name',
-                            hintText: 'John Doe',
-                            prefixIcon: Icons.person_outline_rounded,
-                            fontSize: 15,
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Full name is required';
-                              }
-                              return null;
-                            },
-                          ),
-                          SizedBox(height: CustomTheme.spacingLG),
-                          CustomTextField(
-                            controller: _emailController,
-                            label: 'Email Address',
-                            hintText: 'example@mail.com',
-                            prefixIcon: Icons.email_outlined,
-                            keyboardType: TextInputType.emailAddress,
-                            fontSize: 15,
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Email is required';
-                              }
-                              if (!_isValidEmail(value)) {
-                                return 'Enter a valid email address';
-                              }
-                              return null;
-                            },
-                          ),
-                          SizedBox(height: CustomTheme.spacingLG),
-                          CustomTextField(
-                            controller: _pharmacyNameController,
-                            label: 'Pharmacy Name',
-                            hintText: 'Your pharmacy name',
-                            prefixIcon: Icons.local_pharmacy_outlined,
-                            fontSize: 15,
-                            validator: (value) {
-                              if (value == null || value.trim().isEmpty) {
-                                return 'Pharmacy name is required';
-                              }
-                              return null;
-                            },
-                          ),
-                          SizedBox(height: CustomTheme.spacingLG),
-                          CustomTextField(
-                            controller: _phoneController,
-                            label: 'Phone Number',
-                            hintText: '01XXXXXXXXX',
-                            prefixIcon: Icons.phone_android_rounded,
-                            keyboardType: TextInputType.phone,
-                            fontSize: 15,
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Phone number is required';
-                              }
-                              if (value.length < 11) {
-                                return 'Enter a valid 11-digit number';
-                              }
-                              return null;
-                            },
-                          ),
-                          SizedBox(height: CustomTheme.spacingLG),
-                          CustomTextField(
-                            controller: _passwordController,
-                            label: 'Password',
-                            hintText: '••••••••',
-                            prefixIcon: Icons.lock_outline_rounded,
-                            suffixIcon: IconButton(
-                              icon: Icon(
-                                _isPasswordVisible
-                                    ? Icons.visibility_off_rounded
-                                    : Icons.visibility_rounded,
-                                color: CustomTheme.textTertiary,
-                                size: 20,
-                              ),
-                              onPressed: () {
-                                setState(() {
-                                  _isPasswordVisible = !_isPasswordVisible;
-                                });
-                              },
-                            ),
-                            obscureText: !_isPasswordVisible,
-                            fontSize: 15,
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Password is required';
-                              }
-                              if (value.length < 6) {
-                                return 'Min. 6 characters required';
-                              }
-                              return null;
-                            },
-                          ),
-                          SizedBox(height: CustomTheme.spacingLG),
-                          CustomTextField(
-                            controller: _confirmPasswordController,
-                            label: 'Confirm Password',
-                            hintText: '••••••••',
-                            prefixIcon: Icons.lock_reset_rounded,
-                            suffixIcon: IconButton(
-                              icon: Icon(
-                                _isConfirmPasswordVisible
-                                    ? Icons.visibility_off_rounded
-                                    : Icons.visibility_rounded,
-                                color: CustomTheme.textTertiary,
-                                size: 20,
-                              ),
-                              onPressed: () {
-                                setState(() {
-                                  _isConfirmPasswordVisible =
-                                      !_isConfirmPasswordVisible;
-                                });
-                              },
-                            ),
-                            obscureText: !_isConfirmPasswordVisible,
-                            fontSize: 15,
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Please confirm your password';
-                              }
-                              if (value != _passwordController.text) {
-                                return 'Passwords do not match';
-                              }
-                              return null;
-                            },
-                          ),
-                          SizedBox(height: CustomTheme.spacingLG),
-                          CustomTextField(
-                            controller: _addressController,
-                            label: 'Full Address',
-                            hintText: 'House, road, area',
-                            prefixIcon: Icons.home_outlined,
-                            keyboardType: TextInputType.multiline,
-                            maxLines: 3,
-                            fontSize: 15,
-                            validator: (value) {
-                              if (value == null || value.trim().isEmpty) {
-                                return 'Full address is required';
-                              }
-                              return null;
-                            },
-                          ),
-                          SizedBox(height: CustomTheme.spacingLG),
-                          _buildDropdown(
-                            label: 'Division',
-                            hint: 'Select division',
-                            icon: Icons.map_outlined,
-                            items: _divisions,
-                            value: _divisionId,
-                            isLoading: _loadingDivisions,
-                            onChanged: _onDivisionChanged,
-                            requiredMessage: 'Division is required',
-                          ),
-                          SizedBox(height: CustomTheme.spacingLG),
-                          _buildDropdown(
-                            label: 'District',
-                            hint: 'Select district',
-                            icon: Icons.location_city_outlined,
-                            items: _districts,
-                            value: _districtId,
-                            isLoading: _loadingDistricts,
-                            onChanged: _onDistrictChanged,
-                            requiredMessage: 'District is required',
-                          ),
-                          SizedBox(height: CustomTheme.spacingLG),
-                          _buildDropdown(
-                            label: 'Upazila',
-                            hint: 'Select upazila',
-                            icon: Icons.pin_drop_outlined,
-                            items: _upazilas,
-                            value: _upazilaId,
-                            isLoading: _loadingUpazilas,
-                            onChanged: (id) => setState(() => _upazilaId = id),
-                            requiredMessage: 'Upazila is required',
-                          ),
-                          if (_locationError != null)
-                            GestureDetector(
-                              onTap: _divisions.isEmpty ? _loadDivisions : null,
-                              child: Padding(
-                                padding: EdgeInsets.only(
-                                  top: CustomTheme.spacingSM,
-                                ),
-                                child: Text(
-                                  _locationError!,
-                                  style: CustomTextStyle.bodySmall.copyWith(
-                                    color: CustomTheme.errorColor,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          SizedBox(height: CustomTheme.spacingXXL),
+                      SizedBox(height: CustomTheme.spacingXL),
 
-                          // Error Message
-                          Consumer(
-                            builder: (context, ref, child) {
-                              final authProvider = ref.watch(
-                                authProviderNotifier,
-                              );
-                              if (authProvider.errorMessage != null) {
-                                return Container(
-                                  padding: EdgeInsets.all(
-                                    CustomTheme.spacingMD,
-                                  ),
-                                  margin: EdgeInsets.only(
-                                    bottom: CustomTheme.spacingLG,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: CustomTheme.errorColor.withValues(
-                                      alpha: 0.05,
-                                    ),
-                                    borderRadius: BorderRadius.circular(
-                                      CustomTheme.radiusMD,
-                                    ),
-                                    border: Border.all(
-                                      color: CustomTheme.errorColor.withValues(
-                                        alpha: 0.1,
-                                      ),
-                                    ),
+                      // ── Header ──
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(10),
+                            child: Image.asset(
+                              'assets/images/MediCarePLC.png',
+                              width: 50,
+                              height: 50,
+                              fit: BoxFit.contain,
+                              semanticLabel: 'MediCarePLC logo',
+                            ),
+                          ),
+                          SizedBox(width: CustomTheme.spacingMD),
+                          Text(
+                            'MediCarePLC',
+                            style: CustomTextStyle.heading1.copyWith(
+                              fontSize: 30,
+                              letterSpacing: -0.8,
+                              fontWeight: CustomTheme.fontWeightBold,
+                              color: CustomTheme.primaryColor,
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: CustomTheme.spacingXS),
+                      Text(
+                        'Create an account to start ordering',
+                        style: CustomTextStyle.bodyMedium.copyWith(
+                          fontSize: 15,
+                          fontWeight: CustomTheme.fontWeightBold,
+                          color: CustomTheme.textSecondary,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      SizedBox(height: CustomTheme.spacingXL * 1.5),
+
+                      // ── Registration Form Card ──
+                      Container(
+                        padding: EdgeInsets.all(CustomTheme.spacingXXL),
+                        decoration: BoxDecoration(
+                          color: CustomTheme.surfaceColor,
+                          borderRadius: BorderRadius.circular(
+                            CustomTheme.radiusXL,
+                          ),
+                          border: Border.all(
+                            color: CustomTheme.borderLight,
+                            width: 1,
+                          ),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            // ── Personal ──
+                            _buildSectionLabel(
+                              Icons.person_outline_rounded,
+                              'Personal Info',
+                              const Color(0xFF2563EB),
+                            ),
+                            SizedBox(height: CustomTheme.spacingLG),
+                            CustomTextField(
+                              controller: _nameController,
+                              label: 'Full Name',
+                              hintText: 'John Doe',
+                              prefixIcon: Icons.person_outline_rounded,
+                              fontSize: 18,
+                              labelFontSize: 15,
+                              labelFontWeight: CustomTheme.fontWeightBold,
+                              inputFontWeight: CustomTheme.fontWeightBold,
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Full name is required';
+                                }
+                                return null;
+                              },
+                            ),
+                            SizedBox(height: CustomTheme.spacingLG),
+                            CustomTextField(
+                              controller: _emailController,
+                              label: 'Email Address',
+                              hintText: 'example@mail.com',
+                              prefixIcon: Icons.email_outlined,
+                              keyboardType: TextInputType.emailAddress,
+                              fontSize: 18,
+                              labelFontSize: 15,
+                              labelFontWeight: CustomTheme.fontWeightBold,
+                              inputFontWeight: CustomTheme.fontWeightBold,
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Email is required';
+                                }
+                                if (!_isValidEmail(value)) {
+                                  return 'Enter a valid email address';
+                                }
+                                return null;
+                              },
+                            ),
+                            SizedBox(height: CustomTheme.spacingLG),
+                            CustomTextField(
+                              controller: _phoneController,
+                              label: 'Phone Number',
+                              hintText: '01XXXXXXXXX',
+                              prefixIcon: Icons.phone_android_rounded,
+                              keyboardType: TextInputType.phone,
+                              fontSize: 18,
+                              labelFontSize: 15,
+                              labelFontWeight: CustomTheme.fontWeightBold,
+                              inputFontWeight: CustomTheme.fontWeightBold,
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Phone number is required';
+                                }
+                                if (value.length < 11) {
+                                  return 'Enter a valid 11-digit number';
+                                }
+                                return null;
+                              },
+                            ),
+
+                            SizedBox(height: CustomTheme.spacingXL),
+
+                            // ── Pharmacy ──
+                            _buildSectionLabel(
+                              Icons.local_pharmacy_outlined,
+                              'Pharmacy',
+                              const Color(0xFF16A34A),
+                            ),
+                            SizedBox(height: CustomTheme.spacingLG),
+                            CustomTextField(
+                              controller: _pharmacyNameController,
+                              label: 'Pharmacy Name',
+                              hintText: 'Your pharmacy name',
+                              prefixIcon: Icons.local_pharmacy_outlined,
+                              fontSize: 18,
+                              labelFontSize: 15,
+                              labelFontWeight: CustomTheme.fontWeightBold,
+                              inputFontWeight: CustomTheme.fontWeightBold,
+                              validator: (value) {
+                                if (value == null || value.trim().isEmpty) {
+                                  return 'Pharmacy name is required';
+                                }
+                                return null;
+                              },
+                            ),
+
+                            SizedBox(height: CustomTheme.spacingXL),
+
+                            // ── Security ──
+                            _buildSectionLabel(
+                              Icons.shield_outlined,
+                              'Security',
+                              const Color(0xFF0D9488),
+                            ),
+                            SizedBox(height: CustomTheme.spacingLG),
+                            CustomTextField(
+                              controller: _passwordController,
+                              label: 'Password',
+                              hintText: '••••••••',
+                              prefixIcon: Icons.lock_outline_rounded,
+                              suffixIcon: IconButton(
+                                icon: Icon(
+                                  _isPasswordVisible
+                                      ? Icons.visibility_off_rounded
+                                      : Icons.visibility_rounded,
+                                  color: CustomTheme.textTertiary,
+                                  size: 20,
+                                ),
+                                onPressed: () {
+                                  setState(() {
+                                    _isPasswordVisible = !_isPasswordVisible;
+                                  });
+                                },
+                              ),
+                              obscureText: !_isPasswordVisible,
+                              fontSize: 18,
+                              labelFontSize: 15,
+                              labelFontWeight: CustomTheme.fontWeightBold,
+                              inputFontWeight: CustomTheme.fontWeightBold,
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Password is required';
+                                }
+                                if (value.length < 6) {
+                                  return 'Min. 6 characters required';
+                                }
+                                return null;
+                              },
+                            ),
+                            SizedBox(height: CustomTheme.spacingLG),
+                            CustomTextField(
+                              controller: _confirmPasswordController,
+                              label: 'Confirm Password',
+                              hintText: '••••••••',
+                              prefixIcon: Icons.lock_reset_rounded,
+                              suffixIcon: IconButton(
+                                icon: Icon(
+                                  _isConfirmPasswordVisible
+                                      ? Icons.visibility_off_rounded
+                                      : Icons.visibility_rounded,
+                                  color: CustomTheme.textTertiary,
+                                  size: 20,
+                                ),
+                                onPressed: () {
+                                  setState(() {
+                                    _isConfirmPasswordVisible =
+                                        !_isConfirmPasswordVisible;
+                                  });
+                                },
+                              ),
+                              obscureText: !_isConfirmPasswordVisible,
+                              fontSize: 18,
+                              labelFontSize: 15,
+                              labelFontWeight: CustomTheme.fontWeightBold,
+                              inputFontWeight: CustomTheme.fontWeightBold,
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Please confirm your password';
+                                }
+                                if (value != _passwordController.text) {
+                                  return 'Passwords do not match';
+                                }
+                                return null;
+                              },
+                            ),
+
+                            SizedBox(height: CustomTheme.spacingXL),
+
+                            // ── Location ──
+                            _buildSectionLabel(
+                              Icons.location_on_outlined,
+                              'Delivery Location',
+                              const Color(0xFF7C3AED),
+                            ),
+                            SizedBox(height: CustomTheme.spacingLG),
+                            CustomTextField(
+                              controller: _addressController,
+                              label: 'Full Address',
+                              hintText: 'House, road, area',
+                              prefixIcon: Icons.home_outlined,
+                              keyboardType: TextInputType.multiline,
+                              maxLines: 3,
+                              fontSize: 18,
+                              labelFontSize: 15,
+                              labelFontWeight: CustomTheme.fontWeightBold,
+                              inputFontWeight: CustomTheme.fontWeightBold,
+                              validator: (value) {
+                                if (value == null || value.trim().isEmpty) {
+                                  return 'Full address is required';
+                                }
+                                return null;
+                              },
+                            ),
+                            SizedBox(height: CustomTheme.spacingLG),
+                            _buildDropdown(
+                              label: 'Division',
+                              hint: 'Select division',
+                              icon: Icons.map_outlined,
+                              items: _divisions,
+                              value: _divisionId,
+                              isLoading: _loadingDivisions,
+                              onChanged: _onDivisionChanged,
+                              requiredMessage: 'Division is required',
+                            ),
+                            SizedBox(height: CustomTheme.spacingLG),
+                            _buildDropdown(
+                              label: 'District',
+                              hint: 'Select district',
+                              icon: Icons.location_city_outlined,
+                              items: _districts,
+                              value: _districtId,
+                              isLoading: _loadingDistricts,
+                              onChanged: _onDistrictChanged,
+                              requiredMessage: 'District is required',
+                            ),
+                            SizedBox(height: CustomTheme.spacingLG),
+                            _buildDropdown(
+                              label: 'Upazila',
+                              hint: 'Select upazila',
+                              icon: Icons.pin_drop_outlined,
+                              items: _upazilas,
+                              value: _upazilaId,
+                              isLoading: _loadingUpazilas,
+                              onChanged: (id) =>
+                                  setState(() => _upazilaId = id),
+                              requiredMessage: 'Upazila is required',
+                            ),
+                            if (_locationError != null)
+                              GestureDetector(
+                                onTap: _divisions.isEmpty
+                                    ? _loadDivisions
+                                    : null,
+                                child: Padding(
+                                  padding: EdgeInsets.only(
+                                    top: CustomTheme.spacingSM,
                                   ),
                                   child: Row(
                                     children: [
                                       Icon(
-                                        Icons.error_outline,
+                                        Icons.info_outline_rounded,
+                                        size: 14,
                                         color: CustomTheme.errorColor,
-                                        size: 18,
                                       ),
-                                      SizedBox(width: CustomTheme.spacingSM),
+                                      const SizedBox(width: 6),
                                       Expanded(
                                         child: Text(
-                                          authProvider.errorMessage!,
+                                          _locationError!,
                                           style: CustomTextStyle.bodySmall
                                               .copyWith(
                                                 color: CustomTheme.errorColor,
@@ -507,58 +669,168 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                                       ),
                                     ],
                                   ),
-                                );
-                              }
-                              return const SizedBox.shrink();
-                            },
-                          ),
+                                ),
+                              ),
+                            SizedBox(height: CustomTheme.spacingXXL),
 
-                          // Register Button
-                          Consumer(
-                            builder: (context, ref, child) {
-                              final authProvider = ref.watch(
-                                authProviderNotifier,
-                              );
-                              return CustomButton(
-                                text: 'Create Account',
-                                isLoading: authProvider.isLoading,
-                                onPressed: _handleRegister,
-                              );
-                            },
+                            // Error Message
+                            Consumer(
+                              builder: (context, ref, child) {
+                                final authProvider = ref.watch(
+                                  authProviderNotifier,
+                                );
+                                if (authProvider.errorMessage != null) {
+                                  return Container(
+                                    padding: EdgeInsets.all(
+                                      CustomTheme.spacingMD,
+                                    ),
+                                    margin: EdgeInsets.only(
+                                      bottom: CustomTheme.spacingLG,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: CustomTheme.errorColor.withValues(
+                                        alpha: 0.07,
+                                      ),
+                                      borderRadius: BorderRadius.circular(
+                                        CustomTheme.radiusMD,
+                                      ),
+                                      border: Border.all(
+                                        color: CustomTheme.errorColor
+                                            .withValues(alpha: 0.18),
+                                      ),
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        Container(
+                                          width: 28,
+                                          height: 28,
+                                          decoration: BoxDecoration(
+                                            color: CustomTheme.errorColor
+                                                .withValues(alpha: 0.12),
+                                            shape: BoxShape.circle,
+                                          ),
+                                          child: Icon(
+                                            Icons.error_outline_rounded,
+                                            color: CustomTheme.errorColor,
+                                            size: 16,
+                                          ),
+                                        ),
+                                        SizedBox(width: CustomTheme.spacingSM),
+                                        Expanded(
+                                          child: Text(
+                                            authProvider.errorMessage!,
+                                            style: CustomTextStyle.bodySmall
+                                                .copyWith(
+                                                  color: CustomTheme.errorColor,
+                                                ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                }
+                                return const SizedBox.shrink();
+                              },
+                            ),
+
+                            // Register Button
+                            Consumer(
+                              builder: (context, ref, child) {
+                                final authProvider = ref.watch(
+                                  authProviderNotifier,
+                                );
+                                return CustomButton(
+                                  text: 'Create Account',
+                                  isLoading: authProvider.isLoading,
+                                  onPressed: _handleRegister,
+                                  fontSize: 18,
+                                  fontWeight: CustomTheme.fontWeightBold,
+                                );
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      SizedBox(height: CustomTheme.spacingXXL),
+
+                      // ── Divider ──
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Divider(
+                              color: CustomTheme.borderLight,
+                              thickness: 1,
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 14),
+                            child: Text(
+                              'ALREADY A MEMBER?',
+                              style: CustomTextStyle.caption.copyWith(
+                                fontSize: 10.5,
+                                letterSpacing: 1.2,
+                                fontWeight: CustomTheme.fontWeightSemiBold,
+                                color: CustomTheme.textTertiary,
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            child: Divider(
+                              color: CustomTheme.borderLight,
+                              thickness: 1,
+                            ),
                           ),
                         ],
                       ),
-                    ),
+                      SizedBox(height: CustomTheme.spacingLG),
 
-                    SizedBox(height: CustomTheme.spacingXXL),
-
-                    // Login Link
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          "Already have an account? ",
-                          style: CustomTextStyle.bodyMedium,
-                        ),
-                        GestureDetector(
-                          onTap: () {
-                            Navigator.pushReplacementNamed(
-                              context,
-                              AppRoutes.login,
-                            );
-                          },
-                          child: Text(
-                            'Sign In',
-                            style: CustomTextStyle.bodyMedium.copyWith(
-                              color: CustomTheme.primaryColor,
-                              fontWeight: CustomTheme.fontWeightBold,
+                      // ── Login Link ──
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.pushReplacementNamed(
+                            context,
+                            AppRoutes.login,
+                          );
+                        },
+                        child: Container(
+                          height: 52,
+                          decoration: BoxDecoration(
+                            color: CustomTheme.surfaceColor,
+                            borderRadius: BorderRadius.circular(
+                              CustomTheme.radiusMD,
+                            ),
+                            border: Border.all(
+                              color: CustomTheme.primaryColor.withValues(
+                                alpha: 0.35,
+                              ),
+                              width: 1.5,
                             ),
                           ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                'Already have an account? ',
+                                style: CustomTextStyle.bodyMedium.copyWith(
+                                  fontSize: 14,
+                                ),
+                              ),
+                              Text(
+                                'Sign In',
+                                style: CustomTextStyle.bodyMedium.copyWith(
+                                  fontSize: 15,
+                                  color: CustomTheme.primaryColor,
+                                  fontWeight: CustomTheme.fontWeightBold,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                      ],
-                    ),
-                    SizedBox(height: CustomTheme.spacingXXL),
-                  ],
+                      ),
+                      SizedBox(height: CustomTheme.spacingXXL),
+                    ],
+                  ),
                 ),
               ),
             ),

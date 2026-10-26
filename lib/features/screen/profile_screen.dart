@@ -6,13 +6,32 @@ import 'package:medicare_app/core/di/providers.dart';
 import 'package:medicare_app/core/theme/custom_theme.dart';
 import '../../core/routes/app_routes.dart';
 
-class ProfileScreen extends ConsumerWidget {
+class ProfileScreen extends ConsumerStatefulWidget {
   const ProfileScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends ConsumerState<ProfileScreen> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) ref.read(orderProviderNotifier).fetchOrders();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final authProvider = ref.watch(authProviderNotifier);
     final user = authProvider.currentUser;
+    final orders = ref.watch(orderProviderNotifier).orders;
+    final totalOrders = orders.length;
+    final totalProducts = orders
+        .expand((o) => o.items.map((i) => i.productId))
+        .toSet()
+        .length;
 
     return Scaffold(
       backgroundColor: CustomTheme.backgroundColor,
@@ -31,6 +50,8 @@ class ProfileScreen extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _buildProfileCard(user),
+              const SizedBox(height: 15),
+              _buildStatsRow(totalOrders, totalProducts),
               const SizedBox(height: 24),
               _buildSectionLabel('General'),
               const SizedBox(height: 10),
@@ -102,11 +123,8 @@ class ProfileScreen extends ConsumerWidget {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(
-        color: CustomTheme.surfaceColor,
-        borderRadius: BorderRadius.circular(20),
-      ),
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           // Avatar
           Container(
@@ -117,7 +135,7 @@ class ProfileScreen extends ConsumerWidget {
               color: CustomTheme.primaryColor.withValues(alpha: 0.07),
               border: Border.all(
                 color: CustomTheme.primaryColor.withValues(alpha: 0.12),
-                width: 1.5,
+                width: 1,
               ),
             ),
             child: Center(
@@ -125,7 +143,7 @@ class ProfileScreen extends ConsumerWidget {
                 initials,
                 style: TextStyle(
                   fontFamily: CustomTheme.primaryFontFamily,
-                  fontSize: 24,
+                  fontSize: 25,
                   fontWeight: CustomTheme.fontWeightBold,
                   color: CustomTheme.primaryColor,
                   letterSpacing: -0.5,
@@ -136,29 +154,34 @@ class ProfileScreen extends ConsumerWidget {
           const SizedBox(width: 14),
 
           // Info
-          Expanded(
+          Flexible(
             child: Column(
+              mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   user?.name ?? 'Guest User',
-                  style: CustomTextStyle.heading3.copyWith(
-                    fontSize: 16,
-                    letterSpacing: -0.3,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontFamily: CustomTheme.primaryFontFamily,
+                    fontSize: 20,
+                    fontWeight: CustomTheme.fontWeightBold,
+                    color: CustomTheme.primaryColor,
+                    letterSpacing: -0.5,
                   ),
                 ),
-                if (user?.pharmacyName != null &&
-                    (user!.pharmacyName as String).isNotEmpty) ...[
-                  const SizedBox(height: 4),
-                  _buildInfoChip(
-                    Icons.local_pharmacy_outlined,
-                    user.pharmacyName!,
-                  ),
-                ],
                 if (user?.phoneNumber != null &&
                     (user!.phoneNumber as String).isNotEmpty) ...[
-                  const SizedBox(height: 4),
-                  _buildInfoChip(Icons.phone_outlined, user.phoneNumber),
+                  const SizedBox(height: 2),
+                  Text(
+                    'Phone: ${user.phoneNumber}',
+                    style: TextStyle(
+                      fontFamily: CustomTheme.primaryFontFamily,
+                      fontSize: 15,
+                      color: CustomTheme.textPrimary,
+                    ),
+                  ),
                 ],
               ],
             ),
@@ -168,23 +191,51 @@ class ProfileScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildInfoChip(IconData icon, String value) {
+  Widget _buildStatsRow(int orders, int products) {
     return Row(
       children: [
-        Icon(icon, size: 12, color: CustomTheme.textTertiary),
-        const SizedBox(width: 5),
-        Flexible(
-          child: Text(
-            value,
-            style: CustomTextStyle.bodySmall.copyWith(
-              fontSize: 12,
-              color: CustomTheme.textSecondary,
-            ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ),
+        Expanded(child: _buildStatCard('$orders', 'Total Orders')),
+        const SizedBox(width: 15),
+        Expanded(child: _buildStatCard('$products', 'Products Ordered')),
+        const SizedBox(width: 15),
+        Expanded(child: _buildStatCard('1-3 Days', 'Est. Delivery')),
       ],
+    );
+  }
+
+  Widget _buildStatCard(String value, String label) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 6),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        children: [
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(
+              value,
+              style: TextStyle(
+                fontFamily: CustomTheme.primaryFontFamily,
+                fontSize: 20,
+                fontWeight: CustomTheme.fontWeightBold,
+                color: CustomTheme.textPrimary,
+              ),
+            ),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            label,
+            textAlign: TextAlign.center,
+            maxLines: 2,
+            style: CustomTextStyle.bodySmall.copyWith(
+              fontSize: 14,
+              fontWeight: CustomTheme.fontWeightSemiBold,
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -195,7 +246,7 @@ class ProfileScreen extends ConsumerWidget {
         label.toUpperCase(),
         style: TextStyle(
           fontFamily: CustomTheme.primaryFontFamily,
-          fontSize: 11,
+          fontSize: 13,
           fontWeight: CustomTheme.fontWeightBold,
           color: CustomTheme.textTertiary,
           letterSpacing: 1.2,
@@ -260,15 +311,15 @@ class ProfileScreen extends ConsumerWidget {
                     Text(
                       item.title,
                       style: CustomTextStyle.bodyMedium.copyWith(
-                        fontWeight: CustomTheme.fontWeightSemiBold,
+                        fontWeight: CustomTheme.fontWeightBold,
                         color: CustomTheme.textPrimary,
-                        fontSize: 13,
+                        fontSize: 15,
                       ),
                     ),
                     Text(
                       item.subtitle,
                       style: CustomTextStyle.caption.copyWith(
-                        fontSize: 11,
+                        fontSize: 13,
                         color: CustomTheme.textTertiary,
                       ),
                     ),
@@ -336,13 +387,13 @@ class ProfileScreen extends ConsumerWidget {
                         style: CustomTextStyle.bodyMedium.copyWith(
                           fontWeight: CustomTheme.fontWeightSemiBold,
                           color: CustomTheme.errorColor,
-                          fontSize: 13,
+                          fontSize: 15,
                         ),
                       ),
                       Text(
                         'Sign out of your account',
                         style: CustomTextStyle.caption.copyWith(
-                          fontSize: 11,
+                          fontSize: 13,
                           color: CustomTheme.errorColor.withValues(alpha: 0.6),
                         ),
                       ),
