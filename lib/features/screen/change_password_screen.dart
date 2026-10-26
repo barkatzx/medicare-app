@@ -160,30 +160,6 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
               children: [
                 const SizedBox(height: 16),
 
-                // ── Header ──
-                Center(
-                  child: Container(
-                    width: 50,
-                    height: 50,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [
-                          CustomTheme.primaryColor,
-                          CustomTheme.primaryColor.withValues(alpha: 0.75),
-                        ],
-                      ),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: const Icon(
-                      Icons.lock_reset_rounded,
-                      color: Colors.white,
-                      size: 36,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 20),
                 Text(
                   'Update Your Password',
                   textAlign: TextAlign.center,
@@ -330,6 +306,7 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
                             'Use at least 6 characters. Mixing upper and lower case letters, numbers and symbols makes it stronger.',
                             style: CustomTextStyle.bodySmall.copyWith(
                               fontSize: 12,
+                              color: CustomTheme.textPrimary,
                               height: 1.5,
                             ),
                           ),
@@ -347,7 +324,7 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
                   height: 56,
                   child: Container(
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(18),
+                      borderRadius: BorderRadius.circular(12),
                     ),
                     child: ElevatedButton(
                       onPressed: isLoading ? null : _handleSubmit,
@@ -358,7 +335,7 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
                             .withValues(alpha: 0.5),
                         padding: EdgeInsets.zero,
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(18),
+                          borderRadius: BorderRadius.circular(12),
                         ),
                         elevation: 0,
                         surfaceTintColor: Colors.transparent,
