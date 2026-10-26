@@ -55,6 +55,24 @@ class AboutScreen extends StatelessWidget {
                   _buildInfoRow('Version', '2.0.0'),
                   _buildDivider(),
                   _buildInfoRow('Last Update', 'Oct 2026'),
+                  _buildDivider(),
+                  _buildInfoRow(
+                    'Privacy Policy',
+                    'View',
+                    onTap: () => _openLink(
+                      context,
+                      'https://medicareplc.com/privacy-policy.html',
+                    ),
+                  ),
+                  _buildDivider(),
+                  _buildInfoRow(
+                    'Refund & Return Policy',
+                    'View',
+                    onTap: () => _openLink(
+                      context,
+                      'https://medicareplc.com/return-refund-policy.html',
+                    ),
+                  ),
                 ],
               ),
               const SizedBox(height: CustomTheme.spacingXL),
@@ -67,9 +85,32 @@ class AboutScreen extends StatelessWidget {
                     onTap: () => _showQodeaxModal(context),
                   ),
                   _buildDivider(),
-                  _buildInfoRow('Website', 'medicareplc.com'),
+                  _buildInfoRow(
+                    'Website',
+                    'medicareplc.com',
+                    onTap: () => _openLink(context, 'https://medicareplc.com'),
+                  ),
                   _buildDivider(),
-                  _buildInfoRow('Contact', 'support@medicareplc.com'),
+                  _buildInfoRow(
+                    'Contact',
+                    'support@medicareplc.com',
+                    onTap: () =>
+                        _openLink(context, 'mailto:support@medicareplc.com'),
+                  ),
+                ],
+              ),
+              const SizedBox(height: CustomTheme.spacingXL),
+              _buildSection(
+                title: 'SUPPORT',
+                children: [
+                  _buildInfoRow(
+                    'Rate the App',
+                    'Rate',
+                    onTap: () => _openLink(
+                      context,
+                      'https://play.google.com/store/apps/details?id=com.medicareplc.app&pcampaignid=web_share',
+                    ),
+                  ),
                 ],
               ),
               const SizedBox(height: CustomTheme.spacingXL),
@@ -88,36 +129,49 @@ class AboutScreen extends StatelessWidget {
   }
 
   Widget _buildLogoSection() {
-    return Column(
-      children: [
-        Container(
-          width: 100,
-          height: 100,
-          decoration: BoxDecoration(
-            color: CustomTheme.surfaceColor,
-            shape: BoxShape.circle,
-          ),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(50),
-            child: Image.asset(
-              'assets/images/MediCarePLC.png',
-              fit: BoxFit.cover,
+    return Center(
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Container(
+            width: 50,
+            height: 50,
+            decoration: BoxDecoration(
+              color: CustomTheme.surfaceColor,
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(10),
+              child: Image.asset(
+                'assets/images/MediCarePLC.png',
+                fit: BoxFit.cover,
+              ),
             ),
           ),
-        ),
-        const SizedBox(height: CustomTheme.spacingLG),
-        Text(
-          'MediCarePLC',
-          style: CustomTextStyle.heading2.copyWith(
-            fontWeight: CustomTheme.fontWeightBold,
+          const SizedBox(width: CustomTheme.spacingMD),
+          Flexible(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'MediCarePLC',
+                  style: CustomTextStyle.heading2.copyWith(
+                    color: CustomTheme.primaryColor,
+                    fontWeight: CustomTheme.fontWeightBold,
+                    fontSize: 20,
+                  ),
+                ),
+                const SizedBox(height: CustomTheme.spacingXS),
+                Text(
+                  'Your Trusted B2B Sales Partner',
+                  style: CustomTextStyle.bodyMedium,
+                ),
+              ],
+            ),
           ),
-        ),
-        const SizedBox(height: CustomTheme.spacingXS),
-        Text(
-          'Your Trusted B2B Sales Partner',
-          style: CustomTextStyle.bodyMedium,
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -168,6 +222,7 @@ class AboutScreen extends StatelessWidget {
               title,
               style: CustomTextStyle.bodyMedium.copyWith(
                 fontWeight: CustomTheme.fontWeightMedium,
+                fontSize: 15,
               ),
             ),
             Text(
@@ -210,24 +265,28 @@ class AboutScreen extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             _buildSocialIcon(
+              context,
               FontAwesomeIcons.facebookF,
               const Color(0xFF1877F2),
               'https://www.facebook.com/MediCareplc/',
             ),
             const SizedBox(width: CustomTheme.spacingLG),
             _buildSocialIcon(
+              context,
               FontAwesomeIcons.instagram,
               const Color(0xFFE4405F),
               'https://www.instagram.com/MediCareplc/',
             ),
             const SizedBox(width: CustomTheme.spacingLG),
             _buildSocialIcon(
+              context,
               FontAwesomeIcons.linkedinIn,
               const Color(0xFF0A66C2),
               'https://www.linkedin.com/company/medicareplc/',
             ),
             const SizedBox(width: CustomTheme.spacingLG),
             _buildSocialIcon(
+              context,
               FontAwesomeIcons.whatsapp,
               const Color(0xFF25D366),
               'https://whatsapp.com/+8801568393323',
@@ -238,14 +297,14 @@ class AboutScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSocialIcon(dynamic icon, Color color, String url) {
+  Widget _buildSocialIcon(
+    BuildContext context,
+    dynamic icon,
+    Color color,
+    String url,
+  ) {
     return InkWell(
-      onTap: () async {
-        final uri = Uri.parse(url);
-        if (await canLaunchUrl(uri)) {
-          await launchUrl(uri, mode: LaunchMode.externalApplication);
-        }
-      },
+      onTap: () => _openLink(context, url),
       borderRadius: BorderRadius.circular(CustomTheme.radiusRound),
       child: Container(
         width: 44,
@@ -257,6 +316,16 @@ class AboutScreen extends StatelessWidget {
         child: Center(child: FaIcon(icon, color: color, size: 20)),
       ),
     );
+  }
+
+  Future<void> _openLink(BuildContext context, String link) async {
+    final uri = Uri.parse(link);
+    final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
+    if (!launched && context.mounted) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Unable to open this link')));
+    }
   }
 
   void _showQodeaxModal(BuildContext context) {
@@ -297,12 +366,7 @@ class AboutScreen extends StatelessWidget {
               ),
               const SizedBox(height: CustomTheme.spacingLG),
               InkWell(
-                onTap: () async {
-                  final url = Uri.parse('https://www.qodeax.com/');
-                  if (await canLaunchUrl(url)) {
-                    await launchUrl(url);
-                  }
-                },
+                onTap: () => _openLink(context, 'https://www.qodeax.com/'),
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Row(
