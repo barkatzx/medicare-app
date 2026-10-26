@@ -20,7 +20,7 @@ class ProductCard extends StatelessWidget {
         margin: EdgeInsets.only(bottom: CustomTheme.spacingSM),
         decoration: BoxDecoration(
           color: CustomTheme.surfaceColor,
-          borderRadius: BorderRadius.circular(CustomTheme.radiusMD),
+          borderRadius: BorderRadius.circular(CustomTheme.radiusSM),
         ),
         child: Padding(
           padding: const EdgeInsets.all(8),
@@ -31,8 +31,9 @@ class ProductCard extends StatelessWidget {
                 width: 60,
                 height: 60,
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(CustomTheme.radiusMD),
+                  borderRadius: BorderRadius.circular(CustomTheme.radiusSM),
                   color: CustomTheme.backgroundColor,
+                  border: Border.all(color: CustomTheme.borderLight, width: 1),
                 ),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(CustomTheme.radiusMD),
@@ -66,16 +67,17 @@ class ProductCard extends StatelessWidget {
                         color: CustomTheme.textSecondary.withValues(alpha: 0.5),
                         fontWeight: CustomTheme.fontWeightBold,
                         letterSpacing: 0.5,
-                        fontSize: 12,
+                        fontSize: 13,
                       ),
                     ),
                     const SizedBox(height: 5),
                     Text(
                       product.name,
                       style: CustomTextStyle.bodyMedium.copyWith(
+                        fontSize: 15,
                         fontWeight: CustomTheme.fontWeightSemiBold,
                         color: CustomTheme.textPrimary,
-                        height: 1.2,
+                        height: 1,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -113,7 +115,7 @@ class ProductCard extends StatelessWidget {
       spacing: 5,
       children: [
         Text(
-          '৳${product.finalPrice.toStringAsFixed(0)}',
+          '${product.finalPrice.toStringAsFixed(0)}৳',
           style: CustomTextStyle.heading4.copyWith(
             color: CustomTheme.textSecondary,
             fontWeight: CustomTheme.fontWeightBold,
@@ -121,7 +123,7 @@ class ProductCard extends StatelessWidget {
         ),
         if (hasDiscount) ...[
           Text(
-            '৳${product.price.toStringAsFixed(0)}',
+            '${product.price.toStringAsFixed(0)}৳',
             style: CustomTextStyle.heading4.copyWith(
               decoration: TextDecoration.lineThrough,
               color: CustomTheme.textTertiary,
@@ -130,13 +132,13 @@ class ProductCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
             decoration: BoxDecoration(
-              color: CustomTheme.errorColor.withValues(alpha: 0.1),
+              color: CustomTheme.primaryColor.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Text(
               '${product.discountPercent}% OFF',
               style: TextStyle(
-                color: CustomTheme.errorColor,
+                color: CustomTheme.primaryColor,
                 fontSize: 12,
                 fontWeight: CustomTheme.fontWeightBold,
               ),
@@ -155,7 +157,7 @@ class ProductCard extends StatelessWidget {
               'Stock Out',
               style: TextStyle(
                 color: CustomTheme.errorColor,
-                fontSize: 15,
+                fontSize: 12,
                 fontWeight: CustomTheme.fontWeightBold,
               ),
             ),
@@ -201,6 +203,12 @@ class _AddToCartButtonState extends ConsumerState<_AddToCartButton> {
                 ),
                 backgroundColor: CustomTheme.errorColor,
                 behavior: SnackBarBehavior.floating,
+                margin: EdgeInsets.fromLTRB(
+                  16,
+                  0,
+                  16,
+                  MediaQuery.of(context).padding.bottom + 80,
+                ),
                 duration: const Duration(milliseconds: 1500),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(CustomTheme.radiusMD),
@@ -222,6 +230,12 @@ class _AddToCartButtonState extends ConsumerState<_AddToCartButton> {
                 ),
                 backgroundColor: CustomTheme.errorColor,
                 behavior: SnackBarBehavior.floating,
+                margin: EdgeInsets.fromLTRB(
+                  16,
+                  0,
+                  16,
+                  MediaQuery.of(context).padding.bottom + 80,
+                ),
                 duration: const Duration(milliseconds: 1500),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(CustomTheme.radiusMD),
@@ -249,6 +263,12 @@ class _AddToCartButtonState extends ConsumerState<_AddToCartButton> {
                     ? CustomTheme.successColor
                     : CustomTheme.errorColor,
                 behavior: SnackBarBehavior.floating,
+                margin: EdgeInsets.fromLTRB(
+                  16,
+                  0,
+                  16,
+                  MediaQuery.of(context).padding.bottom + 80,
+                ),
                 duration: const Duration(milliseconds: 800),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(CustomTheme.radiusMD),
@@ -260,24 +280,24 @@ class _AddToCartButtonState extends ConsumerState<_AddToCartButton> {
       },
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 100),
-        width: 40,
-        height: 40,
+        width: 35,
+        height: 35,
         decoration: BoxDecoration(
           color: _isPressed
-              ? CustomTheme.textSecondary.withValues(alpha: 0.2)
-              : CustomTheme.backgroundColor,
+              ? CustomTheme.secondaryColor
+              : CustomTheme.secondaryColor,
           borderRadius: BorderRadius.circular(CustomTheme.radiusSM),
-          border: Border.all(
-            color: _isPressed ? CustomTheme.textSecondary : Colors.transparent,
-            width: 1,
-          ),
+          // border: Border.all(
+          //   color: _isPressed
+          //       ? CustomTheme.textSecondary
+          //       : CustomTheme.borderLight,
+          //   width: 1,
+          // ),
         ),
         child: Icon(
           widget.product.stock <= 0 ? Icons.close : Icons.add,
           size: 20,
-          color: widget.product.stock <= 0
-              ? CustomTheme.textTertiary
-              : CustomTheme.textSecondary,
+          color: CustomTheme.textPrimary,
         ),
       ),
     );
