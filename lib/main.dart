@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:medicare_app/core/theme/custom_theme.dart';
@@ -21,9 +20,6 @@ void main() async {
     debugPrint('Platform Error: $error');
     return true;
   };
-
-  // Handle network issues on Wi-Fi/Broadband
-  HttpOverrides.global = MyHttpOverrides();
 
   final prefs = await SharedPreferences.getInstance();
   final container = ProviderContainer(
@@ -144,5 +140,3 @@ class MyApp extends ConsumerWidget {
     );
   }
 }
-
-class MyHttpOverrides extends HttpOverrides {}
