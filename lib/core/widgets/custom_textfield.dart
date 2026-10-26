@@ -100,13 +100,21 @@ class _CustomTextFieldState extends State<CustomTextField> {
             ),
           ),
           child: Row(
+            crossAxisAlignment: widget.maxLines > 1
+                ? CrossAxisAlignment.start
+                : CrossAxisAlignment.center,
             children: [
               if (widget.prefixIcon != null) ...[
-                SizedBox(width: CustomTheme.spacingMD),
-                Icon(
-                  widget.prefixIcon,
-                  size: 20,
-                  color: CustomTheme.textTertiary,
+                Padding(
+                  padding: EdgeInsets.only(
+                    left: CustomTheme.spacingMD,
+                    top: widget.maxLines > 1 ? CustomTheme.spacingMD : 0,
+                  ),
+                  child: Icon(
+                    widget.prefixIcon,
+                    size: 20,
+                    color: CustomTheme.textTertiary,
+                  ),
                 ),
               ],
               Expanded(
@@ -129,8 +137,8 @@ class _CustomTextFieldState extends State<CustomTextField> {
                     ),
                     border: InputBorder.none,
                     contentPadding: EdgeInsets.symmetric(
-                      horizontal: CustomTheme.spacingXL,
-                      vertical: CustomTheme.spacingXL,
+                      horizontal: CustomTheme.spacingMD,
+                      vertical: CustomTheme.spacingMD,
                     ),
                     isDense: true,
                     errorText: null, // No error inside the field
