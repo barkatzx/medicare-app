@@ -171,13 +171,6 @@ class _CartScreenState extends ConsumerState<CartScreen> {
               decoration: BoxDecoration(
                 color: CustomTheme.surfaceColor,
                 shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.06),
-                    blurRadius: 24,
-                    offset: const Offset(0, 8),
-                  ),
-                ],
               ),
               child: const Icon(
                 Icons.shopping_bag_outlined,
@@ -217,13 +210,6 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                 decoration: BoxDecoration(
                   color: CustomTheme.primaryColor,
                   borderRadius: BorderRadius.circular(14),
-                  boxShadow: [
-                    BoxShadow(
-                      color: CustomTheme.primaryColor.withValues(alpha: 0.3),
-                      blurRadius: 16,
-                      offset: const Offset(0, 6),
-                    ),
-                  ],
                 ),
                 child: Text(
                   'Explore Products',
@@ -261,10 +247,14 @@ class _CartScreenState extends ConsumerState<CartScreen> {
             Stack(
               children: [
                 Container(
-                  width: 75,
-                  height: 75,
+                  width: 70,
+                  height: 70,
                   decoration: BoxDecoration(
                     color: CustomTheme.backgroundColor,
+                    border: Border.all(
+                      color: CustomTheme.borderLight,
+                      width: 1,
+                    ),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: ClipRRect(
@@ -414,7 +404,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                     ],
                   ),
                   // Quantity selector
-                  const SizedBox(height: 5),
+                  const SizedBox(height: 4),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -427,13 +417,6 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                             color: CustomTheme.borderLight,
                             width: 1,
                           ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.04),
-                              blurRadius: 8,
-                              offset: const Offset(0, 2),
-                            ),
-                          ],
                         ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
@@ -452,7 +435,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                               filled: false,
                             ),
                             SizedBox(
-                              width: 30,
+                              width: 35,
                               child: Text(
                                 '${item.quantity}',
                                 textAlign: TextAlign.center,
@@ -548,13 +531,6 @@ class _CartScreenState extends ConsumerState<CartScreen> {
       decoration: BoxDecoration(
         color: CustomTheme.surfaceColor,
         borderRadius: BorderRadius.circular(24),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.07),
-            blurRadius: 20,
-            offset: const Offset(0, -4),
-          ),
-        ],
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
