@@ -53,6 +53,7 @@ class _AddressesScreenState extends ConsumerState<AddressesScreen> {
       backgroundColor: CustomTheme.backgroundColor,
       scrolledUnderElevation: 0,
       systemOverlayStyle: SystemUiOverlayStyle.dark,
+      centerTitle: true,
       leading: Padding(
         padding: const EdgeInsets.only(left: 16),
         child: Center(
@@ -89,12 +90,9 @@ class _AddressesScreenState extends ConsumerState<AddressesScreen> {
         16,
         MediaQuery.of(context).padding.bottom + 16,
       ),
-      decoration: const BoxDecoration(
-        color: CustomTheme.surfaceColor,
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(24),
-          topRight: Radius.circular(24),
-        ),
+      decoration: BoxDecoration(
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(24),
       ),
       child: SizedBox(
         width: double.infinity,
@@ -146,7 +144,7 @@ class _AddressesScreenState extends ConsumerState<AddressesScreen> {
               child: const Icon(
                 Icons.location_off_outlined,
                 size: 40,
-                color: CustomTheme.textTertiary,
+                color: Color(0xFF3B82F6),
               ),
             ),
             const SizedBox(height: 20),
@@ -208,10 +206,10 @@ class _AddressesScreenState extends ConsumerState<AddressesScreen> {
           width: 38,
           height: 38,
           decoration: BoxDecoration(
-            color: CustomTheme.primaryColor.withValues(alpha: 0.08),
+            color: _addressIconColor(icon).withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(11),
           ),
-          child: Icon(icon, size: 18, color: CustomTheme.primaryColor),
+          child: Icon(icon, size: 18, color: _addressIconColor(icon)),
         ),
         const SizedBox(width: 12),
         Expanded(
@@ -221,7 +219,7 @@ class _AddressesScreenState extends ConsumerState<AddressesScreen> {
               Text(
                 label,
                 style: CustomTextStyle.caption.copyWith(
-                  fontSize: 11,
+                  fontSize: 13,
                   letterSpacing: 0.3,
                   color: CustomTheme.textTertiary,
                   fontWeight: CustomTheme.fontWeightSemiBold,
@@ -232,8 +230,8 @@ class _AddressesScreenState extends ConsumerState<AddressesScreen> {
                 value,
                 style: CustomTextStyle.bodyMedium.copyWith(
                   color: CustomTheme.textPrimary,
-                  fontWeight: CustomTheme.fontWeightMedium,
-                  fontSize: 14,
+                  fontWeight: CustomTheme.fontWeightBold,
+                  fontSize: 15,
                 ),
               ),
             ],
@@ -241,6 +239,14 @@ class _AddressesScreenState extends ConsumerState<AddressesScreen> {
         ),
       ],
     );
+  }
+
+  Color _addressIconColor(IconData icon) {
+    if (icon == Icons.home_outlined) return const Color(0xFF3B82F6);
+    if (icon == Icons.map_outlined) return const Color(0xFF10B981);
+    if (icon == Icons.location_city_outlined) return const Color(0xFF8B5CF6);
+    if (icon == Icons.pin_drop_outlined) return const Color(0xFFF59E0B);
+    return CustomTheme.primaryColor;
   }
 
   void _showAddressForm(UserEntity user) {
@@ -392,14 +398,14 @@ class _AddressFormSheetState extends ConsumerState<AddressFormSheet> {
                     width: 38,
                     height: 38,
                     decoration: BoxDecoration(
-                      color: CustomTheme.primaryColor.withValues(alpha: 0.08),
+                      color: const Color(0xFF3B82F6).withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(11),
                     ),
                     child: Icon(
                       isEditing
                           ? Icons.edit_location_alt_outlined
                           : Icons.add_location_alt_outlined,
-                      color: CustomTheme.primaryColor,
+                      color: const Color(0xFF3B82F6),
                       size: 20,
                     ),
                   ),
@@ -515,7 +521,7 @@ class _AddressFormSheetState extends ConsumerState<AddressFormSheet> {
       hintText: hint,
       prefixIcon: Padding(
         padding: const EdgeInsets.only(left: 14, right: 10),
-        child: Icon(icon, size: 17, color: CustomTheme.textTertiary),
+        child: Icon(icon, size: 17),
       ),
       prefixIconConstraints: const BoxConstraints(minWidth: 44, minHeight: 44),
       filled: true,
@@ -559,7 +565,9 @@ class _AddressFormSheetState extends ConsumerState<AddressFormSheet> {
         _label('Full Address'),
         TextFormField(
           controller: _addressController,
+          minLines: 1,
           maxLines: 3,
+          textAlignVertical: TextAlignVertical.center,
           style: _valueStyle,
           decoration: _decoration('House, road, area', Icons.home_outlined),
           validator: (v) =>

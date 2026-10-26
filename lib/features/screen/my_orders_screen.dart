@@ -32,119 +32,168 @@ class _MyOrdersScreenState extends ConsumerState<MyOrdersScreen> {
 
     return Scaffold(
       backgroundColor: CustomTheme.backgroundColor,
-      appBar: AppBar(
-        title: Text('My Orders', style: CustomTextStyle.heading3),
-        centerTitle: true,
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        scrolledUnderElevation: 0,
-        systemOverlayStyle: SystemUiOverlayStyle.dark,
-        leading: Padding(
-          padding: const EdgeInsets.only(left: 12.0),
-          child: Center(
-            child: GestureDetector(
-              onTap: () => Navigator.pop(context),
-              child: Container(
-                width: 36,
-                height: 36,
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  Icons.arrow_back_ios_new_rounded,
-                  color: CustomTheme.textPrimary,
-                  size: 16,
-                ),
+      appBar: _buildAppBar(),
+      body: _buildBody(isLoading, orders),
+    );
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  // AppBar
+  // ─────────────────────────────────────────────────────────────
+  PreferredSizeWidget _buildAppBar() {
+    return AppBar(
+      toolbarHeight: 52,
+      title: Text(
+        'My Orders',
+        style: TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.w700,
+          color: CustomTheme.textPrimary,
+        ),
+      ),
+      centerTitle: true,
+      backgroundColor: CustomTheme.backgroundColor,
+      leading: Padding(
+        padding: const EdgeInsets.only(left: 10.0),
+        child: Center(
+          child: GestureDetector(
+            onTap: () => Navigator.pop(context),
+            child: Container(
+              width: 32,
+              height: 32,
+              decoration: BoxDecoration(
+                color: CustomTheme.surfaceColor,
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.arrow_back_ios_new_rounded,
+                color: CustomTheme.textPrimary,
+                size: 14,
               ),
             ),
           ),
         ),
       ),
-      body: _buildBody(isLoading, orders),
     );
   }
 
+  // ─────────────────────────────────────────────────────────────
+  // Body router
+  // ─────────────────────────────────────────────────────────────
   Widget _buildBody(bool isLoading, List<OrderEntity> orders) {
     if (isLoading && orders.isEmpty) {
       return const LoadingWidget();
     }
 
     if (orders.isEmpty) {
-      return Center(
-        child: Padding(
-          padding: const EdgeInsets.all(40),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(32),
-                decoration: BoxDecoration(
-                  color: CustomTheme.primaryColor.withValues(alpha: 0.05),
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  Icons.shopping_bag_outlined,
-                  size: 64,
-                  color: CustomTheme.primaryColor.withValues(alpha: 0.3),
-                ),
-              ),
-              const SizedBox(height: 32),
-              Text('No Orders Yet', style: CustomTextStyle.heading2),
-              const SizedBox(height: 12),
-              Text(
-                'Looks like you haven\'t placed any orders yet. Start your healthcare journey today!',
-                textAlign: TextAlign.center,
-                style: CustomTextStyle.bodyMedium.copyWith(
-                  color: CustomTheme.textSecondary,
-                ),
-              ),
-              const SizedBox(height: 40),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () =>
-                      Navigator.pushReplacementNamed(context, AppRoutes.home),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: CustomTheme.primaryColor,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(
-                        CustomTheme.radiusRound,
-                      ),
-                    ),
-                    elevation: 0,
-                  ),
-                  child: Text('Start Shopping', style: CustomTextStyle.button),
-                ),
-              ),
-            ],
-          ),
-        ),
-      );
+      return _buildEmptyState();
     }
 
     return RefreshIndicator(
       onRefresh: () => ref.read(orderProviderNotifier).fetchOrders(),
       color: CustomTheme.primaryColor,
       child: ListView.builder(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        padding: const EdgeInsets.fromLTRB(12, 10, 12, 16),
         itemCount: orders.length,
         itemBuilder: (context, index) => _buildOrderCard(orders[index]),
       ),
     );
   }
 
+  // ─────────────────────────────────────────────────────────────
+  // Empty state
+  // ─────────────────────────────────────────────────────────────
+  Widget _buildEmptyState() {
+    return Center(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(22),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    CustomTheme.primaryColor.withValues(alpha: 0.12),
+                    CustomTheme.primaryColor.withValues(alpha: 0.04),
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.shopping_bag_outlined,
+                size: 44,
+                color: CustomTheme.primaryColor,
+              ),
+            ),
+            const SizedBox(height: 20),
+            Text(
+              'No Orders Yet',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
+                color: CustomTheme.textPrimary,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Looks like you haven\'t placed any orders yet.\nStart your healthcare journey today!',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 13,
+                color: CustomTheme.textTertiary,
+                height: 1.45,
+              ),
+            ),
+            const SizedBox(height: 24),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () =>
+                    Navigator.pushReplacementNamed(context, AppRoutes.home),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: CustomTheme.primaryColor,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  elevation: 0,
+                  textStyle: TextStyle(
+                    fontSize: 13.5,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                child: const Text('Start Shopping'),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  // Order card (compact)
+  // ─────────────────────────────────────────────────────────────
   Widget _buildOrderCard(OrderEntity order) {
-    final formattedDate = DateFormat('MMM dd, yyyy').format(order.createdAt);
+    final formattedDate = DateFormat(
+      'MMM dd, yyyy • hh:mm a',
+    ).format(order.createdAt);
     final statusColor = _getStatusColor(order.status);
+    final statusIcon = _getStatusIcon(order.status);
+    final shortId = order.id.length >= 8
+        ? order.id.substring(0, 8).toUpperCase()
+        : order.id.toUpperCase();
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 6),
+      margin: const EdgeInsets.only(bottom: 8),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(CustomTheme.radiusMD),
+        color: CustomTheme.surfaceColor,
+        borderRadius: BorderRadius.circular(10),
       ),
       child: Material(
         color: Colors.transparent,
@@ -154,59 +203,132 @@ class _MyOrdersScreenState extends ConsumerState<MyOrdersScreen> {
             AppRoutes.orderDetail,
             arguments: order.id,
           ),
-          borderRadius: BorderRadius.circular(CustomTheme.radiusMD),
+          borderRadius: BorderRadius.circular(12),
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            padding: const EdgeInsets.all(10),
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      '#${order.id.substring(0, 8).toUpperCase()}',
-                      style: CustomTextStyle.bodyMedium.copyWith(
-                        fontWeight: CustomTheme.fontWeightBold,
-                        color: CustomTheme.textPrimary,
-                      ),
-                    ),
-                    _buildStatusChip(order.status, statusColor),
-                  ],
-                ),
-                const SizedBox(height: 12),
+                // ── Header: ID + Status ─────────────────────
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Row(
                       children: [
-                        Text(
-                          formattedDate,
-                          style: CustomTextStyle.bodySmall.copyWith(
-                            color: CustomTheme.textSecondary,
-                          ),
-                        ),
                         Container(
-                          margin: const EdgeInsets.symmetric(horizontal: 8),
-                          width: 3,
-                          height: 3,
-                          decoration: const BoxDecoration(
-                            color: CustomTheme.textTertiary,
-                            shape: BoxShape.circle,
+                          padding: const EdgeInsets.all(5),
+                          decoration: BoxDecoration(
+                            color: CustomTheme.primaryColor.withValues(
+                              alpha: 0.08,
+                            ),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Icon(
+                            Icons.receipt_long_rounded,
+                            size: 13,
+                            color: CustomTheme.primaryColor,
                           ),
                         ),
-                        Text(
-                          '${order.items.length} ${order.items.length == 1 ? 'Item' : 'Items'}',
-                          style: CustomTextStyle.bodySmall.copyWith(
-                            color: CustomTheme.textSecondary,
-                          ),
+                        const SizedBox(width: 8),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              '#$shortId',
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: CustomTheme.fontWeightBold,
+                                color: CustomTheme.textPrimary,
+                                letterSpacing: 0.3,
+                                height: 1.1,
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
-                    Text(
-                      '৳${order.totalAmount.toStringAsFixed(0)}',
-                      style: CustomTextStyle.bodyLarge.copyWith(
-                        color: CustomTheme.primaryColor,
-                        fontWeight: CustomTheme.fontWeightBold,
+                    _buildStatusChip(order.status, statusColor, statusIcon),
+                  ],
+                ),
+
+                const SizedBox(height: 8),
+
+                // ── Divider ─────────────────────────────────
+                Container(
+                  height: 1,
+                  color: CustomTheme.borderLight.withValues(alpha: 0.5),
+                ),
+
+                const SizedBox(height: 8),
+
+                // ── Footer: Date + Items + Total ────────────
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.calendar_today_rounded,
+                                size: 12,
+                                color: CustomTheme.textTertiary,
+                              ),
+                              const SizedBox(width: 4),
+                              Flexible(
+                                child: Text(
+                                  formattedDate,
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: CustomTheme.textSecondary,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 3),
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.inventory_2_outlined,
+                                size: 12,
+                                color: CustomTheme.textTertiary,
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                '${order.items.length} ${order.items.length == 1 ? 'Item' : 'Items'}',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: CustomTheme.textSecondary,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
+                    ),
+                    const SizedBox(width: 8),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          '৳${order.totalAmount.toStringAsFixed(0)}',
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w800,
+                            color: CustomTheme.primaryColor,
+                            letterSpacing: -0.3,
+                            height: 1.1,
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -218,30 +340,29 @@ class _MyOrdersScreenState extends ConsumerState<MyOrdersScreen> {
     );
   }
 
-  Widget _buildStatusChip(String status, Color color) {
+  // ─────────────────────────────────────────────────────────────
+  // Status chip (compact)
+  // ─────────────────────────────────────────────────────────────
+  Widget _buildStatusChip(String status, Color color, IconData icon) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(CustomTheme.radiusRound),
-        border: Border.all(color: color.withValues(alpha: 0.1), width: 1),
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: color.withValues(alpha: 0.2), width: 1),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Container(
-            width: 5,
-            height: 5,
-            decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-          ),
-          const SizedBox(width: 6),
+          Icon(icon, size: 10, color: color),
+          const SizedBox(width: 4),
           Text(
             status.toUpperCase(),
-            style: CustomTextStyle.caption.copyWith(
+            style: TextStyle(
               color: color,
-              fontWeight: CustomTheme.fontWeightBold,
-              fontSize: 9,
-              letterSpacing: 0.3,
+              fontWeight: FontWeight.w700,
+              fontSize: 8.5,
+              letterSpacing: 0.4,
             ),
           ),
         ],
@@ -249,6 +370,9 @@ class _MyOrdersScreenState extends ConsumerState<MyOrdersScreen> {
     );
   }
 
+  // ─────────────────────────────────────────────────────────────
+  // Status helpers
+  // ─────────────────────────────────────────────────────────────
   Color _getStatusColor(String status) {
     switch (status.toLowerCase()) {
       case 'pending':
@@ -263,6 +387,23 @@ class _MyOrdersScreenState extends ConsumerState<MyOrdersScreen> {
         return CustomTheme.errorColor;
       default:
         return CustomTheme.textTertiary;
+    }
+  }
+
+  IconData _getStatusIcon(String status) {
+    switch (status.toLowerCase()) {
+      case 'pending':
+        return Icons.schedule_rounded;
+      case 'processing':
+        return Icons.autorenew_rounded;
+      case 'shipped':
+        return Icons.local_shipping_outlined;
+      case 'delivered':
+        return Icons.check_circle_outline_rounded;
+      case 'cancelled':
+        return Icons.cancel_outlined;
+      default:
+        return Icons.help_outline_rounded;
     }
   }
 }
