@@ -12,6 +12,9 @@ class CustomTextField extends StatefulWidget {
   final String? Function(String?)? validator;
   final bool enabled;
   final double? fontSize;
+  final double? labelFontSize;
+  final FontWeight? labelFontWeight;
+  final FontWeight? inputFontWeight;
   final int maxLines;
 
   const CustomTextField({
@@ -26,6 +29,9 @@ class CustomTextField extends StatefulWidget {
     this.validator,
     this.enabled = true,
     this.fontSize,
+    this.labelFontSize,
+    this.labelFontWeight,
+    this.inputFontWeight,
     this.maxLines = 1,
   });
 
@@ -75,8 +81,9 @@ class _CustomTextFieldState extends State<CustomTextField> {
         Text(
           widget.label,
           style: TextStyle(
-            fontSize: CustomTheme.fontSizeSM,
-            fontWeight: CustomTheme.fontWeightMedium,
+            fontSize: widget.labelFontSize ?? CustomTheme.fontSizeSM,
+            fontWeight:
+                widget.labelFontWeight ?? CustomTheme.fontWeightMedium,
             color: CustomTheme.textSecondary,
           ),
         ),
@@ -111,6 +118,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
                   maxLines: widget.maxLines,
                   style: TextStyle(
                     fontSize: widget.fontSize ?? CustomTheme.fontSizeMD,
+                    fontWeight: widget.inputFontWeight,
                     color: CustomTheme.textSecondary,
                   ),
                   decoration: InputDecoration(

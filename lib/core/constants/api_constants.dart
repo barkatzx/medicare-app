@@ -1,13 +1,9 @@
-import 'dart:io';
-
 class ApiConstants {
   ApiConstants._();
 
-  // Android emulators reach the host machine through 10.0.2.2. A physical
-  // device needs the backend's LAN/public URL supplied with API_BASE_URL.
   static final String baseUrl = _configuredBaseUrl.isNotEmpty
       ? _configuredBaseUrl
-      : 'http://${Platform.isAndroid ? '10.0.2.2' : 'localhost'}:3000/v1';
+      : 'https://medicare-server-9je0.onrender.com/v1';
 
   static const String _configuredBaseUrl = String.fromEnvironment(
     'API_BASE_URL',

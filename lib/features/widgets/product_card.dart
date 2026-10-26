@@ -63,7 +63,7 @@ class ProductCard extends StatelessWidget {
                     Text(
                       product.categoryName,
                       style: CustomTextStyle.caption.copyWith(
-                        color: CustomTheme.primaryColor.withValues(alpha: 0.5),
+                        color: CustomTheme.textSecondary.withValues(alpha: 0.5),
                         fontWeight: CustomTheme.fontWeightBold,
                         letterSpacing: 0.5,
                         fontSize: 12,
@@ -100,7 +100,7 @@ class ProductCard extends StatelessWidget {
       child: Icon(
         Icons.medical_services_outlined,
         size: 30,
-        color: CustomTheme.primaryColor.withValues(alpha: 0.1),
+        color: CustomTheme.textSecondary.withValues(alpha: 0.1),
       ),
     );
   }
@@ -115,7 +115,7 @@ class ProductCard extends StatelessWidget {
         Text(
           '৳${product.finalPrice.toStringAsFixed(0)}',
           style: CustomTextStyle.heading4.copyWith(
-            color: CustomTheme.primaryColor,
+            color: CustomTheme.textSecondary,
             fontWeight: CustomTheme.fontWeightBold,
           ),
         ),
@@ -264,11 +264,11 @@ class _AddToCartButtonState extends ConsumerState<_AddToCartButton> {
         height: 40,
         decoration: BoxDecoration(
           color: _isPressed
-              ? CustomTheme.primaryColor.withValues(alpha: 0.2)
+              ? CustomTheme.textSecondary.withValues(alpha: 0.2)
               : CustomTheme.backgroundColor,
           borderRadius: BorderRadius.circular(CustomTheme.radiusSM),
           border: Border.all(
-            color: _isPressed ? CustomTheme.primaryColor : Colors.transparent,
+            color: _isPressed ? CustomTheme.textSecondary : Colors.transparent,
             width: 1,
           ),
         ),
@@ -277,7 +277,7 @@ class _AddToCartButtonState extends ConsumerState<_AddToCartButton> {
           size: 20,
           color: widget.product.stock <= 0
               ? CustomTheme.textTertiary
-              : CustomTheme.primaryColor,
+              : CustomTheme.textSecondary,
         ),
       ),
     );

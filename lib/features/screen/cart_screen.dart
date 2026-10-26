@@ -17,12 +17,8 @@ class _CartScreenState extends ConsumerState<CartScreen> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(cartProviderNotifier).loadCart();
-      final categoryProv = ref.read(categoryProviderNotifier);
-      if (categoryProv.categories.isEmpty) {
-        await categoryProv.fetchCategories();
-      }
     });
   }
 
@@ -49,8 +45,10 @@ class _CartScreenState extends ConsumerState<CartScreen> {
         scrolledUnderElevation: 0,
         centerTitle: false,
         titleSpacing: 20,
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.baseline,
+          textBaseline: TextBaseline.alphabetic,
           children: [
             Text(
               'Bag',
@@ -59,14 +57,14 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                 letterSpacing: -0.5,
               ),
             ),
-            if (itemCount > 0)
-              Text(
-                '$itemCount ${itemCount == 1 ? 'item' : 'items'}',
-                style: CustomTextStyle.caption.copyWith(
-                  fontSize: 12,
-                  color: CustomTheme.textTertiary,
-                ),
+            Text(
+              ' ($itemCount)',
+              style: CustomTextStyle.heading2.copyWith(
+                fontSize: 16,
+                letterSpacing: -0.3,
+                color: CustomTheme.textTertiary,
               ),
+            ),
           ],
         ),
         actions: [
@@ -248,36 +246,6 @@ class _CartScreenState extends ConsumerState<CartScreen> {
               ? ((item.price - item.finalPrice) / item.price * 100).round()
               : 0);
 
-    String? resolvedCategoryName;
-
-    // 1. Try finding in loaded products first (highly reliable since they are loaded on Home screen)
-    final products = ref.watch(productProviderNotifier).products;
-    for (final prod in products) {
-      if (prod.id == item.product.id &&
-          prod.categoryName.isNotEmpty &&
-          prod.categoryName != 'Uncategorized') {
-        resolvedCategoryName = prod.categoryName;
-        break;
-      }
-    }
-
-    // 2. Try finding in categories list
-    if (resolvedCategoryName == null) {
-      final categories = ref.watch(categoryProviderNotifier).categories;
-      for (final cat in categories) {
-        if (cat.id == item.product.categoryId && cat.name.isNotEmpty) {
-          resolvedCategoryName = cat.name;
-          break;
-        }
-      }
-    }
-
-    final categoryNameText =
-        resolvedCategoryName ??
-        (item.categoryName.isEmpty || item.categoryName == 'Uncategorized'
-            ? 'Uncategorized'
-            : item.categoryName);
-
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       decoration: BoxDecoration(
@@ -287,14 +255,14 @@ class _CartScreenState extends ConsumerState<CartScreen> {
       child: Padding(
         padding: const EdgeInsets.all(8),
         child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             // ── Product Image ──
             Stack(
               children: [
                 Container(
-                  width: 64,
-                  height: 64,
+                  width: 75,
+                  height: 75,
                   decoration: BoxDecoration(
                     color: CustomTheme.backgroundColor,
                     borderRadius: BorderRadius.circular(10),
@@ -328,7 +296,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                         vertical: 2,
                       ),
                       decoration: const BoxDecoration(
-                        color: CustomTheme.successColor,
+                        color: CustomTheme.primaryColor,
                         borderRadius: BorderRadius.only(
                           topLeft: Radius.circular(10),
                           bottomRight: Radius.circular(6),
@@ -338,7 +306,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                         '-$discountPercent%',
                         style: const TextStyle(
                           fontFamily: CustomTheme.primaryFontFamily,
-                          fontSize: 8,
+                          fontSize: 12,
                           fontWeight: FontWeight.w700,
                           color: Colors.white,
                         ),
@@ -359,33 +327,15 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              categoryNameText,
-                              style: CustomTextStyle.caption.copyWith(
-                                color: CustomTheme.primaryColor.withValues(
-                                  alpha: 0.5,
-                                ),
-                                fontWeight: CustomTheme.fontWeightBold,
-                                letterSpacing: 0.5,
-                                fontSize: 10,
-                              ),
-                            ),
-                            const SizedBox(height: 3),
-                            Text(
-                              item.productName,
-                              style: CustomTextStyle.bodyMedium.copyWith(
-                                fontWeight: CustomTheme.fontWeightSemiBold,
-                                color: CustomTheme.textPrimary,
-                                fontSize: 12,
-                                height: 1.2,
-                              ),
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ],
+                        child: Text(
+                          item.productName,
+                          style: CustomTextStyle.bodyMedium.copyWith(
+                            fontWeight: CustomTheme.fontWeightSemiBold,
+                            color: CustomTheme.textPrimary,
+                            fontSize: 14,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
                       const SizedBox(width: 6),
@@ -397,8 +347,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                           item.productName,
                         ),
                         child: Container(
-                          width: 24,
-                          height: 24,
+                          width: 20,
                           decoration: BoxDecoration(
                             color: CustomTheme.errorColor.withValues(
                               alpha: 0.08,
@@ -407,7 +356,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                           ),
                           child: const Icon(
                             Icons.close_rounded,
-                            size: 13,
+                            size: 20,
                             color: CustomTheme.errorColor,
                           ),
                         ),
@@ -422,7 +371,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                     textBaseline: TextBaseline.alphabetic,
                     children: [
                       Text(
-                        '৳${item.finalPrice.toStringAsFixed(0)}',
+                        '${item.finalPrice.toStringAsFixed(0)} ৳',
                         style: TextStyle(
                           fontFamily: CustomTheme.primaryFontFamily,
                           fontSize: 15,
@@ -434,28 +383,28 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                       if (hasSavings) ...[
                         const SizedBox(width: 5),
                         Text(
-                          '৳${item.price.toStringAsFixed(0)}',
+                          '${item.price.toStringAsFixed(0)} ৳',
                           style: CustomTextStyle.caption.copyWith(
                             decoration: TextDecoration.lineThrough,
-                            fontSize: 10,
+                            fontSize: 12,
                             color: CustomTheme.textTertiary,
                           ),
                         ),
                         const SizedBox(width: 8),
                         Container(
                           padding: const EdgeInsets.symmetric(
-                            horizontal: 6,
-                            vertical: 2,
+                            horizontal: 5,
+                            vertical: 0,
                           ),
                           decoration: BoxDecoration(
                             color: CustomTheme.successColor,
                             borderRadius: BorderRadius.circular(4),
                           ),
                           child: Text(
-                            'Your Save ${savings.toStringAsFixed(0)} ৳',
+                            'Save ${savings.toStringAsFixed(0)} ৳',
                             style: const TextStyle(
                               fontFamily: CustomTheme.primaryFontFamily,
-                              fontSize: 9,
+                              fontSize: 12,
                               fontWeight: FontWeight.w600,
                               color: Colors.white,
                             ),
@@ -464,18 +413,30 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                       ],
                     ],
                   ),
-                  const SizedBox(height: 3),
-
                   // Quantity selector
+                  const SizedBox(height: 5),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Container(
+                        padding: const EdgeInsets.all(0),
                         decoration: BoxDecoration(
                           color: CustomTheme.backgroundColor,
-                          borderRadius: BorderRadius.circular(8),
+                          borderRadius: BorderRadius.circular(30),
+                          border: Border.all(
+                            color: CustomTheme.borderLight,
+                            width: 1,
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.04),
+                              blurRadius: 8,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
                         ),
                         child: Row(
+                          mainAxisSize: MainAxisSize.min,
                           children: [
                             _buildQtyButton(
                               icon: Icons.remove_rounded,
@@ -488,15 +449,16 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                                 }
                               },
                               enabled: item.quantity > 1,
+                              filled: false,
                             ),
                             SizedBox(
-                              width: 24,
+                              width: 30,
                               child: Text(
                                 '${item.quantity}',
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                   fontFamily: CustomTheme.primaryFontFamily,
-                                  fontSize: 12,
+                                  fontSize: 15,
                                   fontWeight: CustomTheme.fontWeightBold,
                                   color: CustomTheme.textPrimary,
                                 ),
@@ -509,6 +471,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                                 item.quantity + 1,
                               ),
                               enabled: true,
+                              filled: true,
                             ),
                           ],
                         ),
@@ -516,12 +479,12 @@ class _CartScreenState extends ConsumerState<CartScreen> {
 
                       // Item subtotal
                       Text(
-                        '৳${item.itemTotal.toStringAsFixed(0)}',
+                        '${item.itemTotal.toStringAsFixed(0)}৳',
                         style: TextStyle(
                           fontFamily: CustomTheme.primaryFontFamily,
-                          fontSize: 12,
+                          fontSize: 16,
                           fontWeight: CustomTheme.fontWeightSemiBold,
-                          color: CustomTheme.textSecondary,
+                          color: CustomTheme.textPrimary,
                         ),
                       ),
                     ],
@@ -539,29 +502,32 @@ class _CartScreenState extends ConsumerState<CartScreen> {
     required IconData icon,
     required VoidCallback onTap,
     required bool enabled,
+    required bool filled,
   }) {
     return GestureDetector(
       onTap: enabled ? onTap : null,
       child: Container(
-        width: 24,
-        height: 24,
+        width: 26,
+        height: 26,
         decoration: BoxDecoration(
-          color: enabled ? CustomTheme.surfaceColor : Colors.transparent,
-          borderRadius: BorderRadius.circular(6),
-          boxShadow: enabled
+          color: filled ? CustomTheme.primaryColor : CustomTheme.surfaceColor,
+          shape: BoxShape.circle,
+          boxShadow: filled
               ? [
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.05),
-                    blurRadius: 4,
+                    color: CustomTheme.primaryColor.withValues(alpha: 0.4),
+                    blurRadius: 2,
                     offset: const Offset(0, 1),
                   ),
                 ]
-              : [],
+              : null,
         ),
         child: Icon(
           icon,
-          size: 14,
-          color: enabled ? CustomTheme.textPrimary : CustomTheme.textTertiary,
+          size: 16,
+          color: enabled
+              ? (filled ? Colors.white : CustomTheme.textPrimary)
+              : CustomTheme.textTertiary,
         ),
       ),
     );
@@ -575,16 +541,13 @@ class _CartScreenState extends ConsumerState<CartScreen> {
     return Container(
       padding: EdgeInsets.fromLTRB(
         16,
+        8,
         16,
-        16,
-        MediaQuery.of(context).padding.bottom + 16,
+        MediaQuery.of(context).padding.bottom + 8,
       ),
       decoration: BoxDecoration(
         color: CustomTheme.surfaceColor,
-        borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(24),
-          topRight: Radius.circular(24),
-        ),
+        borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.07),
@@ -600,7 +563,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
           Container(
             width: 36,
             height: 4,
-            margin: const EdgeInsets.only(bottom: 16),
+            margin: const EdgeInsets.only(bottom: 8),
             decoration: BoxDecoration(
               color: CustomTheme.borderLight,
               borderRadius: BorderRadius.circular(2),
@@ -609,7 +572,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
 
           // Price breakdown
           Container(
-            padding: const EdgeInsets.all(14),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
             decoration: BoxDecoration(
               color: CustomTheme.backgroundColor,
               borderRadius: BorderRadius.circular(14),
@@ -622,16 +585,16 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                   valueColor: CustomTheme.textPrimary,
                 ),
                 if (totalSavings > 0) ...[
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 4),
                   _buildPriceRow(
-                    'You save',
+                    'Your savings',
                     '-৳${totalSavings.toStringAsFixed(0)}',
                     valueColor: CustomTheme.successColor,
                     isBold: true,
                   ),
                 ],
                 Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 10),
+                  padding: const EdgeInsets.symmetric(vertical: 6),
                   child: Divider(height: 1, color: CustomTheme.borderLight),
                 ),
                 Row(
@@ -650,9 +613,9 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                       '৳${total.toStringAsFixed(0)}',
                       style: TextStyle(
                         fontFamily: CustomTheme.primaryFontFamily,
-                        fontSize: 22,
+                        fontSize: 19,
                         fontWeight: CustomTheme.fontWeightBold,
-                        color: CustomTheme.primaryColor,
+                        color: CustomTheme.textPrimary,
                         letterSpacing: -0.5,
                       ),
                     ),
@@ -662,19 +625,19 @@ class _CartScreenState extends ConsumerState<CartScreen> {
             ),
           ),
 
-          const SizedBox(height: 12),
+          const SizedBox(height: 8),
 
           // Checkout button
           SizedBox(
             width: double.infinity,
-            height: 54,
+            height: 48,
             child: ElevatedButton(
               onPressed: () => Navigator.pushNamed(context, '/checkout'),
               style: ElevatedButton.styleFrom(
                 backgroundColor: CustomTheme.primaryColor,
                 foregroundColor: Colors.white,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(12),
                 ),
                 elevation: 0,
               ),
@@ -716,7 +679,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
         Text(
           label,
           style: CustomTextStyle.bodyMedium.copyWith(
-            fontSize: 13,
+            fontSize: 15,
             color: CustomTheme.textSecondary,
           ),
         ),
@@ -724,7 +687,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
           value,
           style: TextStyle(
             fontFamily: CustomTheme.primaryFontFamily,
-            fontSize: 13,
+            fontSize: 15,
             fontWeight: isBold
                 ? CustomTheme.fontWeightSemiBold
                 : CustomTheme.fontWeightMedium,
@@ -762,13 +725,13 @@ class _CartScreenState extends ConsumerState<CartScreen> {
               const SizedBox(height: 16),
               Text(
                 'Clear Cart',
-                style: CustomTextStyle.heading3.copyWith(fontSize: 17),
+                style: CustomTextStyle.heading3.copyWith(fontSize: 18),
               ),
               const SizedBox(height: 8),
               Text(
                 'Are you sure you want to remove all items from your cart?',
                 textAlign: TextAlign.center,
-                style: CustomTextStyle.bodyMedium.copyWith(fontSize: 13),
+                style: CustomTextStyle.bodyMedium.copyWith(fontSize: 15),
               ),
               const SizedBox(height: 20),
               Row(
@@ -860,13 +823,13 @@ class _CartScreenState extends ConsumerState<CartScreen> {
               const SizedBox(height: 16),
               Text(
                 'Remove Item',
-                style: CustomTextStyle.heading3.copyWith(fontSize: 17),
+                style: CustomTextStyle.heading3.copyWith(fontSize: 18),
               ),
               const SizedBox(height: 8),
               Text(
                 'Remove "$productName" from your cart?',
                 textAlign: TextAlign.center,
-                style: CustomTextStyle.bodyMedium.copyWith(fontSize: 13),
+                style: CustomTextStyle.bodyMedium.copyWith(fontSize: 15),
               ),
               const SizedBox(height: 20),
               Row(

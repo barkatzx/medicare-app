@@ -112,7 +112,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen>
               opacity: _stepFadeAnim ?? const AlwaysStoppedAnimation(1.0),
               child: SingleChildScrollView(
                 physics: const BouncingScrollPhysics(),
-                padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
                 child: _currentStep == 0
                     ? _buildShippingForm(cartProvider)
                     : _buildOrderReview(cartProvider),
@@ -176,30 +176,37 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen>
       children: [
         // ── Order Items Summary ──
         _buildSectionHeader(
-          'Your Order',
+          'Products Checklist',
           '${items.length} items',
           Icons.shopping_bag_outlined,
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: 8),
         _buildItemsCard(items, cartProvider),
-        const SizedBox(height: 32),
+        const SizedBox(height: 16),
       ],
     );
   }
 
   Widget _buildSectionHeader(String title, String subtitle, IconData icon) {
+    final accentColor = switch (title) {
+      'Delivery Info' => const Color(0xFF3B82F6),
+      'Ship To' => const Color(0xFF10B981),
+      'Payment' => const Color(0xFF8B5CF6),
+      _ => CustomTheme.primaryColor,
+    };
+
     return Row(
       children: [
         Container(
-          width: 36,
-          height: 36,
+          width: 40,
+          height: 40,
           decoration: BoxDecoration(
-            color: CustomTheme.primaryColor.withValues(alpha: 0.08),
+            color: accentColor.withValues(alpha: 0.10),
             borderRadius: BorderRadius.circular(10),
           ),
-          child: Icon(icon, size: 18, color: CustomTheme.primaryColor),
+          child: Icon(icon, size: 18, color: accentColor),
         ),
-        const SizedBox(width: 10),
+        const SizedBox(width: 8),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -230,14 +237,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen>
     return Container(
       decoration: BoxDecoration(
         color: CustomTheme.surfaceColor,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 12,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
         children: [
@@ -247,18 +247,18 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen>
             return Column(
               children: [
                 Padding(
-                  padding: const EdgeInsets.all(14),
+                  padding: const EdgeInsets.all(10),
                   child: Row(
                     children: [
                       Container(
-                        width: 52,
-                        height: 52,
+                        width: 40,
+                        height: 40,
                         decoration: BoxDecoration(
                           color: CustomTheme.backgroundColor,
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(10),
                         ),
                         child: ClipRRect(
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(10),
                           child: item.productImage.isNotEmpty
                               ? Image.network(
                                   item.productImage,
@@ -276,7 +276,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen>
                                 ),
                         ),
                       ),
-                      const SizedBox(width: 12),
+                      const SizedBox(width: 10),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -284,9 +284,9 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen>
                             Text(
                               item.productName,
                               style: CustomTextStyle.bodyMedium.copyWith(
-                                fontWeight: CustomTheme.fontWeightMedium,
+                                fontWeight: CustomTheme.fontWeightBold,
                                 color: CustomTheme.textPrimary,
-                                fontSize: 13,
+                                fontSize: 15,
                               ),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
@@ -300,17 +300,16 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen>
                                     vertical: 2,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: CustomTheme.backgroundColor,
+                                    color: CustomTheme.primaryColor,
                                     borderRadius: BorderRadius.circular(6),
                                   ),
                                   child: Text(
-                                    'x${item.quantity}',
+                                    'x ${item.quantity}',
                                     style: TextStyle(
                                       fontFamily: CustomTheme.primaryFontFamily,
-                                      fontSize: 11,
-                                      fontWeight:
-                                          CustomTheme.fontWeightSemiBold,
-                                      color: CustomTheme.textSecondary,
+                                      fontSize: 12,
+                                      fontWeight: CustomTheme.fontWeightBold,
+                                      color: CustomTheme.surfaceColor,
                                     ),
                                   ),
                                 ),
@@ -318,7 +317,8 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen>
                                 Text(
                                   '${item.finalPrice.toStringAsFixed(2)}৳ each',
                                   style: CustomTextStyle.caption.copyWith(
-                                    fontSize: 11,
+                                    fontSize: 13,
+                                    color: CustomTheme.textSecondary,
                                   ),
                                 ),
                               ],
@@ -351,9 +351,9 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen>
 
           // Total row
           Container(
-            padding: const EdgeInsets.fromLTRB(14, 12, 14, 14),
+            padding: const EdgeInsets.fromLTRB(12, 8, 12, 10),
             decoration: BoxDecoration(
-              color: CustomTheme.backgroundColor,
+              color: CustomTheme.secondaryColor,
               borderRadius: const BorderRadius.only(
                 bottomLeft: Radius.circular(16),
                 bottomRight: Radius.circular(16),
@@ -375,9 +375,9 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen>
                   '${cartProvider.total.toStringAsFixed(2)}৳',
                   style: TextStyle(
                     fontFamily: CustomTheme.primaryFontFamily,
-                    fontSize: 16,
+                    fontSize: 15,
                     fontWeight: CustomTheme.fontWeightBold,
-                    color: CustomTheme.primaryColor,
+                    color: CustomTheme.textPrimary,
                   ),
                 ),
               ],
@@ -401,24 +401,28 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen>
             'Full Name',
             user?.name ?? 'N/A',
             false,
+            const Color(0xFF3B82F6),
           ),
           _buildInfoTile(
             Icons.local_pharmacy_outlined,
             'Pharmacy',
             user?.pharmacyName ?? 'N/A',
             false,
+            const Color(0xFF14B8A6),
           ),
           _buildInfoTile(
             Icons.email_outlined,
             'Email',
             user?.email ?? 'N/A',
             false,
+            const Color(0xFF8B5CF6),
           ),
           _buildInfoTile(
             Icons.phone_outlined,
             'Phone',
             user?.phoneNumber ?? 'N/A',
             true,
+            const Color(0xFFF59E0B),
           ),
         ],
       ),
@@ -430,23 +434,24 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen>
     String label,
     String value,
     bool isLast,
+    Color iconColor,
   ) {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
           child: Row(
             children: [
               Container(
-                width: 34,
-                height: 34,
+                width: 36,
+                height: 36,
                 decoration: BoxDecoration(
-                  color: CustomTheme.backgroundColor,
+                  color: iconColor.withValues(alpha: 0.10),
                   borderRadius: BorderRadius.circular(9),
                 ),
-                child: Icon(icon, size: 17, color: CustomTheme.textSecondary),
+                child: Icon(icon, size: 17, color: iconColor),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 10),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -454,7 +459,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen>
                     Text(
                       label,
                       style: CustomTextStyle.caption.copyWith(
-                        fontSize: 10,
+                        fontSize: 13,
                         letterSpacing: 0.5,
                         color: CustomTheme.textTertiary,
                       ),
@@ -464,8 +469,8 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen>
                       value,
                       style: CustomTextStyle.bodyMedium.copyWith(
                         color: CustomTheme.textPrimary,
-                        fontWeight: CustomTheme.fontWeightMedium,
-                        fontSize: 13,
+                        fontWeight: CustomTheme.fontWeightBold,
+                        fontSize: 15,
                       ),
                     ),
                   ],
@@ -487,95 +492,61 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen>
 
   Widget _buildAddressCard(UserEntity? user) {
     final hasAddress = user?.hasAddress ?? false;
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: CustomTheme.surfaceColor,
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 42,
-            height: 42,
-            decoration: BoxDecoration(
-              color: CustomTheme.primaryColor.withValues(alpha: 0.08),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: const Icon(
-              Icons.home_outlined,
-              color: CustomTheme.primaryColor,
-              size: 20,
-            ),
+    const addressColor = Color(0xFF10B981);
+    return Row(
+      children: [
+        Container(
+          width: 36,
+          height: 36,
+          decoration: BoxDecoration(
+            color: addressColor.withValues(alpha: 0.10),
+            borderRadius: BorderRadius.circular(12),
           ),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Text(
-                      'Delivery Address',
-                      style: TextStyle(
-                        fontFamily: CustomTheme.primaryFontFamily,
-                        fontSize: 10,
-                        fontWeight: CustomTheme.fontWeightSemiBold,
-                        color: CustomTheme.primaryColor,
-                        letterSpacing: 0.5,
-                      ),
-                    ),
-                    const SizedBox(width: 6),
-                    Container(
-                      width: 5,
-                      height: 5,
-                      decoration: const BoxDecoration(
-                        color: CustomTheme.successColor,
-                        shape: BoxShape.circle,
-                      ),
-                    ),
-                  ],
+          child: const Icon(Icons.home_outlined, color: addressColor, size: 20),
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                hasAddress ? user!.fullAddress! : 'No address added yet',
+                style: CustomTextStyle.bodyMedium.copyWith(
+                  color: CustomTheme.textPrimary,
+                  fontWeight: CustomTheme.fontWeightBold,
+                  fontSize: 15,
                 ),
-                const SizedBox(height: 3),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+              if (hasAddress)
                 Text(
-                  hasAddress ? user!.fullAddress! : 'No address added yet',
-                  style: CustomTextStyle.bodyMedium.copyWith(
-                    color: CustomTheme.textPrimary,
-                    fontWeight: CustomTheme.fontWeightMedium,
-                    fontSize: 13,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+                  '${user!.upazila!.label}, ${user.district!.label}, ${user.division!.label}',
+                  style: CustomTextStyle.caption.copyWith(fontSize: 13),
                 ),
-                if (hasAddress)
-                  Text(
-                    '${user!.upazila!.label}, ${user.district!.label}, ${user.division!.label}',
-                    style: CustomTextStyle.caption.copyWith(fontSize: 11),
-                  ),
-              ],
-            ),
+            ],
           ),
-          GestureDetector(
-            onTap: () => _editAddress(user),
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
-              decoration: BoxDecoration(
-                color: CustomTheme.primaryColor,
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Text(
-                hasAddress ? 'Change' : 'Add',
-                style: TextStyle(
-                  fontFamily: CustomTheme.primaryFontFamily,
-                  fontSize: 11,
-                  fontWeight: CustomTheme.fontWeightSemiBold,
-                  color: Colors.white,
-                ),
+        ),
+        GestureDetector(
+          onTap: () => _editAddress(user),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+            decoration: BoxDecoration(
+              color: CustomTheme.primaryColor,
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Text(
+              hasAddress ? 'Change' : 'Add',
+              style: TextStyle(
+                fontFamily: CustomTheme.primaryFontFamily,
+                fontSize: 11,
+                fontWeight: CustomTheme.fontWeightSemiBold,
+                color: Colors.white,
               ),
             ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
@@ -586,47 +557,34 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen>
     String subtitle,
   ) {
     final isSelected = _selectedPayment == value;
+    const paymentColor = Color(0xFF8B5CF6);
     return GestureDetector(
       onTap: () => setState(() => _selectedPayment = value),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 250),
         curve: Curves.easeInOut,
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.zero,
         decoration: BoxDecoration(
-          color: CustomTheme.surfaceColor,
+          color: Colors.transparent,
           borderRadius: BorderRadius.circular(16),
         ),
         child: Row(
           children: [
             AnimatedContainer(
               duration: const Duration(milliseconds: 250),
-              width: 48,
-              height: 48,
+              width: 36,
+              height: 36,
               decoration: BoxDecoration(
-                color: isSelected
-                    ? CustomTheme.primaryColor
-                    : CustomTheme.backgroundColor,
-                borderRadius: BorderRadius.circular(13),
+                color: paymentColor.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(12),
               ),
               child: Center(
                 child: icon is IconData
-                    ? Icon(
-                        icon,
-                        size: 22,
-                        color: isSelected
-                            ? Colors.white
-                            : CustomTheme.textSecondary,
-                      )
-                    : FaIcon(
-                        icon,
-                        size: 20,
-                        color: isSelected
-                            ? Colors.white
-                            : CustomTheme.textSecondary,
-                      ),
+                    ? Icon(icon, size: 22, color: paymentColor)
+                    : FaIcon(icon, size: 20, color: paymentColor),
               ),
             ),
-            const SizedBox(width: 14),
+            const SizedBox(width: 10),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -635,8 +593,8 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen>
                     title,
                     style: TextStyle(
                       fontFamily: CustomTheme.primaryFontFamily,
-                      fontSize: 14,
-                      fontWeight: CustomTheme.fontWeightSemiBold,
+                      fontSize: 15,
+                      fontWeight: CustomTheme.fontWeightBold,
                       color: isSelected
                           ? CustomTheme.textPrimary
                           : CustomTheme.textPrimary,
@@ -645,24 +603,20 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen>
                   const SizedBox(height: 2),
                   Text(
                     subtitle,
-                    style: CustomTextStyle.caption.copyWith(fontSize: 11),
+                    style: CustomTextStyle.caption.copyWith(fontSize: 13),
                   ),
                 ],
               ),
             ),
             AnimatedContainer(
               duration: const Duration(milliseconds: 250),
-              width: 24,
-              height: 24,
+              width: 20,
+              height: 20,
               decoration: BoxDecoration(
-                color: isSelected
-                    ? CustomTheme.primaryColor
-                    : Colors.transparent,
+                color: isSelected ? paymentColor : Colors.transparent,
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color: isSelected
-                      ? CustomTheme.primaryColor
-                      : CustomTheme.borderMedium,
+                  color: isSelected ? paymentColor : CustomTheme.borderMedium,
                   width: 2,
                 ),
               ),
@@ -690,41 +644,52 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // ── Delivery Information ──
-          _buildSectionHeader(
-            'Delivery Info',
-            'Auto-filled',
-            Icons.person_outline,
+          Padding(
+            padding: const EdgeInsets.only(bottom: 20),
+            child: _buildSectionHeader(
+              'Personal Details',
+              'Auto-filled',
+              Icons.person_outline,
+            ),
           ),
-          const SizedBox(height: 12),
           _buildDeliveryInfoCard(user),
-          const SizedBox(height: 20),
-
-          // ── Shipping Address ──
-          _buildSectionHeader(
-            'Ship To',
-            'Delivery address',
-            Icons.location_on_outlined,
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 20),
+            child: _buildSectionHeader(
+              'Ship & Payment',
+              'Address and payment method',
+              Icons.local_shipping_outlined,
+            ),
           ),
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: CustomTheme.surfaceColor,
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildAddressCard(user),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  child: Divider(
+                    height: 1,
+                    color: CustomTheme.borderLight,
+                    indent: 46,
+                  ),
+                ),
+                _buildPaymentOption(
+                  'cash_on_delivery',
+                  'Cash on Delivery',
+                  FontAwesomeIcons.handHoldingDollar,
+                  'Pay when you receive your order',
+                ),
+              ],
+            ),
+          ),
+
           const SizedBox(height: 12),
-
-          _buildAddressCard(user),
-
-          const SizedBox(height: 20),
-
-          _buildSectionHeader(
-            'Payment',
-            'How you\'ll pay',
-            Icons.payment_outlined,
-          ),
-          const SizedBox(height: 12),
-          _buildPaymentOption(
-            'cash_on_delivery',
-            'Cash on Delivery',
-            FontAwesomeIcons.handHoldingDollar,
-            'Pay when you receive your order',
-          ),
-
-          const SizedBox(height: 32),
         ],
       ),
     );
@@ -743,13 +708,6 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen>
               decoration: BoxDecoration(
                 color: CustomTheme.surfaceColor,
                 shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.06),
-                    blurRadius: 24,
-                    offset: const Offset(0, 8),
-                  ),
-                ],
               ),
               child: const Icon(
                 Icons.shopping_cart_outlined,
@@ -783,13 +741,6 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen>
                 decoration: BoxDecoration(
                   color: CustomTheme.primaryColor,
                   borderRadius: BorderRadius.circular(14),
-                  boxShadow: [
-                    BoxShadow(
-                      color: CustomTheme.primaryColor.withValues(alpha: 0.3),
-                      blurRadius: 16,
-                      offset: const Offset(0, 6),
-                    ),
-                  ],
                 ),
                 child: Text(
                   'Start Shopping',
@@ -811,9 +762,9 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen>
     return Container(
       padding: EdgeInsets.fromLTRB(
         16,
+        10,
         16,
-        16,
-        MediaQuery.of(context).padding.bottom + 16,
+        MediaQuery.of(context).padding.bottom + 8,
       ),
       decoration: BoxDecoration(
         color: CustomTheme.surfaceColor,
@@ -821,34 +772,16 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen>
           topLeft: Radius.circular(24),
           topRight: Radius.circular(24),
         ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.07),
-            blurRadius: 20,
-            offset: const Offset(0, -4),
-          ),
-        ],
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // Drag handle
-          Container(
-            width: 36,
-            height: 4,
-            margin: const EdgeInsets.only(bottom: 14),
-            decoration: BoxDecoration(
-              color: CustomTheme.borderLight,
-              borderRadius: BorderRadius.circular(2),
-            ),
-          ),
-
           if (_currentStep == 1) ...[
             Container(
-              padding: const EdgeInsets.all(14),
+              padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
                 color: CustomTheme.backgroundColor,
-                borderRadius: BorderRadius.circular(14),
+                borderRadius: BorderRadius.circular(12),
               ),
               child: Column(
                 children: [
@@ -872,7 +805,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen>
                     ],
                   ),
                   if (totalSavings > 0) ...[
-                    const SizedBox(height: 6),
+                    const SizedBox(height: 4),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -892,9 +825,9 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen>
                       ],
                     ),
                   ],
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 6),
                   Divider(height: 1, color: CustomTheme.borderLight),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 6),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -911,7 +844,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen>
                         '${total.toStringAsFixed(2)}৳',
                         style: TextStyle(
                           fontFamily: CustomTheme.primaryFontFamily,
-                          fontSize: 20,
+                          fontSize: 18,
                           fontWeight: CustomTheme.fontWeightBold,
                           color: CustomTheme.primaryColor,
                           letterSpacing: -0.5,
@@ -922,12 +855,12 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen>
                 ],
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 8),
           ],
 
           SizedBox(
             width: double.infinity,
-            height: 54,
+            height: 48,
             child: AnimatedBuilder(
               animation: _pulseAnim ?? const AlwaysStoppedAnimation(1.0),
               builder: (context, child) {
@@ -950,29 +883,11 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen>
                     borderRadius: BorderRadius.circular(16),
                   ),
                   elevation: 0,
-                  shadowColor: Colors.transparent,
                 ),
                 child: Container(
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(16),
-                    gradient: _isPlacingOrder
-                        ? null
-                        : const LinearGradient(
-                            colors: [Color(0xFF2A2A2A), Color(0xFF010101)],
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                          ),
-                    boxShadow: _isPlacingOrder
-                        ? []
-                        : [
-                            BoxShadow(
-                              color: CustomTheme.primaryColor.withValues(
-                                alpha: 0.35,
-                              ),
-                              blurRadius: 16,
-                              offset: const Offset(0, 6),
-                            ),
-                          ],
+                    color: CustomTheme.primaryColor,
                   ),
                   child: Center(
                     child: _isPlacingOrder
