@@ -145,8 +145,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _buildProfileHeader(user),
-                        const SizedBox(height: 24),
+                        const SizedBox(height: 8),
                         _buildSectionHeader(
                           'Account Information',
                           Icons.shield_outlined,
@@ -209,88 +208,24 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     return Row(
       children: [
         Container(
-          width: 32,
-          height: 32,
+          width: 40,
+          height: 40,
           decoration: BoxDecoration(
-            color: CustomTheme.primaryColor.withValues(alpha: 0.08),
-            borderRadius: BorderRadius.circular(9),
+            color: _iconColor(icon).withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(10),
           ),
-          child: Icon(icon, size: 16, color: CustomTheme.primaryColor),
+          child: Icon(icon, size: 20, color: _iconColor(icon)),
         ),
         const SizedBox(width: 10),
         Text(
           title,
           style: CustomTextStyle.heading4.copyWith(
-            fontSize: 14,
+            fontSize: 16,
+            fontWeight: CustomTheme.fontWeightBold,
             letterSpacing: -0.2,
           ),
         ),
       ],
-    );
-  }
-
-  Widget _buildProfileHeader(UserEntity user) {
-    final initials = user.name.isNotEmpty
-        ? user.name
-              .trim()
-              .split(' ')
-              .map((e) => e[0])
-              .take(2)
-              .join()
-              .toUpperCase()
-        : 'U';
-
-    return Center(
-      child: Column(
-        children: [
-          Container(
-            width: 88,
-            height: 88,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: CustomTheme.surfaceColor,
-            ),
-            child: Center(
-              child: Text(
-                initials,
-                style: TextStyle(
-                  fontFamily: CustomTheme.primaryFontFamily,
-                  fontSize: 32,
-                  fontWeight: CustomTheme.fontWeightBold,
-                  color: CustomTheme.primaryColor,
-                  letterSpacing: -1,
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(height: 14),
-          Text(
-            user.name,
-            style: CustomTextStyle.heading2.copyWith(
-              fontSize: 20,
-              letterSpacing: -0.4,
-            ),
-          ),
-          const SizedBox(height: 6),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
-            decoration: BoxDecoration(
-              color: CustomTheme.primaryColor.withValues(alpha: 0.08),
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Text(
-              user.role.toUpperCase(),
-              style: TextStyle(
-                fontFamily: CustomTheme.primaryFontFamily,
-                fontSize: 10,
-                fontWeight: CustomTheme.fontWeightBold,
-                color: CustomTheme.primaryColor,
-                letterSpacing: 1.2,
-              ),
-            ),
-          ),
-        ],
-      ),
     );
   }
 
@@ -347,10 +282,10 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                 width: 36,
                 height: 36,
                 decoration: BoxDecoration(
-                  color: CustomTheme.backgroundColor,
+                  color: _iconColor(icon).withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: Icon(icon, size: 17, color: CustomTheme.textSecondary),
+                child: Icon(icon, size: 17, color: _iconColor(icon)),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -360,18 +295,18 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                     Text(
                       label,
                       style: CustomTextStyle.caption.copyWith(
-                        fontSize: 10,
-                        letterSpacing: 0.4,
-                        color: CustomTheme.textTertiary,
+                        fontSize: 13,
+                        fontWeight: CustomTheme.fontWeightSemiBold,
+                        color: CustomTheme.textSecondary,
                       ),
                     ),
                     const SizedBox(height: 2),
                     Text(
                       value,
                       style: CustomTextStyle.bodyMedium.copyWith(
-                        fontWeight: CustomTheme.fontWeightSemiBold,
+                        fontWeight: CustomTheme.fontWeightBold,
                         color: valueColor ?? CustomTheme.textPrimary,
-                        fontSize: 13,
+                        fontSize: 15,
                       ),
                     ),
                   ],
@@ -389,6 +324,18 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
           ),
       ],
     );
+  }
+
+  Color _iconColor(IconData icon) {
+    if (icon == Icons.email_outlined) return const Color(0xFF3B82F6);
+    if (icon == Icons.verified_user_outlined) return const Color(0xFF10B981);
+    if (icon == Icons.calendar_today_outlined) return const Color(0xFF8B5CF6);
+    if (icon == Icons.person_outline_rounded) return const Color(0xFF3B82F6);
+    if (icon == Icons.local_pharmacy_outlined) return const Color(0xFF10B981);
+    if (icon == Icons.phone_android_rounded) return const Color(0xFF8B5CF6);
+    if (icon == Icons.shield_outlined) return const Color(0xFF3B82F6);
+    if (icon == Icons.edit_outlined) return const Color(0xFF8B5CF6);
+    return CustomTheme.primaryColor;
   }
 
   Widget _buildEditCard() {
@@ -443,7 +390,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
         Text(
           label,
           style: CustomTextStyle.caption.copyWith(
-            fontSize: 11,
+            fontSize: 13,
             letterSpacing: 0.3,
             color: CustomTheme.textTertiary,
             fontWeight: CustomTheme.fontWeightSemiBold,
@@ -455,9 +402,9 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
           keyboardType: keyboardType,
           validator: validator,
           style: CustomTextStyle.bodyMedium.copyWith(
-            fontWeight: CustomTheme.fontWeightMedium,
+            fontWeight: CustomTheme.fontWeightBold,
             color: CustomTheme.textPrimary,
-            fontSize: 14,
+            fontSize: 15,
           ),
           decoration: InputDecoration(
             hintText: hint,
@@ -467,10 +414,10 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
             ),
             prefixIcon: Padding(
               padding: const EdgeInsets.only(left: 14, right: 10),
-              child: Icon(icon, size: 18, color: CustomTheme.textTertiary),
+              child: Icon(icon, size: 18),
             ),
             prefixIconConstraints: const BoxConstraints(
-              minWidth: 46,
+              minWidth: 54,
               minHeight: 46,
             ),
             filled: true,
@@ -526,11 +473,8 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
           MediaQuery.of(context).padding.bottom + 16,
         ),
         decoration: BoxDecoration(
-          color: CustomTheme.surfaceColor,
-          borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(24),
-            topRight: Radius.circular(24),
-          ),
+          color: Colors.transparent,
+          borderRadius: BorderRadius.circular(24),
         ),
         child: SizedBox(
           width: double.infinity,
@@ -548,20 +492,12 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                 borderRadius: BorderRadius.circular(16),
               ),
               elevation: 0,
-              shadowColor: Colors.transparent,
               surfaceTintColor: Colors.transparent,
               overlayColor: Colors.transparent,
             ),
             child: Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(16),
-                gradient: isLoading
-                    ? null
-                    : const LinearGradient(
-                        colors: [Color(0xFF2A2A2A), Color(0xFF010101)],
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                      ),
               ),
               child: Center(
                 child: isLoading
