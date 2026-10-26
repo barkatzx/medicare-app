@@ -67,8 +67,6 @@ class CartRepositoryImpl implements CartRepository {
     if (token == null) throw Exception('User not authenticated');
 
     final body = {'productId': productId, 'quantity': quantity};
-    debugPrint('addToCart body: $body');
-
     final response = await client
         .post(
           Uri.parse(ApiConstants.addToCart),
@@ -77,9 +75,7 @@ class CartRepositoryImpl implements CartRepository {
         )
         .timeout(ApiConstants.connectionTimeout);
 
-    debugPrint(
-      'addToCart status: ${response.statusCode}, body: ${response.body}',
-    );
+    debugPrint('addToCart status: ${response.statusCode}');
 
     if (response.statusCode >= 200 && response.statusCode < 300) return;
 

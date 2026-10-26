@@ -110,11 +110,14 @@ class ProductRepositoryImpl implements ProductRepository {
           return PaginatedProductResponse(products: [], hasNextPage: false);
         }
       } else {
-        return PaginatedProductResponse(products: [], hasNextPage: false);
+        final responseData = json.decode(response.body);
+        throw Exception(
+          responseData['message'] ?? 'Search failed (${response.statusCode})',
+        );
       }
     } catch (e) {
       debugPrint('Search products error: $e');
-      return PaginatedProductResponse(products: [], hasNextPage: false);
+      rethrow;
     }
   }
 

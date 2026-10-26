@@ -5,6 +5,7 @@ import 'package:medicare_app/features/repository/auth_repository.dart';
 import '../../core/constants/api_constants.dart';
 import '../entity/user_entity.dart';
 import '../../core/storage/shared_prefs_helper.dart';
+import '../../core/utils/network_error.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
   final http.Client client;
@@ -51,7 +52,11 @@ class AuthRepositoryImpl implements AuthRepository {
 
         if (responseData['data'] != null) {
           final userData = responseData['data']['user'];
-          token = responseData['data']['token'];
+          final responseToken = responseData['data']['token'];
+          if (responseToken is! String || responseToken.isEmpty) {
+            throw Exception('Invalid login response: token not found');
+          }
+          token = responseToken;
 
           if (userData == null) {
             throw Exception('User data not found');
@@ -150,7 +155,7 @@ class AuthRepositoryImpl implements AuthRepository {
         if (user != null) {
           // Save user data (no token yet since account needs approval)
           await sharedPreferencesHelper.saveUser(user);
-          debugPrint('User registered successfully: ${user.email}');
+          debugPrint('User registered successfully');
           return user;
         } else {
           // Return a pending user object for approval
@@ -185,7 +190,7 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<UserEntity> verifyAuth() async {
     try {
       final token = await sharedPreferencesHelper.getToken();
-      if (token == null) {
+      if (token == null || token.isEmpty) {
         throw Exception('No token found');
       }
 
@@ -230,9 +235,11 @@ class AuthRepositoryImpl implements AuthRepository {
         throw Exception('Server error and no cached user found.');
       }
     } catch (e) {
-      // On network errors or other exceptions, try to return cached user
-      final cachedUser = await sharedPreferencesHelper.getUser();
-      if (cachedUser != null) return cachedUser;
+      // Keep the cached session available only when verification is unavailable.
+      if (isConnectionError(e)) {
+        final cachedUser = await sharedPreferencesHelper.getUser();
+        if (cachedUser != null) return cachedUser;
+      }
       rethrow;
     }
   }
