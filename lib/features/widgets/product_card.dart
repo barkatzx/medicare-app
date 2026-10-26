@@ -36,7 +36,7 @@ class ProductCard extends StatelessWidget {
                   border: Border.all(color: CustomTheme.borderLight, width: 1),
                 ),
                 child: ClipRRect(
-                  borderRadius: BorderRadius.circular(CustomTheme.radiusMD),
+                  borderRadius: BorderRadius.circular(CustomTheme.radiusSM),
                   child: product.images.isNotEmpty
                       ? CachedNetworkImage(
                           imageUrl: product.images.first.url,

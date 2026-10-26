@@ -116,8 +116,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
         margin: const EdgeInsets.only(right: 16),
         decoration: BoxDecoration(
           color: CustomTheme.surfaceColor,
-          borderRadius: BorderRadius.circular(CustomTheme.radiusMD),
-          border: Border.all(color: CustomTheme.borderLight),
+          borderRadius: BorderRadius.circular(CustomTheme.radiusSM),
         ),
         child: TextField(
           controller: _searchController,
@@ -128,10 +127,17 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
             hintStyle: CustomTextStyle.bodySmall.copyWith(
               color: CustomTheme.textTertiary,
             ),
-            prefixIcon: Icon(
-              Icons.search,
-              size: 20,
-              color: CustomTheme.primaryColor,
+            prefixIcon: Container(
+              margin: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: CustomTheme.secondaryColor,
+                borderRadius: BorderRadius.circular(5),
+              ),
+              child: Icon(
+                Icons.search,
+                size: 20,
+                color: CustomTheme.primaryColor,
+              ),
             ),
             suffixIcon: _searchController.text.isNotEmpty
                 ? IconButton(
