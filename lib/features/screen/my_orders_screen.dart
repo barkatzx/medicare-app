@@ -181,7 +181,7 @@ class _MyOrdersScreenState extends ConsumerState<MyOrdersScreen> {
   // ─────────────────────────────────────────────────────────────
   Widget _buildOrderCard(OrderEntity order) {
     final formattedDate = DateFormat(
-      'MMM dd, yyyy • hh:mm a',
+      'MMM dd, yy • hh:mm a',
     ).format(order.createdAt);
     final statusColor = _getStatusColor(order.status);
     final statusIcon = _getStatusIcon(order.status);
@@ -263,72 +263,61 @@ class _MyOrdersScreenState extends ConsumerState<MyOrdersScreen> {
 
                 // ── Footer: Date + Items + Total ────────────
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                      child: Row(
                         children: [
-                          Row(
-                            children: [
-                              Icon(
-                                Icons.calendar_today_rounded,
-                                size: 12,
-                                color: CustomTheme.textTertiary,
-                              ),
-                              const SizedBox(width: 4),
-                              Flexible(
-                                child: Text(
-                                  formattedDate,
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: CustomTheme.textSecondary,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                            ],
+                          Icon(
+                            Icons.calendar_today_rounded,
+                            size: 11,
+                            color: CustomTheme.textTertiary,
                           ),
-                          const SizedBox(height: 3),
-                          Row(
-                            children: [
-                              Icon(
-                                Icons.inventory_2_outlined,
-                                size: 12,
-                                color: CustomTheme.textTertiary,
+                          const SizedBox(width: 4),
+                          Flexible(
+                            child: Text(
+                              formattedDate,
+                              style: TextStyle(
+                                fontSize: 11,
+                                color: CustomTheme.textSecondary,
+                                fontWeight: FontWeight.w500,
                               ),
-                              const SizedBox(width: 4),
-                              Text(
-                                '${order.items.length} ${order.items.length == 1 ? 'Item' : 'Items'}',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: CustomTheme.textSecondary,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ],
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                            ),
                           ),
                         ],
                       ),
                     ),
-                    const SizedBox(width: 8),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
+                    const SizedBox(width: 6),
+                    Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
+                        Icon(
+                          Icons.inventory_2_outlined,
+                          size: 11,
+                          color: CustomTheme.textTertiary,
+                        ),
+                        const SizedBox(width: 3),
                         Text(
-                          '৳${order.totalAmount.toStringAsFixed(0)}',
+                          '${order.items.length} ${order.items.length == 1 ? 'item' : 'items'}',
                           style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w800,
-                            color: CustomTheme.primaryColor,
-                            letterSpacing: -0.3,
-                            height: 1.1,
+                            fontSize: 11,
+                            color: CustomTheme.textSecondary,
+                            fontWeight: FontWeight.w500,
                           ),
                         ),
                       ],
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      '${order.totalAmount.toStringAsFixed(0)}৳',
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w800,
+                        color: CustomTheme.textPrimary,
+                        letterSpacing: -0.3,
+                        height: 1.1,
+                      ),
                     ),
                   ],
                 ),
