@@ -85,7 +85,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           SafeArea(
             child: SingleChildScrollView(
               physics: const BouncingScrollPhysics(),
-              padding: EdgeInsets.symmetric(horizontal: CustomTheme.spacingXXL),
+              padding: EdgeInsets.symmetric(horizontal: CustomTheme.spacingMD),
               child: Form(
                 key: _formKey,
                 child: TweenAnimationBuilder<double>(
@@ -210,6 +210,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               hintText: '••••••••',
                               prefixIcon: Icons.lock_outline_rounded,
                               suffixIcon: IconButton(
+                                padding: EdgeInsets.zero,
+                                constraints: const BoxConstraints.tightFor(
+                                  width: 40,
+                                  height: 40,
+                                ),
                                 icon: Icon(
                                   _isPasswordVisible
                                       ? Icons.visibility_off_rounded
