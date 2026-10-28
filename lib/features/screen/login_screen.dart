@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medicare_app/core/di/providers.dart';
 import 'package:medicare_app/core/theme/custom_theme.dart';
@@ -18,6 +19,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _phoneController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _isPasswordVisible = false;
+  bool _isExitDialogOpen = false;
 
   @override
   void dispose() {
@@ -30,7 +32,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
 
-    return Scaffold(
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (!didPop) _confirmExit();
+      },
+      child: Scaffold(
       backgroundColor: CustomTheme.backgroundColor,
       body: Stack(
         children: [
@@ -462,7 +469,36 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           ),
         ],
       ),
+      ),
     );
+  }
+
+  Future<void> _confirmExit() async {
+    if (_isExitDialogOpen) return;
+    _isExitDialogOpen = true;
+
+    final shouldExit = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Exit app?'),
+        content: const Text('Are you sure you want to exit the app?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: const Text('Exit'),
+          ),
+        ],
+      ),
+    );
+
+    _isExitDialogOpen = false;
+    if (shouldExit == true && mounted) {
+      await SystemNavigator.pop();
+    }
   }
 
   Future<void> _handleLogin() async {
