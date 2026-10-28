@@ -159,10 +159,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen>
       ),
       title: Text(
         'Checkout',
-        style: CustomTextStyle.heading2.copyWith(
-          fontSize: 19,
-          letterSpacing: -0.4,
-        ),
+        style: CustomTextStyle.heading2.copyWith(fontSize: 20),
       ),
     );
   }
@@ -220,7 +217,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen>
             Text(
               subtitle,
               style: CustomTextStyle.caption.copyWith(
-                fontSize: 11,
+                fontSize: 13,
                 color: CustomTheme.textTertiary,
               ),
             ),
@@ -350,10 +347,17 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen>
           }),
 
           // Total row
+          Divider(
+            height: 1,
+            thickness: 1,
+            color: CustomTheme.borderLight,
+            indent: 12,
+            endIndent: 12,
+          ),
           Container(
             padding: const EdgeInsets.fromLTRB(12, 8, 12, 10),
             decoration: BoxDecoration(
-              color: CustomTheme.secondaryColor,
+              color: CustomTheme.surfaceColor,
               borderRadius: const BorderRadius.only(
                 bottomLeft: Radius.circular(16),
                 bottomRight: Radius.circular(16),
@@ -810,14 +814,14 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen>
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          'You save',
-                          style: CustomTextStyle.caption.copyWith(fontSize: 12),
+                          'Your savings',
+                          style: CustomTextStyle.caption.copyWith(fontSize: 13),
                         ),
                         Text(
                           '-${totalSavings.toStringAsFixed(2)}৳',
                           style: TextStyle(
                             fontFamily: CustomTheme.primaryFontFamily,
-                            fontSize: 12,
+                            fontSize: 13,
                             fontWeight: CustomTheme.fontWeightSemiBold,
                             color: CustomTheme.successColor,
                           ),
