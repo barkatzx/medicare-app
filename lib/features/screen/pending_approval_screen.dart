@@ -144,7 +144,7 @@ class _PendingApprovalScreenState extends ConsumerState<PendingApprovalScreen> {
                                           ),
                                           child: Icon(
                                             Icons.info_outline_rounded,
-                                            size: 17,
+                                            size: 20,
                                             color: CustomTheme.warningColor,
                                           ),
                                         ),
@@ -155,9 +155,7 @@ class _PendingApprovalScreenState extends ConsumerState<PendingApprovalScreen> {
                                               top: 1,
                                             ),
                                             child: Text(
-                                              authProvider
-                                                      .pendingApprovalMessage ??
-                                                  'Your account is pending approval from the administrator. This process usually takes 24-48 hours.',
+                                              'Your account is pending approval from the administrator. This process usually takes 24-48 hours.',
                                               style: CustomTextStyle.bodyMedium
                                                   .copyWith(
                                                     fontSize: 13,
