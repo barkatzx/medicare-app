@@ -13,12 +13,12 @@ void main() async {
   // Global Error Handling for Production
   FlutterError.onError = (details) {
     FlutterError.presentError(details);
-    debugPrint('Flutter Error: ${details.exception}');
   };
 
   PlatformDispatcher.instance.onError = (error, stack) {
-    debugPrint('Platform Error: $error');
-    return true;
+    debugPrint('Unhandled platform error: $error');
+    debugPrintStack(stackTrace: stack);
+    return false;
   };
 
   final prefs = await SharedPreferences.getInstance();

@@ -988,6 +988,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen>
   }
 
   Future<void> _placeOrder(CartProvider cartProvider) async {
+    if (_isPlacingOrder) return;
     setState(() => _isPlacingOrder = true);
 
     try {

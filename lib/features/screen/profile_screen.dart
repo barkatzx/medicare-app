@@ -28,6 +28,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     final user = authProvider.currentUser;
     final orders = ref.watch(orderProviderNotifier).orders;
     final totalOrders = orders.length;
+    final cancelledOrders = orders
+        .where((o) => o.status.toLowerCase() == 'cancelled')
+        .length;
     final totalProducts = orders
         .expand((o) => o.items.map((i) => i.productId))
         .toSet()
@@ -51,7 +54,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             children: [
               _buildProfileCard(user),
               const SizedBox(height: 15),
-              _buildStatsRow(totalOrders, totalProducts),
+              _buildStatsRow(totalOrders, totalProducts, cancelledOrders),
               const SizedBox(height: 24),
               _buildSectionLabel('General'),
               const SizedBox(height: 10),
@@ -191,14 +194,14 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     );
   }
 
-  Widget _buildStatsRow(int orders, int products) {
+  Widget _buildStatsRow(int orders, int products, int cancelled) {
     return Row(
       children: [
         Expanded(child: _buildStatCard('$orders', 'Total Orders')),
         const SizedBox(width: 15),
         Expanded(child: _buildStatCard('$products', 'Products Ordered')),
         const SizedBox(width: 15),
-        Expanded(child: _buildStatCard('1-3 Days', 'Est. Delivery')),
+        Expanded(child: _buildStatCard('$cancelled', 'Cancelled Orders')),
       ],
     );
   }

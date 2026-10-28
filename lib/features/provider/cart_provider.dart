@@ -12,11 +12,13 @@ class CartProvider extends ChangeNotifier {
   CartEntity? _cart;
   bool _isLoading = false;
   bool _isUpdating = false;
+  bool _isAddingToCart = false;
   int _cartItemCount = 0;
 
   CartEntity? get cart => _cart;
   bool get isLoading => _isLoading;
   bool get isUpdating => _isUpdating;
+  bool get isAddingToCart => _isAddingToCart;
   int get cartItemCount => _cartItemCount;
   List<CartItemEntity> get cartItems => _cart?.items ?? [];
   double get subtotal => _cart?.subtotal ?? 0.0;
@@ -59,14 +61,20 @@ class CartProvider extends ChangeNotifier {
     }
   }
 
+  String? lastAddToCartError;
+
   Future<bool> addToCart(String productId, int quantity) async {
+    if (_isAddingToCart) {
+      lastAddToCartError = 'Please wait, adding previous item...';
+      return false;
+    }
+    lastAddToCartError = null;
+    _isAddingToCart = true;
+    _cartItemCount += quantity;
+    notifyListeners();
+
     try {
       debugPrint('Adding to cart: productId=$productId, quantity=$quantity');
-
-      // Optimistic increment
-      _cartItemCount += quantity;
-      notifyListeners();
-
       // Call API to add to cart
       await cartRepository.addToCart(productId, quantity);
 
@@ -80,11 +88,15 @@ class CartProvider extends ChangeNotifier {
     } catch (e) {
       // Revert optimistic count
       _cartItemCount -= quantity;
+      lastAddToCartError = e.toString().replaceFirst('Exception: ', '');
       notifyListeners();
 
       Logger.error('Error adding to cart', e);
       onShowMessage?.call('Failed to add product to cart', isError: true);
       return false;
+    } finally {
+      _isAddingToCart = false;
+      notifyListeners();
     }
   }
 

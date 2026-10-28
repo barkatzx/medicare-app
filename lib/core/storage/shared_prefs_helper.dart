@@ -40,11 +40,22 @@ class SharedPrefsHelper {
   }
 
   Future<void> saveUser(UserEntity user) async {
-    await _prefs.setString(_userKey, json.encode(user.toJson()));
+    await _secureStorage.write(
+      key: _userKey,
+      value: json.encode(user.toJson()),
+    );
+    await _prefs.remove(_userKey);
   }
 
   Future<UserEntity?> getUser() async {
-    final userString = _prefs.getString(_userKey);
+    var userString = await _secureStorage.read(key: _userKey);
+    if (userString == null) {
+      userString = _prefs.getString(_userKey);
+      if (userString != null) {
+        await _secureStorage.write(key: _userKey, value: userString);
+        await _prefs.remove(_userKey);
+      }
+    }
     if (userString != null) {
       final userData = json.decode(userString);
       return UserEntity.fromJson(userData);
@@ -53,10 +64,12 @@ class SharedPrefsHelper {
   }
 
   Future<void> clearUser() async {
+    await _secureStorage.delete(key: _userKey);
     await _prefs.remove(_userKey);
   }
 
   Future<void> clearAll() async {
+    await Future.wait([clearToken(), clearUser()]);
     await _prefs.clear();
   }
 }

@@ -127,26 +127,30 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             ),
                           ),
                           SizedBox(width: CustomTheme.spacingMD),
-                          Text(
-                            'MediCarePLC',
-                            style: CustomTextStyle.heading1.copyWith(
-                              fontSize: 30,
-                              color: CustomTheme.primaryColor,
-                              fontWeight: CustomTheme.fontWeightBold,
-                              letterSpacing: -0.8,
-                            ),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                'MediCarePLC',
+                                style: CustomTextStyle.heading1.copyWith(
+                                  fontSize: 30,
+                                  color: CustomTheme.primaryColor,
+                                  fontWeight: CustomTheme.fontWeightBold,
+                                  letterSpacing: -0.8,
+                                ),
+                              ),
+                              Text(
+                                'Welcome back! Sign in to continue',
+                                style: CustomTextStyle.bodyMedium.copyWith(
+                                  fontSize: 15,
+                                  fontWeight: CustomTheme.fontWeightBold,
+                                  color: CustomTheme.textSecondary,
+                                ),
+                              ),
+                            ],
                           ),
                         ],
-                      ),
-                      SizedBox(height: CustomTheme.spacingXS),
-                      Text(
-                        'Welcome back! Sign in to continue',
-                        style: CustomTextStyle.bodyMedium.copyWith(
-                          fontSize: 15,
-                          fontWeight: CustomTheme.fontWeightBold,
-                          color: CustomTheme.textSecondary,
-                        ),
-                        textAlign: TextAlign.center,
                       ),
                       SizedBox(height: CustomTheme.spacingXXL * 1.4),
 

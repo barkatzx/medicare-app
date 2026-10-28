@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:medicare_app/core/widgets/custom_button.dart';
 import 'package:medicare_app/core/widgets/custom_textfield.dart';
 import 'package:medicare_app/core/theme/custom_theme.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({super.key});
@@ -14,7 +15,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   bool _isLoading = false;
-  bool _isEmailSent = false;
 
   @override
   void dispose() {
@@ -23,19 +23,36 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   }
 
   Future<void> _handleResetPassword() async {
-    if (_formKey.currentState!.validate()) {
-      setState(() {
-        _isLoading = true;
-      });
+    if (!(_formKey.currentState?.validate() ?? false)) return;
 
-      // Simulate API call - Replace with your actual API
-      await Future.delayed(const Duration(seconds: 2));
-
-      setState(() {
-        _isLoading = false;
-        _isEmailSent = true;
-      });
+    setState(() => _isLoading = true);
+    try {
+      final uri = Uri(
+        scheme: 'mailto',
+        path: 'support@medicareplc.com',
+        queryParameters: {
+          'subject': 'Password reset request',
+          'body':
+              'Please help me reset the password for ${_emailController.text.trim()}.',
+        },
+      );
+      final opened = await launchUrl(uri, mode: LaunchMode.externalApplication);
+      if (!opened && mounted) _showSupportUnavailable();
+    } catch (_) {
+      if (mounted) _showSupportUnavailable();
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
     }
+  }
+
+  void _showSupportUnavailable() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text(
+          'Unable to open email. Contact support@medicareplc.com to reset your password.',
+        ),
+      ),
+    );
   }
 
   @override
@@ -57,14 +74,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
                   colors: [
-                    (_isEmailSent
-                            ? CustomTheme.successColor
-                            : CustomTheme.primaryColor)
-                        .withValues(alpha: 0.14),
-                    (_isEmailSent
-                            ? CustomTheme.successColor
-                            : CustomTheme.primaryColor)
-                        .withValues(alpha: 0.0),
+                    CustomTheme.primaryColor.withValues(alpha: 0.14),
+                    CustomTheme.primaryColor.withValues(alpha: 0.0),
                   ],
                 ),
               ),
@@ -118,45 +129,20 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     ),
                   ),
 
-                  AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 450),
-                    switchInCurve: Curves.easeOutCubic,
-                    switchOutCurve: Curves.easeIn,
-                    transitionBuilder: (child, animation) {
-                      return FadeTransition(
-                        opacity: animation,
-                        child: SlideTransition(
-                          position: Tween<Offset>(
-                            begin: const Offset(0, 0.04),
-                            end: Offset.zero,
-                          ).animate(animation),
+                  TweenAnimationBuilder<double>(
+                    tween: Tween(begin: 0.0, end: 1.0),
+                    duration: const Duration(milliseconds: 700),
+                    curve: Curves.easeOutCubic,
+                    builder: (context, value, child) {
+                      return Opacity(
+                        opacity: value,
+                        child: Transform.translate(
+                          offset: Offset(0, 24 * (1 - value)),
                           child: child,
                         ),
                       );
                     },
-                    child: _isEmailSent
-                        ? KeyedSubtree(
-                            key: const ValueKey('success'),
-                            child: _buildSuccessView(),
-                          )
-                        : KeyedSubtree(
-                            key: const ValueKey('form'),
-                            child: TweenAnimationBuilder<double>(
-                              tween: Tween(begin: 0.0, end: 1.0),
-                              duration: const Duration(milliseconds: 700),
-                              curve: Curves.easeOutCubic,
-                              builder: (context, value, child) {
-                                return Opacity(
-                                  opacity: value,
-                                  child: Transform.translate(
-                                    offset: Offset(0, 24 * (1 - value)),
-                                    child: child,
-                                  ),
-                                );
-                              },
-                              child: _buildResetForm(),
-                            ),
-                          ),
+                    child: _buildResetForm(),
                   ),
                 ],
               ),
@@ -238,7 +224,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8),
             child: Text(
-              'Enter your email address and we will send you a link to reset your password',
+              'Contact support to request help resetting your password.',
               style: CustomTextStyle.bodyMedium.copyWith(
                 fontSize: 14.5,
                 height: 1.6,
@@ -283,7 +269,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
                 // Send Reset Link Button
                 CustomButton(
-                  text: 'Send Reset Link',
+                  text: 'Contact Support',
                   onPressed: _handleResetPassword,
                   isLoading: _isLoading,
                   fontSize: 16,
@@ -333,134 +319,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           SizedBox(height: CustomTheme.spacingXXL),
         ],
       ),
-    );
-  }
-
-  Widget _buildSuccessView() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        SizedBox(height: CustomTheme.spacingXL),
-
-        _buildHeroIcon(
-          icon: Icons.mark_email_read_rounded,
-          color: CustomTheme.successColor,
-        ),
-
-        SizedBox(height: CustomTheme.spacingXL),
-
-        // Success Title
-        Text(
-          'Check Your Email',
-          style: CustomTextStyle.heading1.copyWith(
-            fontSize: 28,
-            letterSpacing: -0.8,
-            fontWeight: FontWeight.w800,
-          ),
-          textAlign: TextAlign.center,
-        ),
-
-        SizedBox(height: CustomTheme.spacingSM),
-
-        // Success Message
-        Text(
-          'We have sent a password reset link to',
-          style: CustomTextStyle.bodyMedium.copyWith(
-            fontSize: 14.5,
-            color: CustomTheme.textSecondary,
-          ),
-          textAlign: TextAlign.center,
-        ),
-
-        SizedBox(height: CustomTheme.spacingMD),
-
-        // Email chip
-        Center(
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-            decoration: BoxDecoration(
-              color: CustomTheme.surfaceColor,
-              borderRadius: BorderRadius.circular(30),
-              border: Border.all(color: CustomTheme.borderLight),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  Icons.email_outlined,
-                  size: 16,
-                  color: CustomTheme.primaryColor,
-                ),
-                const SizedBox(width: 8),
-                Flexible(
-                  child: Text(
-                    _emailController.text,
-                    overflow: TextOverflow.ellipsis,
-                    style: CustomTextStyle.bodyMedium.copyWith(
-                      fontSize: 13.5,
-                      color: CustomTheme.textPrimary,
-                      fontWeight: CustomTheme.fontWeightSemiBold,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-
-        SizedBox(height: CustomTheme.spacingXXL),
-
-        // Info Card
-        Container(
-          padding: EdgeInsets.all(CustomTheme.spacingLG),
-          decoration: BoxDecoration(
-            color: CustomTheme.successColor.withValues(alpha: 0.06),
-            borderRadius: BorderRadius.circular(CustomTheme.radiusLG),
-            border: Border.all(
-              color: CustomTheme.successColor.withValues(alpha: 0.2),
-              width: 1,
-            ),
-          ),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                width: 34,
-                height: 34,
-                decoration: BoxDecoration(
-                  color: CustomTheme.successColor.withValues(alpha: 0.14),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Icon(
-                  Icons.info_outline_rounded,
-                  color: CustomTheme.successColor,
-                  size: 18,
-                ),
-              ),
-              SizedBox(width: CustomTheme.spacingMD),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.only(top: 2),
-                  child: Text(
-                    'Please check your spam folder if you don\'t see the email in your inbox.',
-                    style: CustomTextStyle.bodySmall.copyWith(height: 1.5),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-
-        SizedBox(height: CustomTheme.spacingXXL * 1.5),
-
-        // Back to Login Button
-        CustomButton(
-          text: 'Back to Login',
-          onPressed: () => Navigator.pop(context),
-        ),
-
-        SizedBox(height: CustomTheme.spacingXXL),
-      ],
     );
   }
 }
