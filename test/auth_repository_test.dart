@@ -58,6 +58,55 @@ void main() {
     client.close();
   });
 
+  test('login reports pending approval before requiring a token', () async {
+    final client = MockClient(
+      (_) async => http.Response(
+        jsonEncode({
+          'data': {
+            'user': {..._userJson(), 'isApproved': false},
+          },
+        }),
+        200,
+      ),
+    );
+    final repository = AuthRepositoryImpl(
+      client: client,
+      sharedPreferencesHelper: storage,
+    );
+
+    await expectLater(
+      repository.login(phoneNumber: '01700000000', password: 'test-password'),
+      throwsA(
+        predicate((error) => error.toString().contains('pending approval')),
+      ),
+    );
+
+    expect(await storage.getToken(), isNull);
+    expect(await storage.getUser(), isNull);
+    client.close();
+  });
+
+  test('login surfaces the server pending approval error', () async {
+    final client = MockClient(
+      (_) async => http.Response(
+        jsonEncode({'error': 'Your account is pending approval'}),
+        401,
+      ),
+    );
+    final repository = AuthRepositoryImpl(
+      client: client,
+      sharedPreferencesHelper: storage,
+    );
+
+    await expectLater(
+      repository.login(phoneNumber: '01700000000', password: 'test-password'),
+      throwsA(
+        predicate((error) => error.toString().contains('pending approval')),
+      ),
+    );
+    client.close();
+  });
+
   test(
     'expired authentication clears the secure token and cached user',
     () async {

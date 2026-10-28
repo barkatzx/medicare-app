@@ -53,18 +53,12 @@ class AuthRepositoryImpl implements AuthRepository {
         if (responseData['data'] != null) {
           final userData = responseData['data']['user'];
           final responseToken = responseData['data']['token'];
-          if (responseToken is! String || responseToken.isEmpty) {
-            throw Exception('Invalid login response: token not found');
-          }
-          token = responseToken;
-
           if (userData == null) {
             throw Exception('User data not found');
           }
 
           user = UserEntity.fromJson(userData);
 
-          // Check if user is customer and approved
           if (user.role.toLowerCase() == 'customer') {
             if (!user.isApproved) {
               throw Exception(
@@ -77,6 +71,11 @@ class AuthRepositoryImpl implements AuthRepository {
             );
           }
 
+          if (responseToken is! String || responseToken.isEmpty) {
+            throw Exception('Invalid login response: token not found');
+          }
+          token = responseToken;
+
           // Save token and user data
           await sharedPreferencesHelper.saveToken(token);
           await sharedPreferencesHelper.saveUser(user);
@@ -87,7 +86,9 @@ class AuthRepositoryImpl implements AuthRepository {
         }
       } else {
         final errorBody = json.decode(response.body);
-        throw (errorBody['message'] ??
+        // The server reports failures (including pending approval) under `error`.
+        throw (errorBody['error'] ??
+            errorBody['message'] ??
             'Login failed. Check your password and try again.');
       }
     } catch (e) {
