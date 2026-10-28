@@ -29,8 +29,6 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen>
 
   AnimationController? _stepAnimController;
   Animation<double>? _stepFadeAnim;
-  AnimationController? _pulseController;
-  Animation<double>? _pulseAnim;
 
   @override
   void initState() {
@@ -43,16 +41,6 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen>
     _stepAnimController = stepCtrl;
     _stepFadeAnim = CurvedAnimation(parent: stepCtrl, curve: Curves.easeOut);
     stepCtrl.forward();
-
-    final pulseCtrl = AnimationController(
-      duration: const Duration(milliseconds: 1500),
-      vsync: this,
-    )..repeat(reverse: true);
-    _pulseController = pulseCtrl;
-    _pulseAnim = Tween<double>(
-      begin: 0.95,
-      end: 1.05,
-    ).animate(CurvedAnimation(parent: pulseCtrl, curve: Curves.easeInOut));
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _prefillUserData();
@@ -73,7 +61,6 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen>
     _nameController.dispose();
     _phoneController.dispose();
     _stepAnimController?.dispose();
-    _pulseController?.dispose();
     super.dispose();
   }
 
@@ -865,15 +852,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen>
           SizedBox(
             width: double.infinity,
             height: 48,
-            child: AnimatedBuilder(
-              animation: _pulseAnim ?? const AlwaysStoppedAnimation(1.0),
-              builder: (context, child) {
-                return Transform.scale(
-                  scale: _isPlacingOrder ? (_pulseAnim?.value ?? 1.0) : 1.0,
-                  child: child,
-                );
-              },
-              child: ElevatedButton(
+            child: ElevatedButton(
                 onPressed: _isPlacingOrder
                     ? null
                     : () => _handleContinue(cartProvider),
@@ -948,7 +927,6 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen>
                           ),
                   ),
                 ),
-              ),
             ),
           ),
         ],

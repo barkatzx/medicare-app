@@ -4,7 +4,6 @@ import 'package:intl/intl.dart';
 import 'package:medicare_app/core/di/providers.dart';
 import 'package:medicare_app/features/entity/order_entity.dart';
 import 'package:medicare_app/core/theme/custom_theme.dart';
-import 'package:medicare_app/core/widgets/loading_widget.dart';
 import 'package:medicare_app/core/routes/app_routes.dart';
 
 class MyOrdersScreen extends ConsumerStatefulWidget {
@@ -76,7 +75,39 @@ class _MyOrdersScreenState extends ConsumerState<MyOrdersScreen> {
   // ─────────────────────────────────────────────────────────────
   Widget _buildBody(bool isLoading, List<OrderEntity> orders) {
     if (isLoading && orders.isEmpty) {
-      return const LoadingWidget();
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              width: 52,
+              height: 52,
+              decoration: BoxDecoration(
+                color: CustomTheme.surfaceColor,
+                shape: BoxShape.circle,
+              ),
+              child: Center(
+                child: SizedBox(
+                  width: 22,
+                  height: 22,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2.2,
+                    color: CustomTheme.primaryColor,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              'Loading orders…',
+              style: CustomTextStyle.bodySmall.copyWith(
+                fontSize: 12,
+                color: CustomTheme.textTertiary,
+              ),
+            ),
+          ],
+        ),
+      );
     }
 
     if (orders.isEmpty) {

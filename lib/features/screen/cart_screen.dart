@@ -51,7 +51,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
           textBaseline: TextBaseline.alphabetic,
           children: [
             Text(
-              'Bag',
+              'Bag Products ',
               style: CustomTextStyle.heading2.copyWith(
                 fontSize: 20,
                 letterSpacing: -0.5,
