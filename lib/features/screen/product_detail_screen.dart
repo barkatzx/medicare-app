@@ -105,7 +105,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
   // ─────────────────────────────────────────────────────────────
   PreferredSizeWidget _buildSimpleAppBar() {
     return AppBar(
-      toolbarHeight: 52,
+      toolbarHeight: 50,
       elevation: 0,
       backgroundColor: CustomTheme.backgroundColor,
       scrolledUnderElevation: 0.5,

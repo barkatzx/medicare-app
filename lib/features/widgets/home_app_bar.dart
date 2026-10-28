@@ -18,7 +18,7 @@ class HomeAppBar extends ConsumerStatefulWidget implements PreferredSizeWidget {
 class _HomeAppBarState extends ConsumerState<HomeAppBar> {
   static const double _sidePadding = 16;
   static const double _avatarSize = 44;
-  static const double _actionSize = 40;
+  static const double _actionSize = 35;
   static const double _iconSize = 20;
 
   @override
@@ -55,11 +55,11 @@ class _HomeAppBarState extends ConsumerState<HomeAppBar> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  'Welcome back 👋',
+                  'Welcome Back 👋',
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                    fontSize: 11,
+                    fontSize: 13,
                     height: 1.2,
                     color: CustomTheme.textTertiary,
                     fontWeight: FontWeight.w500,
@@ -104,13 +104,9 @@ class _HomeAppBarState extends ConsumerState<HomeAppBar> {
       padding: const EdgeInsets.all(2),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(8),
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            CustomTheme.primaryColor,
-            CustomTheme.primaryColor.withValues(alpha: 0.5),
-          ],
+        border: Border.all(
+          color: CustomTheme.borderLight.withValues(alpha: 0.6),
+          width: 1,
         ),
       ),
       child: Container(
@@ -123,7 +119,7 @@ class _HomeAppBarState extends ConsumerState<HomeAppBar> {
           initial,
           style: TextStyle(
             fontFamily: CustomTheme.primaryFontFamily,
-            fontSize: 17,
+            fontSize: 25,
             height: 1,
             fontWeight: FontWeight.w800,
             color: CustomTheme.primaryColor,
