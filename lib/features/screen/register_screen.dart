@@ -338,15 +338,15 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                         child: GestureDetector(
                           onTap: () => Navigator.maybePop(context),
                           child: Container(
-                            width: 40,
-                            height: 40,
+                            width: 30,
+                            height: 30,
                             decoration: BoxDecoration(
                               color: CustomTheme.surfaceColor,
-                              shape: BoxShape.circle,
+                              borderRadius: BorderRadius.circular(8),
                             ),
                             child: const Icon(
                               Icons.arrow_back_ios_new_rounded,
-                              size: 16,
+                              size: 18,
                               color: CustomTheme.textPrimary,
                             ),
                           ),
@@ -403,10 +403,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                           color: CustomTheme.surfaceColor,
                           borderRadius: BorderRadius.circular(
                             CustomTheme.radiusXL,
-                          ),
-                          border: Border.all(
-                            color: CustomTheme.borderLight,
-                            width: 1,
                           ),
                         ),
                         child: Column(

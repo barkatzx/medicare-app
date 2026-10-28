@@ -63,23 +63,24 @@ class _CategoryProductsScreenState
     return Scaffold(
       backgroundColor: CustomTheme.backgroundColor,
       appBar: AppBar(
-        leadingWidth: 60,
+        leadingWidth: 50,
         leading: Padding(
           padding: const EdgeInsets.only(left: 16),
           child: Center(
-            child: GestureDetector(
+            child: InkWell(
+              borderRadius: BorderRadius.circular(8),
               onTap: () => Navigator.pop(context),
               child: Container(
-                width: 36,
-                height: 36,
-                decoration: const BoxDecoration(
+                width: 30,
+                height: 30,
+                decoration: BoxDecoration(
                   color: CustomTheme.surfaceColor,
-                  shape: BoxShape.circle,
+                  borderRadius: BorderRadius.circular(8),
                 ),
                 child: const Icon(
-                  Icons.chevron_left_rounded,
+                  Icons.arrow_back_ios_new_rounded,
                   color: CustomTheme.textPrimary,
-                  size: 20,
+                  size: 18,
                 ),
               ),
             ),

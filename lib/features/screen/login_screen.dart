@@ -171,10 +171,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             borderRadius: BorderRadius.circular(
                               CustomTheme.radiusXL,
                             ),
-                            border: Border.all(
-                              color: CustomTheme.borderLight,
-                              width: 1,
-                            ),
                           ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.stretch,
