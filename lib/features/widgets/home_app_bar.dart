@@ -32,9 +32,14 @@ class _HomeAppBarState extends ConsumerState<HomeAppBar> {
   @override
   Widget build(BuildContext context) {
     final user = ref.watch(authProviderNotifier).currentUser;
-    final hasName = user?.name.isNotEmpty == true;
     final displayName = user?.name ?? 'Guest User';
-    final initial = hasName ? user!.name[0].toUpperCase() : 'G';
+    final nameParts = (user?.name ?? '')
+        .trim()
+        .split(RegExp(r'\s+'))
+        .where((part) => part.isNotEmpty);
+    final initials = nameParts.isEmpty
+        ? 'G'
+        : nameParts.take(2).map((part) => part[0].toUpperCase()).join();
 
     return AppBar(
       elevation: 0,
@@ -46,7 +51,7 @@ class _HomeAppBarState extends ConsumerState<HomeAppBar> {
       titleSpacing: _sidePadding,
       title: Row(
         children: [
-          _buildAvatar(initial),
+          _buildAvatar(initials),
           const SizedBox(width: 10),
           Expanded(
             child: Column(
@@ -96,34 +101,28 @@ class _HomeAppBarState extends ConsumerState<HomeAppBar> {
     );
   }
 
-  // ── Avatar with gradient ring ──
-  Widget _buildAvatar(String initial) {
+  // ── Avatar styled like the profile screen ──
+  Widget _buildAvatar(String initials) {
     return Container(
       width: _avatarSize,
       height: _avatarSize,
-      padding: const EdgeInsets.all(2),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(10),
+        color: CustomTheme.primaryColor.withValues(alpha: 0.07),
         border: Border.all(
-          color: CustomTheme.borderLight.withValues(alpha: 0.6),
+          color: CustomTheme.primaryColor.withValues(alpha: 0.12),
           width: 1,
         ),
       ),
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(6),
-        ),
-        alignment: Alignment.center,
-        child: Text(
-          initial,
-          style: TextStyle(
-            fontFamily: CustomTheme.primaryFontFamily,
-            fontSize: 25,
-            height: 1,
-            fontWeight: FontWeight.w800,
-            color: CustomTheme.primaryColor,
-          ),
+      alignment: Alignment.center,
+      child: Text(
+        initials,
+        style: TextStyle(
+          fontFamily: CustomTheme.primaryFontFamily,
+          fontSize: 19,
+          height: 1,
+          fontWeight: CustomTheme.fontWeightBold,
+          color: CustomTheme.primaryColor,
         ),
       ),
     );

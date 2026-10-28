@@ -42,7 +42,7 @@ class _CategoriesScreenState extends ConsumerState<CategoriesScreen> {
       backgroundColor: CustomTheme.backgroundColor,
       appBar: AppBar(
         title: _buildSearchField(provider),
-        titleSpacing: 20,
+        titleSpacing: 16,
         backgroundColor: CustomTheme.backgroundColor,
         elevation: 0,
         scrolledUnderElevation: 0,
@@ -57,7 +57,7 @@ class _CategoriesScreenState extends ConsumerState<CategoriesScreen> {
     return Container(
       height: 46,
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: CustomTheme.surfaceColor,
         borderRadius: BorderRadius.circular(CustomTheme.radiusSM),
       ),
       child: TextField(
@@ -69,17 +69,10 @@ class _CategoriesScreenState extends ConsumerState<CategoriesScreen> {
           hintStyle: CustomTextStyle.bodyMedium.copyWith(
             color: CustomTheme.textTertiary,
           ),
-          prefixIcon: Container(
-            margin: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: CustomTheme.secondaryColor,
-              borderRadius: BorderRadius.circular(5),
-            ),
-            child: const Icon(
-              Icons.search_rounded,
-              color: CustomTheme.primaryColor,
-              size: 22,
-            ),
+          prefixIcon: const Icon(
+            Icons.search_rounded,
+            color: CustomTheme.primaryColor,
+            size: 22,
           ),
           suffixIcon: _searchController.text.isNotEmpty
               ? IconButton(
@@ -196,8 +189,19 @@ class _CategoriesScreenState extends ConsumerState<CategoriesScreen> {
 
     return RefreshIndicator(
       onRefresh: () => provider.fetchCategories(),
+      color: CustomTheme.primaryColor,
+      backgroundColor: CustomTheme.surfaceColor,
+      strokeWidth: 2,
       child: ListView.separated(
-        padding: const EdgeInsets.fromLTRB(20, 16, 20, 40),
+        physics: const AlwaysScrollableScrollPhysics(
+          parent: BouncingScrollPhysics(),
+        ),
+        padding: EdgeInsets.fromLTRB(
+          16,
+          8,
+          16,
+          MediaQuery.of(context).padding.bottom + 112,
+        ),
         itemCount: categories.length,
         separatorBuilder: (context, index) => const SizedBox(height: 5),
         itemBuilder: (context, index) {

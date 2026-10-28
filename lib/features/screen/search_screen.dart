@@ -122,6 +122,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
           controller: _searchController,
           focusNode: _searchFocusNode,
           onChanged: _onSearchChanged,
+          cursorColor: CustomTheme.primaryColor,
           textAlignVertical: TextAlignVertical.center,
           decoration: InputDecoration(
             hintText: 'Type Medicine Name',

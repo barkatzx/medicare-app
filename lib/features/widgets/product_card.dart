@@ -75,7 +75,7 @@ class ProductCard extends StatelessWidget {
                       product.name,
                       style: CustomTextStyle.bodyMedium.copyWith(
                         fontSize: 15,
-                        fontWeight: CustomTheme.fontWeightSemiBold,
+                        fontWeight: CustomTheme.fontWeightBold,
                         color: CustomTheme.textPrimary,
                         height: 1,
                       ),

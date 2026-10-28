@@ -129,14 +129,6 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
           letterSpacing: -0.3,
         ),
       ),
-      actions: [
-        Padding(
-          padding: const EdgeInsets.only(right: 12),
-          child: Center(
-            child: _buildCircleIconButton(Icons.share_outlined, () {}),
-          ),
-        ),
-      ],
     );
   }
 

@@ -379,7 +379,7 @@ class _OrderDetailScreenState extends ConsumerState<OrderDetailScreen> {
                 style: CustomTextStyle.bodySmall.copyWith(
                   color: CustomTheme.errorColor,
                   fontWeight: CustomTheme.fontWeightSemiBold,
-                  fontSize: 10.5,
+                  fontSize: 13,
                 ),
               ),
             ),
@@ -482,7 +482,7 @@ class _OrderDetailScreenState extends ConsumerState<OrderDetailScreen> {
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     fontFamily: CustomTheme.primaryFontFamily,
-                    fontSize: 10,
+                    fontSize: 13,
                     fontWeight: isCurrent
                         ? CustomTheme.fontWeightBold
                         : CustomTheme.fontWeightMedium,
@@ -517,10 +517,10 @@ class _OrderDetailScreenState extends ConsumerState<OrderDetailScreen> {
           ),
           const SizedBox(width: 5),
           Text(
-            status,
+            status.toUpperCase(),
             style: TextStyle(
               fontFamily: CustomTheme.primaryFontFamily,
-              fontSize: 12,
+              fontSize: 13,
               fontWeight: CustomTheme.fontWeightBold,
               color: color,
             ),
@@ -606,9 +606,9 @@ class _OrderDetailScreenState extends ConsumerState<OrderDetailScreen> {
                           Text(
                             item.product?.name ?? 'Unknown Product',
                             style: CustomTextStyle.bodyMedium.copyWith(
-                              fontWeight: CustomTheme.fontWeightSemiBold,
+                              fontWeight: CustomTheme.fontWeightBold,
                               color: CustomTheme.textPrimary,
-                              fontSize: 13,
+                              fontSize: 15,
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
@@ -617,7 +617,7 @@ class _OrderDetailScreenState extends ConsumerState<OrderDetailScreen> {
                           Text(
                             '${item.price.toStringAsFixed(0)}৳ × ${item.quantity}',
                             style: CustomTextStyle.caption.copyWith(
-                              fontSize: 10,
+                              fontSize: 13,
                               color: CustomTheme.textTertiary,
                             ),
                           ),
@@ -629,7 +629,7 @@ class _OrderDetailScreenState extends ConsumerState<OrderDetailScreen> {
                       '${(item.price * item.quantity).toStringAsFixed(0)}৳',
                       style: TextStyle(
                         fontFamily: CustomTheme.primaryFontFamily,
-                        fontSize: 12,
+                        fontSize: 15,
                         fontWeight: CustomTheme.fontWeightBold,
                         color: CustomTheme.textPrimary,
                       ),
@@ -660,7 +660,7 @@ class _OrderDetailScreenState extends ConsumerState<OrderDetailScreen> {
                   'Subtotal',
                   style: TextStyle(
                     fontFamily: CustomTheme.primaryFontFamily,
-                    fontSize: 13,
+                    fontSize: 15,
                     fontWeight: CustomTheme.fontWeightSemiBold,
                     color: CustomTheme.textSecondary,
                   ),
@@ -669,7 +669,7 @@ class _OrderDetailScreenState extends ConsumerState<OrderDetailScreen> {
                   '৳${subtotal.toStringAsFixed(0)}',
                   style: TextStyle(
                     fontFamily: CustomTheme.primaryFontFamily,
-                    fontSize: 13,
+                    fontSize: 15,
                     fontWeight: CustomTheme.fontWeightBold,
                     color: CustomTheme.textPrimary,
                   ),
@@ -717,9 +717,9 @@ class _OrderDetailScreenState extends ConsumerState<OrderDetailScreen> {
                         Text(
                           addr.street,
                           style: CustomTextStyle.bodyMedium.copyWith(
-                            fontWeight: CustomTheme.fontWeightSemiBold,
+                            fontWeight: CustomTheme.fontWeightBold,
                             color: CustomTheme.textPrimary,
-                            fontSize: 11,
+                            fontSize: 15,
                           ),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
@@ -731,7 +731,7 @@ class _OrderDetailScreenState extends ConsumerState<OrderDetailScreen> {
                             addr.state,
                           ].where((e) => e.trim().isNotEmpty).join(', '),
                           style: CustomTextStyle.caption.copyWith(
-                            fontSize: 10,
+                            fontSize: 13,
                             color: CustomTheme.textTertiary,
                           ),
                         ),
@@ -774,7 +774,7 @@ class _OrderDetailScreenState extends ConsumerState<OrderDetailScreen> {
                           style: CustomTextStyle.bodyMedium.copyWith(
                             fontWeight: CustomTheme.fontWeightSemiBold,
                             color: CustomTheme.textPrimary,
-                            fontSize: 11,
+                            fontSize: 15,
                           ),
                         ),
                         const SizedBox(height: 2),
@@ -782,7 +782,7 @@ class _OrderDetailScreenState extends ConsumerState<OrderDetailScreen> {
                           pay.method == 'cod' ? 'Cash on Delivery' : pay.method,
                           style: CustomTextStyle.caption.copyWith(
                             color: CustomTheme.textTertiary,
-                            fontSize: 10,
+                            fontSize: 13,
                           ),
                         ),
                       ],
@@ -803,8 +803,8 @@ class _OrderDetailScreenState extends ConsumerState<OrderDetailScreen> {
 
   Widget _buildInfoIcon(IconData icon, Color color) {
     return Container(
-      width: 28,
-      height: 28,
+      width: 35,
+      height: 35,
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(8),

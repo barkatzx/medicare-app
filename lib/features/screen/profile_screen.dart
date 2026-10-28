@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 
 import 'package:medicare_app/core/di/providers.dart';
 import 'package:medicare_app/core/theme/custom_theme.dart';
@@ -35,6 +36,14 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         .expand((o) => o.items.map((i) => i.productId))
         .toSet()
         .length;
+    final lastOrderDate = orders.isEmpty
+        ? null
+        : orders
+              .reduce(
+                (latest, order) =>
+                    order.createdAt.isAfter(latest.createdAt) ? order : latest,
+              )
+              .createdAt;
 
     return Scaffold(
       backgroundColor: CustomTheme.backgroundColor,
@@ -52,7 +61,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildProfileCard(user),
+              _buildProfileCard(user, lastOrderDate),
               const SizedBox(height: 15),
               _buildStatsRow(totalOrders, totalProducts, cancelledOrders),
               const SizedBox(height: 24),
@@ -112,7 +121,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     );
   }
 
-  Widget _buildProfileCard(dynamic user) {
+  Widget _buildProfileCard(dynamic user, DateTime? lastOrderDate) {
     final initials = user?.name?.isNotEmpty == true
         ? (user!.name as String)
               .trim()
@@ -125,69 +134,107 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(10),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(15),
+      ),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          // Avatar
-          Container(
-            width: 50,
-            height: 50,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: CustomTheme.primaryColor.withValues(alpha: 0.07),
-              border: Border.all(
-                color: CustomTheme.primaryColor.withValues(alpha: 0.12),
-                width: 1,
-              ),
-            ),
-            child: Center(
-              child: Text(
-                initials,
-                style: TextStyle(
-                  fontFamily: CustomTheme.primaryFontFamily,
-                  fontSize: 25,
-                  fontWeight: CustomTheme.fontWeightBold,
-                  color: CustomTheme.primaryColor,
-                  letterSpacing: -0.5,
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(width: 14),
-
-          // Info
-          Flexible(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
+          Expanded(
+            child: Row(
               children: [
-                Text(
-                  user?.name ?? 'Guest User',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontFamily: CustomTheme.primaryFontFamily,
-                    fontSize: 20,
-                    fontWeight: CustomTheme.fontWeightBold,
-                    color: CustomTheme.primaryColor,
-                    letterSpacing: -0.5,
-                  ),
-                ),
-                if (user?.phoneNumber != null &&
-                    (user!.phoneNumber as String).isNotEmpty) ...[
-                  const SizedBox(height: 2),
-                  Text(
-                    'Phone: ${user.phoneNumber}',
-                    style: TextStyle(
-                      fontFamily: CustomTheme.primaryFontFamily,
-                      fontSize: 15,
-                      color: CustomTheme.textPrimary,
+                // Avatar
+                Container(
+                  width: 50,
+                  height: 50,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    color: CustomTheme.primaryColor.withValues(alpha: 0.07),
+                    border: Border.all(
+                      color: CustomTheme.primaryColor.withValues(alpha: 0.12),
+                      width: 1,
                     ),
                   ),
-                ],
+                  child: Center(
+                    child: Text(
+                      initials,
+                      style: TextStyle(
+                        fontFamily: CustomTheme.primaryFontFamily,
+                        fontSize: 25,
+                        fontWeight: CustomTheme.fontWeightBold,
+                        color: CustomTheme.primaryColor,
+                        letterSpacing: -0.5,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 10),
+
+                // Profile info
+                Expanded(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        user?.name ?? 'Guest User',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontFamily: CustomTheme.primaryFontFamily,
+                          fontSize: 18,
+                          fontWeight: CustomTheme.fontWeightBold,
+                          color: CustomTheme.primaryColor,
+                          letterSpacing: -0.5,
+                        ),
+                      ),
+                      if (user?.phoneNumber != null &&
+                          (user!.phoneNumber as String).isNotEmpty) ...[
+                        const SizedBox(height: 2),
+                        Text(
+                          '${user.phoneNumber}',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontFamily: CustomTheme.primaryFontFamily,
+                            fontSize: 13,
+                            color: CustomTheme.textPrimary,
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
               ],
             ),
+          ),
+          const SizedBox(width: 8),
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Text(
+                'Last Ordered',
+                style: CustomTextStyle.caption.copyWith(
+                  fontSize: 13,
+                  color: CustomTheme.textTertiary,
+                  fontWeight: CustomTheme.fontWeightSemiBold,
+                ),
+              ),
+              const SizedBox(height: 3),
+              Text(
+                lastOrderDate == null
+                    ? '—'
+                    : DateFormat('MMM d, yyyy').format(lastOrderDate),
+                style: CustomTextStyle.bodySmall.copyWith(
+                  fontSize: 15,
+                  color: CustomTheme.textPrimary,
+                  fontWeight: CustomTheme.fontWeightBold,
+                ),
+              ),
+            ],
           ),
         ],
       ),

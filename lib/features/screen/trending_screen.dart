@@ -69,7 +69,7 @@ class _TrendingScreenState extends ConsumerState<TrendingScreen>
           children: [
             // Small Premium TabBar with Icons
             Container(
-              margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
               height: 40,
               padding: const EdgeInsets.all(3),
               decoration: BoxDecoration(
@@ -176,8 +176,15 @@ class _ProductList extends ConsumerWidget {
       color: CustomTheme.primaryColor,
       onRefresh: () => provider.loadProducts(type, refresh: true),
       child: ListView.builder(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-        physics: const AlwaysScrollableScrollPhysics(),
+        padding: EdgeInsets.fromLTRB(
+          16,
+          8,
+          16,
+          MediaQuery.of(context).padding.bottom + 112,
+        ),
+        physics: const AlwaysScrollableScrollPhysics(
+          parent: BouncingScrollPhysics(),
+        ),
         itemCount: products.length + (provider.hasNextPage(type) ? 1 : 0),
         itemBuilder: (context, index) {
           if (index == products.length) {

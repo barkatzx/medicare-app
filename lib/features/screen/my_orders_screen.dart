@@ -257,7 +257,7 @@ class _MyOrdersScreenState extends ConsumerState<MyOrdersScreen> {
                             Text(
                               '#$shortId',
                               style: TextStyle(
-                                fontSize: 13,
+                                fontSize: 15,
                                 fontWeight: CustomTheme.fontWeightBold,
                                 color: CustomTheme.textPrimary,
                                 letterSpacing: 0.3,
@@ -298,7 +298,7 @@ class _MyOrdersScreenState extends ConsumerState<MyOrdersScreen> {
                             child: Text(
                               formattedDate,
                               style: TextStyle(
-                                fontSize: 11,
+                                fontSize: 13,
                                 color: CustomTheme.textSecondary,
                                 fontWeight: FontWeight.w500,
                               ),
@@ -322,7 +322,7 @@ class _MyOrdersScreenState extends ConsumerState<MyOrdersScreen> {
                         Text(
                           '${order.items.length} ${order.items.length == 1 ? 'item' : 'items'}',
                           style: TextStyle(
-                            fontSize: 11,
+                            fontSize: 13,
                             color: CustomTheme.textSecondary,
                             fontWeight: FontWeight.w500,
                           ),
@@ -355,6 +355,7 @@ class _MyOrdersScreenState extends ConsumerState<MyOrdersScreen> {
   // ─────────────────────────────────────────────────────────────
   Widget _buildStatusChip(String status, Color color, IconData icon) {
     return Container(
+      alignment: Alignment.center,
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.1),
@@ -363,16 +364,19 @@ class _MyOrdersScreenState extends ConsumerState<MyOrdersScreen> {
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Icon(icon, size: 10, color: color),
+          Icon(icon, size: 12, color: color),
           const SizedBox(width: 4),
           Text(
             status.toUpperCase(),
             style: TextStyle(
               color: color,
               fontWeight: FontWeight.w700,
-              fontSize: 8.5,
+              fontSize: 12,
               letterSpacing: 0.4,
+              height: 1,
             ),
           ),
         ],
