@@ -61,7 +61,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               _buildMenuCard([
                 _MenuItemData(
                   icon: Icons.person_outline_rounded,
-                  title: 'Edit Profile',
+                  title: 'Profile',
                   subtitle: 'Update your personal info',
                   iconColor: const Color(0xFF3B82F6),
                   onTap: () =>
@@ -69,7 +69,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 ),
                 _MenuItemData(
                   icon: Icons.location_on_outlined,
-                  title: 'My Address',
+                  title: 'Address',
                   subtitle: 'Your delivery location',
                   iconColor: const Color(0xFF10B981),
                   onTap: () =>
@@ -97,7 +97,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 ),
                 _MenuItemData(
                   icon: Icons.info_outline_rounded,
-                  title: 'About',
+                  title: 'App Info',
                   subtitle: 'App version and info',
                   iconColor: const Color(0xFF6366F1),
                   onTap: () => Navigator.pushNamed(context, AppRoutes.about),
@@ -233,7 +233,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             textAlign: TextAlign.center,
             maxLines: 2,
             style: CustomTextStyle.bodySmall.copyWith(
-              fontSize: 14,
+              fontSize: 13,
               fontWeight: CustomTheme.fontWeightSemiBold,
             ),
           ),

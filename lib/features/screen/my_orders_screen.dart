@@ -43,14 +43,9 @@ class _MyOrdersScreenState extends ConsumerState<MyOrdersScreen> {
     return AppBar(
       toolbarHeight: 52,
       title: Text(
-        'My Orders',
-        style: TextStyle(
-          fontSize: 16,
-          fontWeight: FontWeight.w700,
-          color: CustomTheme.textPrimary,
-        ),
+        'Order History',
+        style: CustomTextStyle.heading2.copyWith(fontSize: 20),
       ),
-      centerTitle: true,
       backgroundColor: CustomTheme.backgroundColor,
       leading: Padding(
         padding: const EdgeInsets.only(left: 10.0),
@@ -58,16 +53,16 @@ class _MyOrdersScreenState extends ConsumerState<MyOrdersScreen> {
           child: GestureDetector(
             onTap: () => Navigator.pop(context),
             child: Container(
-              width: 32,
-              height: 32,
+              width: 30,
+              height: 30,
               decoration: BoxDecoration(
                 color: CustomTheme.surfaceColor,
-                shape: BoxShape.circle,
+                borderRadius: BorderRadius.circular(8),
               ),
               child: const Icon(
                 Icons.arrow_back_ios_new_rounded,
                 color: CustomTheme.textPrimary,
-                size: 14,
+                size: 18,
               ),
             ),
           ),
@@ -131,17 +126,13 @@ class _MyOrdersScreenState extends ConsumerState<MyOrdersScreen> {
             const SizedBox(height: 20),
             Text(
               'No Orders Yet',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w700,
-                color: CustomTheme.textPrimary,
-              ),
+              style: CustomTextStyle.heading2.copyWith(fontSize: 16),
             ),
             const SizedBox(height: 8),
             Text(
               'Looks like you haven\'t placed any orders yet.\nStart your healthcare journey today!',
               textAlign: TextAlign.center,
-              style: TextStyle(
+              style: CustomTextStyle.bodyMedium.copyWith(
                 fontSize: 13,
                 color: CustomTheme.textTertiary,
                 height: 1.45,

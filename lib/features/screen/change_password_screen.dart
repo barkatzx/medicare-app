@@ -185,7 +185,6 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
                   decoration: BoxDecoration(
                     color: CustomTheme.surfaceColor,
                     borderRadius: BorderRadius.circular(22),
-                    border: Border.all(color: CustomTheme.borderLight),
                   ),
                   child: Column(
                     children: [
@@ -386,7 +385,6 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
       elevation: 0,
       backgroundColor: CustomTheme.backgroundColor,
       scrolledUnderElevation: 0,
-      centerTitle: true,
       systemOverlayStyle: SystemUiOverlayStyle.dark,
       leading: Padding(
         padding: const EdgeInsets.only(left: 16),
@@ -394,24 +392,24 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
           child: GestureDetector(
             onTap: () => Navigator.pop(context),
             child: Container(
-              width: 38,
-              height: 38,
+              width: 30,
+              height: 30,
               decoration: BoxDecoration(
                 color: CustomTheme.surfaceColor,
-                shape: BoxShape.circle,
+                borderRadius: BorderRadius.circular(8),
               ),
               child: const Icon(
                 Icons.arrow_back_ios_new_rounded,
                 color: CustomTheme.textPrimary,
-                size: 15,
+                size: 18,
               ),
             ),
           ),
         ),
       ),
       title: Text(
-        'Change Password',
-        style: CustomTextStyle.heading2.copyWith(fontSize: 19),
+        'Privacy & Security',
+        style: CustomTextStyle.heading2.copyWith(fontSize: 20),
       ),
     );
   }

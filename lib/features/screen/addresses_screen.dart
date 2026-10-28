@@ -31,7 +31,12 @@ class _AddressesScreenState extends ConsumerState<AddressesScreen> {
       backgroundColor: CustomTheme.backgroundColor,
       appBar: _buildAppBar(),
       body: user == null
-          ? const Center(child: CircularProgressIndicator())
+          ? Center(
+              child: CircularProgressIndicator(
+                color: CustomTheme.primaryColor,
+                strokeWidth: 2.5,
+              ),
+            )
           : RefreshIndicator(
               onRefresh: () => ref.read(authProviderNotifier).getProfile(),
               color: CustomTheme.primaryColor,
@@ -39,11 +44,14 @@ class _AddressesScreenState extends ConsumerState<AddressesScreen> {
                 physics: const AlwaysScrollableScrollPhysics(
                   parent: BouncingScrollPhysics(),
                 ),
-                padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
-                children: [_buildAddressCard(user)],
+                padding: const EdgeInsets.all(16),
+                children: [
+                  _buildSectionHeader(user),
+                  const SizedBox(height: 12),
+                  _buildAddressCard(user),
+                ],
               ),
             ),
-      bottomNavigationBar: user == null ? null : _buildBottomAction(user),
     );
   }
 
@@ -53,23 +61,22 @@ class _AddressesScreenState extends ConsumerState<AddressesScreen> {
       backgroundColor: CustomTheme.backgroundColor,
       scrolledUnderElevation: 0,
       systemOverlayStyle: SystemUiOverlayStyle.dark,
-      centerTitle: true,
       leading: Padding(
         padding: const EdgeInsets.only(left: 16),
         child: Center(
           child: GestureDetector(
             onTap: () => Navigator.pop(context),
             child: Container(
-              width: 38,
-              height: 38,
+              width: 30,
+              height: 30,
               decoration: BoxDecoration(
                 color: CustomTheme.surfaceColor,
-                shape: BoxShape.circle,
+                borderRadius: BorderRadius.circular(8),
               ),
               child: const Icon(
                 Icons.arrow_back_ios_new_rounded,
                 color: CustomTheme.textPrimary,
-                size: 15,
+                size: 18,
               ),
             ),
           ),
@@ -77,61 +84,71 @@ class _AddressesScreenState extends ConsumerState<AddressesScreen> {
       ),
       title: Text(
         'My Address',
-        style: CustomTextStyle.heading2.copyWith(fontSize: 19),
+        style: CustomTextStyle.heading2.copyWith(fontSize: 20),
       ),
     );
   }
 
-  Widget _buildBottomAction(UserEntity user) {
-    return Container(
-      padding: EdgeInsets.fromLTRB(
-        16,
-        16,
-        16,
-        MediaQuery.of(context).padding.bottom + 16,
-      ),
-      decoration: BoxDecoration(
-        color: Colors.transparent,
-        borderRadius: BorderRadius.circular(24),
-      ),
-      child: SizedBox(
-        width: double.infinity,
-        height: 54,
-        child: ElevatedButton.icon(
-          onPressed: () => _showAddressForm(user),
-          icon: Icon(
-            user.hasAddress ? Icons.edit_outlined : Icons.add_rounded,
-            color: Colors.white,
+  Widget _buildSectionHeader(UserEntity user) {
+    return Row(
+      children: [
+        Container(
+          width: 40,
+          height: 40,
+          decoration: BoxDecoration(
+            color: const Color(0xFF10B981).withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: const Icon(
+            Icons.location_on_outlined,
             size: 20,
+            color: Color(0xFF10B981),
           ),
-          label: Text(
-            user.hasAddress ? 'Edit Address' : 'Add Address',
-            style: CustomTextStyle.button.copyWith(
-              fontSize: 15,
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Text(
+            'Delivery Address',
+            style: CustomTextStyle.heading4.copyWith(
+              fontSize: 16,
               fontWeight: CustomTheme.fontWeightBold,
-              color: Colors.white,
-              letterSpacing: 0.3,
-            ),
-          ),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: CustomTheme.primaryColor,
-            foregroundColor: Colors.white,
-            elevation: 0,
-            shadowColor: Colors.transparent,
-            surfaceTintColor: Colors.transparent,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
+              letterSpacing: -0.2,
             ),
           ),
         ),
-      ),
+        Tooltip(
+          message: user.hasAddress ? 'Edit address' : 'Add address',
+          child: Material(
+            color: CustomTheme.primaryColor,
+            borderRadius: BorderRadius.circular(10),
+            child: InkWell(
+              onTap: () => _showAddressForm(user),
+              borderRadius: BorderRadius.circular(10),
+              child: SizedBox(
+                width: 40,
+                height: 40,
+                child: Icon(
+                  user.hasAddress ? Icons.edit_outlined : Icons.add_rounded,
+                  color: Colors.white,
+                  size: 20,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 
   Widget _buildAddressCard(UserEntity user) {
     if (!user.hasAddress) {
-      return Padding(
-        padding: const EdgeInsets.only(top: 80),
+      return Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 36),
+        decoration: BoxDecoration(
+          color: CustomTheme.surfaceColor,
+          borderRadius: BorderRadius.circular(16),
+        ),
         child: Column(
           children: [
             Container(
@@ -170,83 +187,40 @@ class _AddressesScreenState extends ConsumerState<AddressesScreen> {
     }
 
     return Container(
-      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: CustomTheme.surfaceColor,
         borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
         children: [
-          _infoRow(Icons.home_outlined, 'Full Address', user.fullAddress!),
-          _divider(),
-          _infoRow(Icons.map_outlined, 'Division', user.division!.label),
-          _divider(),
-          _infoRow(
-            Icons.location_city_outlined,
-            'District',
-            user.district!.label,
+          _AddressInfoTile(
+            icon: Icons.home_outlined,
+            label: 'Full Address',
+            value: user.fullAddress!,
+            color: const Color(0xFF3B82F6),
           ),
-          _divider(),
-          _infoRow(Icons.pin_drop_outlined, 'Upazila', user.upazila!.label),
+          _AddressInfoTile(
+            icon: Icons.map_outlined,
+            label: 'Division',
+            value: user.division!.label,
+            color: const Color(0xFF10B981),
+          ),
+          _AddressInfoTile(
+            icon: Icons.location_city_outlined,
+            label: 'District',
+            value: user.district!.label,
+            color: const Color(0xFF8B5CF6),
+          ),
+          _AddressInfoTile(
+            icon: Icons.pin_drop_outlined,
+            label: 'Upazila',
+            value: user.upazila!.label,
+            color: const Color(0xFFF59E0B),
+            isLast: true,
+          ),
         ],
       ),
     );
-  }
-
-  Widget _divider() => Padding(
-    padding: const EdgeInsets.symmetric(vertical: 12),
-    child: Divider(height: 1, color: CustomTheme.borderLight),
-  );
-
-  Widget _infoRow(IconData icon, String label, String value) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          width: 38,
-          height: 38,
-          decoration: BoxDecoration(
-            color: _addressIconColor(icon).withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(11),
-          ),
-          child: Icon(icon, size: 18, color: _addressIconColor(icon)),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                label,
-                style: CustomTextStyle.caption.copyWith(
-                  fontSize: 13,
-                  letterSpacing: 0.3,
-                  color: CustomTheme.textTertiary,
-                  fontWeight: CustomTheme.fontWeightSemiBold,
-                ),
-              ),
-              const SizedBox(height: 3),
-              Text(
-                value,
-                style: CustomTextStyle.bodyMedium.copyWith(
-                  color: CustomTheme.textPrimary,
-                  fontWeight: CustomTheme.fontWeightBold,
-                  fontSize: 15,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Color _addressIconColor(IconData icon) {
-    if (icon == Icons.home_outlined) return const Color(0xFF3B82F6);
-    if (icon == Icons.map_outlined) return const Color(0xFF10B981);
-    if (icon == Icons.location_city_outlined) return const Color(0xFF8B5CF6);
-    if (icon == Icons.pin_drop_outlined) return const Color(0xFFF59E0B);
-    return CustomTheme.primaryColor;
   }
 
   void _showAddressForm(UserEntity user) {
@@ -255,6 +229,78 @@ class _AddressesScreenState extends ConsumerState<AddressesScreen> {
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) => AddressFormSheet(user: user),
+    );
+  }
+}
+
+class _AddressInfoTile extends StatelessWidget {
+  const _AddressInfoTile({
+    required this.icon,
+    required this.label,
+    required this.value,
+    required this.color,
+    this.isLast = false,
+  });
+
+  final IconData icon;
+  final String label;
+  final String value;
+  final Color color;
+  final bool isLast;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          child: Row(
+            children: [
+              Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  color: color.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(icon, size: 17, color: color),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      label,
+                      style: CustomTextStyle.caption.copyWith(
+                        fontSize: 13,
+                        fontWeight: CustomTheme.fontWeightSemiBold,
+                        color: CustomTheme.textSecondary,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      value,
+                      style: CustomTextStyle.bodyMedium.copyWith(
+                        fontWeight: CustomTheme.fontWeightBold,
+                        color: CustomTheme.textPrimary,
+                        fontSize: 15,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+        if (!isLast)
+          const Divider(
+            height: 1,
+            color: CustomTheme.borderLight,
+            indent: 64,
+            endIndent: 16,
+          ),
+      ],
     );
   }
 }

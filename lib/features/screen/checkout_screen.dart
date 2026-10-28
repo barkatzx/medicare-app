@@ -142,16 +142,16 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen>
               }
             },
             child: Container(
-              width: 35,
-              height: 35,
+              width: 30,
+              height: 30,
               decoration: BoxDecoration(
                 color: CustomTheme.surfaceColor,
-                shape: BoxShape.circle,
+                borderRadius: BorderRadius.circular(8),
               ),
               child: const Icon(
                 Icons.arrow_back_ios_new_rounded,
                 color: CustomTheme.textPrimary,
-                size: 15,
+                size: 18,
               ),
             ),
           ),

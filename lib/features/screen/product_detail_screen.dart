@@ -123,13 +123,12 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
         'Product Details',
         style: TextStyle(
           fontFamily: CustomTheme.primaryFontFamily,
-          fontSize: 16,
+          fontSize: 20,
           fontWeight: FontWeight.w700,
           color: CustomTheme.textPrimary,
           letterSpacing: -0.3,
         ),
       ),
-      centerTitle: true,
       actions: [
         Padding(
           padding: const EdgeInsets.only(right: 12),
@@ -145,13 +144,13 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: 32,
-        height: 32,
+        width: 30,
+        height: 30,
         decoration: BoxDecoration(
           color: CustomTheme.surfaceColor,
-          shape: BoxShape.circle,
+          borderRadius: BorderRadius.circular(8),
         ),
-        child: Icon(icon, color: CustomTheme.textPrimary, size: 13),
+        child: Icon(icon, color: CustomTheme.textPrimary, size: 18),
       ),
     );
   }

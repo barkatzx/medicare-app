@@ -103,7 +103,7 @@ class _HomeAppBarState extends ConsumerState<HomeAppBar> {
       height: _avatarSize,
       padding: const EdgeInsets.all(2),
       decoration: BoxDecoration(
-        shape: BoxShape.circle,
+        borderRadius: BorderRadius.circular(8),
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -114,9 +114,9 @@ class _HomeAppBarState extends ConsumerState<HomeAppBar> {
         ),
       ),
       child: Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           color: Colors.white,
-          shape: BoxShape.circle,
+          borderRadius: BorderRadius.circular(6),
         ),
         alignment: Alignment.center,
         child: Text(
@@ -151,7 +151,7 @@ class _HomeAppBarState extends ConsumerState<HomeAppBar> {
             height: _actionSize,
             decoration: BoxDecoration(
               color: CustomTheme.surfaceColor,
-              shape: BoxShape.circle,
+              borderRadius: BorderRadius.circular(8),
               border: Border.all(
                 color: CustomTheme.borderLight.withValues(alpha: 0.6),
                 width: 1,
@@ -159,11 +159,11 @@ class _HomeAppBarState extends ConsumerState<HomeAppBar> {
             ),
             child: Material(
               color: Colors.transparent,
-              shape: const CircleBorder(),
+              borderRadius: BorderRadius.circular(8),
               clipBehavior: Clip.antiAlias,
               child: InkWell(
                 onTap: onTap,
-                customBorder: const CircleBorder(),
+                borderRadius: BorderRadius.circular(8),
                 child: Center(
                   child: Icon(
                     icon,

@@ -12,8 +12,10 @@ class AboutScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: CustomTheme.backgroundColor,
       appBar: AppBar(
-        title: Text('About', style: CustomTextStyle.heading3),
-        centerTitle: true,
+        title: Text(
+          'App Info',
+          style: CustomTextStyle.heading2.copyWith(fontSize: 20),
+        ),
         backgroundColor: Colors.transparent,
         elevation: 0,
         scrolledUnderElevation: 0,
@@ -21,19 +23,20 @@ class AboutScreen extends StatelessWidget {
         leading: Padding(
           padding: const EdgeInsets.only(left: 12.0),
           child: Center(
-            child: GestureDetector(
+            child: InkWell(
+              borderRadius: BorderRadius.circular(8),
               onTap: () => Navigator.pop(context),
               child: Container(
-                width: 36,
-                height: 36,
-                decoration: const BoxDecoration(
+                width: 30,
+                height: 30,
+                decoration: BoxDecoration(
                   color: CustomTheme.surfaceColor,
-                  shape: BoxShape.circle,
+                  borderRadius: BorderRadius.circular(8),
                 ),
                 child: const Icon(
                   Icons.arrow_back_ios_new_rounded,
                   color: CustomTheme.textPrimary,
-                  size: 16,
+                  size: 18,
                 ),
               ),
             ),

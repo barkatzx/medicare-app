@@ -94,16 +94,16 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
               Navigator.pop(context);
             },
             child: Container(
-              width: 38,
-              height: 38,
+              width: 30,
+              height: 30,
               decoration: BoxDecoration(
                 color: CustomTheme.surfaceColor,
-                shape: BoxShape.circle,
+                borderRadius: BorderRadius.circular(8),
               ),
               child: const Icon(
                 Icons.arrow_back_ios_new_rounded,
                 color: CustomTheme.textPrimary,
-                size: 15,
+                size: 18,
               ),
             ),
           ),
@@ -112,7 +112,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
       leadingWidth: 54,
       titleSpacing: 12,
       title: Container(
-        height: 45,
+        height: 40,
         margin: const EdgeInsets.only(right: 16),
         decoration: BoxDecoration(
           color: CustomTheme.surfaceColor,
@@ -122,22 +122,22 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
           controller: _searchController,
           focusNode: _searchFocusNode,
           onChanged: _onSearchChanged,
+          textAlignVertical: TextAlignVertical.center,
           decoration: InputDecoration(
             hintText: 'Type Medicine Name',
             hintStyle: CustomTextStyle.bodySmall.copyWith(
               color: CustomTheme.textTertiary,
             ),
-            prefixIcon: Container(
-              margin: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: CustomTheme.secondaryColor,
-                borderRadius: BorderRadius.circular(5),
-              ),
+            prefixIcon: Center(
               child: Icon(
                 Icons.search,
                 size: 20,
                 color: CustomTheme.primaryColor,
               ),
+            ),
+            prefixIconConstraints: const BoxConstraints.tightFor(
+              width: 44,
+              height: 40,
             ),
             suffixIcon: _searchController.text.isNotEmpty
                 ? IconButton(
@@ -154,7 +154,8 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                   )
                 : null,
             border: InputBorder.none,
-            contentPadding: const EdgeInsets.symmetric(vertical: 10),
+            contentPadding: EdgeInsets.zero,
+            isDense: true,
           ),
           style: CustomTextStyle.bodyMedium.copyWith(
             color: CustomTheme.textSecondary,

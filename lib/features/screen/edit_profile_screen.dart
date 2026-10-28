@@ -20,23 +20,22 @@ class EditProfileScreen extends ConsumerWidget {
         backgroundColor: CustomTheme.backgroundColor,
         scrolledUnderElevation: 0,
         systemOverlayStyle: SystemUiOverlayStyle.dark,
-        centerTitle: true,
         leading: Padding(
           padding: const EdgeInsets.only(left: 16),
           child: Center(
             child: GestureDetector(
               onTap: () => Navigator.pop(context),
               child: Container(
-                width: 38,
-                height: 38,
+                width: 30,
+                height: 30,
                 decoration: BoxDecoration(
                   color: CustomTheme.surfaceColor,
-                  shape: BoxShape.circle,
+                  borderRadius: BorderRadius.circular(8),
                 ),
                 child: const Icon(
                   Icons.arrow_back_ios_new_rounded,
                   color: CustomTheme.textPrimary,
-                  size: 15,
+                  size: 18,
                 ),
               ),
             ),
@@ -44,7 +43,7 @@ class EditProfileScreen extends ConsumerWidget {
         ),
         title: Text(
           'Edit Profile',
-          style: CustomTextStyle.heading2.copyWith(fontSize: 18),
+          style: CustomTextStyle.heading2.copyWith(fontSize: 20),
         ),
       ),
       body: user == null
@@ -179,7 +178,9 @@ class EditProfileScreen extends ConsumerWidget {
           content: const Text('Profile updated successfully'),
           backgroundColor: CustomTheme.successColor,
           behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
           margin: const EdgeInsets.all(16),
         ),
       );
@@ -250,7 +251,12 @@ class _InfoTile extends StatelessWidget {
           ),
         ),
         if (!isLast)
-          Divider(height: 1, color: CustomTheme.borderLight, indent: 64, endIndent: 16),
+          Divider(
+            height: 1,
+            color: CustomTheme.borderLight,
+            indent: 64,
+            endIndent: 16,
+          ),
       ],
     );
   }
@@ -339,7 +345,9 @@ class _ProfileEditSheetState extends ConsumerState<_ProfileEditSheet> {
                       children: [
                         Text(
                           'Update Account Information',
-                          style: CustomTextStyle.heading3.copyWith(fontSize: 17),
+                          style: CustomTextStyle.heading3.copyWith(
+                            fontSize: 17,
+                          ),
                         ),
                         Text(
                           'Edit your name and pharmacy name',
@@ -426,7 +434,10 @@ class _ProfileEditSheetState extends ConsumerState<_ProfileEditSheet> {
         prefixIcon: Icon(icon, size: 18),
         filled: true,
         fillColor: CustomTheme.backgroundColor,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 14,
+        ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(13),
           borderSide: BorderSide.none,
@@ -440,11 +451,17 @@ class _ProfileEditSheetState extends ConsumerState<_ProfileEditSheet> {
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(13),
-          borderSide: const BorderSide(color: CustomTheme.errorColor, width: 1.5),
+          borderSide: const BorderSide(
+            color: CustomTheme.errorColor,
+            width: 1.5,
+          ),
         ),
         focusedErrorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(13),
-          borderSide: const BorderSide(color: CustomTheme.errorColor, width: 1.5),
+          borderSide: const BorderSide(
+            color: CustomTheme.errorColor,
+            width: 1.5,
+          ),
         ),
       ),
     );
@@ -454,11 +471,13 @@ class _ProfileEditSheetState extends ConsumerState<_ProfileEditSheet> {
     if (!_formKey.currentState!.validate()) return;
     FocusScope.of(context).unfocus();
 
-    final success = await ref.read(authProviderNotifier).updateProfile(
-      name: _nameController.text.trim(),
-      pharmacyName: _pharmacyController.text.trim(),
-      phoneNumber: widget.user.phoneNumber,
-    );
+    final success = await ref
+        .read(authProviderNotifier)
+        .updateProfile(
+          name: _nameController.text.trim(),
+          pharmacyName: _pharmacyController.text.trim(),
+          phoneNumber: widget.user.phoneNumber,
+        );
 
     if (!mounted) return;
     if (success) {
