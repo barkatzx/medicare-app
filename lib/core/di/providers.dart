@@ -53,7 +53,9 @@ final sharedPrefsHelperProvider = Provider<SharedPrefsHelper>((ref) {
 });
 
 final httpClientProvider = Provider<http.Client>((ref) {
-  return http.Client();
+  final client = http.Client();
+  ref.onDispose(client.close);
+  return client;
 });
 
 // Repositories

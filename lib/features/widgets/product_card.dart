@@ -256,7 +256,8 @@ class _AddToCartButtonState extends ConsumerState<_AddToCartButton> {
                 content: Text(
                   success
                       ? '${widget.product.name} added to cart'
-                      : 'Stock Out',
+                      : (cartProvider.lastAddToCartError ??
+                            'Failed to add to cart'),
                   style: const TextStyle(color: Colors.white, fontSize: 12),
                 ),
                 backgroundColor: success

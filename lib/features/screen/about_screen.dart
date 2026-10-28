@@ -52,9 +52,9 @@ class AboutScreen extends StatelessWidget {
               _buildSection(
                 title: 'APP INFO',
                 children: [
-                  _buildInfoRow('Version', '2.0.0'),
+                  _buildInfoRow('Version', '2.0.5'),
                   _buildDivider(),
-                  _buildInfoRow('Last Update', 'Oct 2026'),
+                  _buildInfoRow('Last Update', 'Nov 2026'),
                   _buildDivider(),
                   _buildInfoRow(
                     'Privacy Policy',

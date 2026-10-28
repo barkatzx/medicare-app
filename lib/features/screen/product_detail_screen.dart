@@ -662,6 +662,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
   Widget _buildBottomAction(ProductEntity product) {
     final total = product.finalPrice * _quantity;
     final isAvailable = product.stock > 0;
+    final isAddingToCart = ref.watch(cartProviderNotifier).isAddingToCart;
 
     return Positioned(
       bottom: 0,
@@ -705,12 +706,15 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
               child: SizedBox(
                 height: 46,
                 child: ElevatedButton(
-                  onPressed: isAvailable ? () => _addToCart(product) : null,
+                  onPressed: isAvailable && !isAddingToCart
+                      ? () => _addToCart(product)
+                      : null,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: CustomTheme.primaryColor,
                     foregroundColor: Colors.white,
-                    disabledBackgroundColor: CustomTheme.textTertiary
-                        .withValues(alpha: 0.3),
+                    disabledBackgroundColor: isAddingToCart
+                        ? CustomTheme.primaryColor.withValues(alpha: 0.75)
+                        : CustomTheme.textTertiary.withValues(alpha: 0.3),
                     padding: EdgeInsets.zero,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -723,16 +727,30 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(
-                        isAvailable
-                            ? Icons.shopping_bag_outlined
-                            : Icons.block_rounded,
-                        size: 15,
-                        color: isAvailable ? Colors.white : Colors.white70,
-                      ),
+                      if (isAddingToCart)
+                        const SizedBox(
+                          width: 15,
+                          height: 15,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        )
+                      else
+                        Icon(
+                          isAvailable
+                              ? Icons.shopping_bag_outlined
+                              : Icons.block_rounded,
+                          size: 15,
+                          color: isAvailable ? Colors.white : Colors.white70,
+                        ),
                       const SizedBox(width: 6),
                       Text(
-                        isAvailable ? 'Add to Bag' : 'Out of Stock',
+                        isAddingToCart
+                            ? 'Adding…'
+                            : isAvailable
+                            ? 'Add to Bag'
+                            : 'Out of Stock',
                         style: TextStyle(
                           fontFamily: CustomTheme.primaryFontFamily,
                           fontSize: 15,
@@ -851,7 +869,10 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
 
     if (mounted) {
       _showSnackBar(
-        success ? 'Added to bag successfully!' : 'Stock Out',
+        success
+            ? 'Added to bag successfully!'
+            : (ref.read(cartProviderNotifier).lastAddToCartError ??
+                  'Failed to add to cart'),
         isError: !success,
       );
     }
