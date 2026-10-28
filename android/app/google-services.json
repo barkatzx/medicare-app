@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "751291235158",
+    "project_id": "medicareplc-app",
+    "storage_bucket": "medicareplc-app.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:751291235158:android:823ebeddcfbb46f31374f7",
+        "android_client_info": {
+          "package_name": "com.medicareplc.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCNh7bOrYCSITzSOsAJYzd_vKb0h2VpTwo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

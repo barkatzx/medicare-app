@@ -204,7 +204,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                     style: const TextStyle(
                       fontFamily: CustomTheme.primaryFontFamily,
                       color: Colors.white,
-                      fontSize: 8,
+                      fontSize: 13,
                       fontWeight: FontWeight.w700,
                     ),
                     textAlign: TextAlign.center,

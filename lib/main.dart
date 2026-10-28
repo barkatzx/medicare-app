@@ -1,5 +1,8 @@
 import 'dart:ui';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:medicare_app/core/theme/custom_theme.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medicare_app/core/di/providers.dart';
@@ -9,6 +12,21 @@ import 'core/routes/route_generator.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  final navigatorObservers = <NavigatorObserver>[];
+  if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {
+    try {
+      await Firebase.initializeApp();
+      final analytics = FirebaseAnalytics.instance;
+      await analytics.setAnalyticsCollectionEnabled(true);
+      navigatorObservers.add(
+        FirebaseAnalyticsObserver(analytics: analytics),
+      );
+    } catch (error, stackTrace) {
+      debugPrint('Firebase Analytics initialization failed: $error');
+      debugPrintStack(stackTrace: stackTrace);
+    }
+  }
 
   // Global Error Handling for Production
   FlutterError.onError = (details) {
@@ -28,11 +46,18 @@ void main() async {
 
   await container.read(authProviderNotifier).initialize();
 
-  runApp(UncontrolledProviderScope(container: container, child: const MyApp()));
+  runApp(
+    UncontrolledProviderScope(
+      container: container,
+      child: MyApp(navigatorObservers: navigatorObservers),
+    ),
+  );
 }
 
 class MyApp extends ConsumerWidget {
-  const MyApp({super.key});
+  const MyApp({super.key, required this.navigatorObservers});
+
+  final List<NavigatorObserver> navigatorObservers;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -41,6 +66,7 @@ class MyApp extends ConsumerWidget {
     return MaterialApp(
       title: 'MediCare PLC',
       debugShowCheckedModeBanner: false,
+      navigatorObservers: navigatorObservers,
       theme: ThemeData(
         useMaterial3: false,
         scaffoldBackgroundColor: CustomTheme.backgroundColor,
