@@ -472,6 +472,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   }
 
   void _showLogoutDialog(BuildContext context, WidgetRef ref) {
+    final navigator = Navigator.of(context);
     showDialog(
       context: context,
       builder: (context) => Dialog(
@@ -537,10 +538,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       onTap: () async {
                         Navigator.pop(context);
                         await ref.read(authProviderNotifier).logout();
-                        if (context.mounted) {
-                          Navigator.pushReplacementNamed(
-                            context,
+                        if (navigator.mounted) {
+                          navigator.pushNamedAndRemoveUntil(
                             AppRoutes.login,
+                            (route) => false,
                           );
                         }
                       },
