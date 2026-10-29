@@ -7,6 +7,7 @@ import '../usecases/get_profile_usecase.dart';
 import '../usecases/update_profile_usecase.dart';
 import '../usecases/change_password_usecase.dart';
 import '../../core/utils/network_error.dart';
+import '../../core/notifications/push_notification_service.dart';
 
 class AuthProvider extends ChangeNotifier {
   final LoginUseCase loginUseCase;
@@ -15,6 +16,7 @@ class AuthProvider extends ChangeNotifier {
   final GetProfileUseCase getProfileUseCase;
   final UpdateProfileUseCase updateProfileUseCase;
   final ChangePasswordUseCase changePasswordUseCase;
+  PushNotificationService? pushNotificationService;
 
   AuthProvider({
     required this.loginUseCase,
@@ -23,7 +25,12 @@ class AuthProvider extends ChangeNotifier {
     required this.getProfileUseCase,
     required this.updateProfileUseCase,
     required this.changePasswordUseCase,
+    this.pushNotificationService,
   });
+
+  void attachPushNotificationService(PushNotificationService service) {
+    pushNotificationService = service;
+  }
 
   UserEntity? _currentUser;
   bool _isLoading = false;
@@ -60,6 +67,9 @@ class AuthProvider extends ChangeNotifier {
       final verifiedUser = await verifyAuthUseCase.execute();
       _currentUser = verifiedUser;
       _pendingApprovalMessage = null;
+      if (isLoggedIn && isCustomer) {
+        await pushNotificationService?.setAuthenticated(true);
+      }
     } catch (e) {
       // If we don't have a cached user AND verification failed, then we are logged out
       if (_currentUser == null) {
@@ -100,6 +110,9 @@ class AuthProvider extends ChangeNotifier {
 
       _currentUser = user;
       _isInitialized = true;
+      if (user.isApproved && user.isCustomer) {
+        await pushNotificationService?.setAuthenticated(true);
+      }
       _setLoading(false);
       return true;
     } catch (e) {
@@ -161,6 +174,7 @@ class AuthProvider extends ChangeNotifier {
   }
 
   Future<void> logout() async {
+    await pushNotificationService?.unregisterCurrentToken();
     await loginUseCase.repository.logout();
     _currentUser = null;
     // We intentionally keep _isInitialized = true, because the app has already done

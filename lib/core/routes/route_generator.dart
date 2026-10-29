@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:medicare_app/features/screen/product_detail_screen.dart';
+import '../../features/screen/notifications_screen.dart';
+import '../../features/screen/notification_detail_screen.dart';
 import '../../features/screen/login_screen.dart';
 import '../../features/screen/register_screen.dart';
 import '../../features/screen/forgot_password_screen.dart';
@@ -72,6 +74,18 @@ class RouteGenerator {
       case AppRoutes.search:
         return MaterialPageRoute(
           builder: (_) => AuthGuard.protectRoute(const SearchScreen()),
+        );
+      case AppRoutes.notifications:
+        return MaterialPageRoute(
+          builder: (_) => AuthGuard.protectRoute(const NotificationsScreen()),
+          settings: settings,
+        );
+      case AppRoutes.notificationDetail:
+        final id = settings.arguments as String;
+        return MaterialPageRoute(
+          builder: (_) =>
+              AuthGuard.protectRoute(NotificationDetailScreen(id: id)),
+          settings: settings,
         );
       case AppRoutes.myOrders:
         return MaterialPageRoute(

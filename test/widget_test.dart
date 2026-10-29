@@ -15,7 +15,7 @@ void main() {
         overrides: [
           sharedPreferencesProvider.overrideWithValue(sharedPreferences),
         ],
-        child: const MyApp(),
+        child: const MyApp(navigatorObservers: []),
       ),
     );
     await tester.pump();

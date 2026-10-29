@@ -59,6 +59,16 @@ class ApiConstants {
   static String cancelOrder(String orderId) =>
       '$baseUrl/orders/$orderId/cancel';
 
+  // ==================== NOTIFICATIONS ROUTES ====================
+  static String get notifications => '$baseUrl/notifications';
+  static String get deviceNotificationToken =>
+      '$baseUrl/notifications/device-token';
+  static String notificationDetail(String id) => '$baseUrl/notifications/$id';
+  static String get markAllNotificationsRead =>
+      '$baseUrl/notifications/markall';
+  static String get deleteAllNotifications =>
+      '$baseUrl/notifications/alldelete';
+
   // ==================== HTTP METHODS ====================
   static const String methodGet = 'GET';
   static const String methodPost = 'POST';

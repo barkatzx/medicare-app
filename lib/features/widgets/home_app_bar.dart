@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medicare_app/core/di/providers.dart';
 import 'package:medicare_app/core/theme/custom_theme.dart';
+import 'package:medicare_app/core/routes/app_routes.dart';
 
 class HomeAppBar extends ConsumerStatefulWidget implements PreferredSizeWidget {
   const HomeAppBar({super.key});
@@ -26,12 +27,17 @@ class _HomeAppBarState extends ConsumerState<HomeAppBar> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(authProviderNotifier).getProfile();
+      ref.read(notificationProviderNotifier).load();
     });
   }
 
   @override
   Widget build(BuildContext context) {
     final user = ref.watch(authProviderNotifier).currentUser;
+    final unreadCount = ref
+        .watch(notificationProviderNotifier)
+        .unreadCount
+        .clamp(0, 999);
     final displayName = user?.name ?? 'Guest User';
     final nameParts = (user?.name ?? '')
         .trim()
@@ -96,6 +102,12 @@ class _HomeAppBarState extends ConsumerState<HomeAppBar> {
           label: 'Search',
           onTap: () => Navigator.pushNamed(context, '/search'),
         ),
+        _buildActionButton(
+          icon: Icons.notifications_none_rounded,
+          label: 'Notifications',
+          badgeCount: unreadCount,
+          onTap: () => Navigator.pushNamed(context, AppRoutes.notifications),
+        ),
         const SizedBox(width: _sidePadding - 4),
       ],
     );
@@ -133,6 +145,7 @@ class _HomeAppBarState extends ConsumerState<HomeAppBar> {
     required IconData icon,
     required String label,
     required VoidCallback onTap,
+    int badgeCount = 0,
   }) {
     return SizedBox(
       width: 44,
@@ -159,11 +172,46 @@ class _HomeAppBarState extends ConsumerState<HomeAppBar> {
               child: InkWell(
                 onTap: onTap,
                 borderRadius: BorderRadius.circular(8),
-                child: Center(
-                  child: Icon(
-                    icon,
-                    color: CustomTheme.textPrimary,
-                    size: _iconSize,
+                child: SizedBox(
+                  width: _actionSize,
+                  height: _actionSize,
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      Icon(
+                        icon,
+                        color: CustomTheme.textPrimary,
+                        size: _iconSize,
+                      ),
+                      if (badgeCount > 0)
+                        Positioned(
+                          right: 0,
+                          top: 0,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 4,
+                              vertical: 1,
+                            ),
+                            constraints: const BoxConstraints(
+                              minWidth: 15,
+                              minHeight: 15,
+                            ),
+                            decoration: const BoxDecoration(
+                              color: CustomTheme.errorColor,
+                              shape: BoxShape.circle,
+                            ),
+                            child: Text(
+                              badgeCount > 99 ? '99+' : '$badgeCount',
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 13,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ),
+                        ),
+                    ],
                   ),
                 ),
               ),

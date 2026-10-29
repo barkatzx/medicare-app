@@ -12,6 +12,8 @@ class AppRoutes {
   static const String categories = '/categories';
   static const String categoryProducts = '/category-products';
   static const String search = '/search';
+  static const String notifications = '/notifications';
+  static const String notificationDetail = '/notification-detail';
 
   // Cart & Checkout
   static const String cart = '/cart';

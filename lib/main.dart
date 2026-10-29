@@ -7,6 +7,7 @@ import 'package:medicare_app/core/theme/custom_theme.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medicare_app/core/di/providers.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'core/notifications/push_notification_service.dart';
 import 'core/routes/app_routes.dart';
 import 'core/routes/route_generator.dart';
 
@@ -46,12 +47,31 @@ void main() async {
 
   await container.read(authProviderNotifier).initialize();
 
+  final pushNotifications = container.read(pushNotificationServiceProvider);
+  container
+      .read(authProviderNotifier)
+      .attachPushNotificationService(pushNotifications);
+  if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {
+    try {
+      await pushNotifications.initialize(
+        authenticated: container.read(authProviderNotifier).isLoggedIn &&
+            container.read(authProviderNotifier).isCustomer,
+      );
+    } catch (error, stackTrace) {
+      debugPrint('Firebase Messaging initialization failed: $error');
+      debugPrintStack(stackTrace: stackTrace);
+    }
+  }
+
   runApp(
     UncontrolledProviderScope(
       container: container,
       child: MyApp(navigatorObservers: navigatorObservers),
     ),
   );
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    pushNotifications.flushPendingNavigation();
+  });
 }
 
 class MyApp extends ConsumerWidget {
@@ -67,6 +87,7 @@ class MyApp extends ConsumerWidget {
       title: 'MediCare PLC',
       debugShowCheckedModeBanner: false,
       navigatorObservers: navigatorObservers,
+      navigatorKey: appNavigatorKey,
       theme: ThemeData(
         useMaterial3: false,
         scaffoldBackgroundColor: CustomTheme.backgroundColor,

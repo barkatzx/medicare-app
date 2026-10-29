@@ -27,6 +27,9 @@ import '../../features/provider/category_provider.dart';
 import '../../features/provider/category_products_provider.dart';
 import '../../features/provider/special_products_provider.dart';
 import '../../features/provider/order_provider.dart';
+import '../../features/notifications/notification_provider.dart';
+import '../../features/notifications/notification_repository.dart';
+import '../notifications/push_notification_service.dart';
 
 // Navigation Provider
 class NavigationProvider extends ChangeNotifier {
@@ -56,6 +59,14 @@ final httpClientProvider = Provider<http.Client>((ref) {
   final client = http.Client();
   ref.onDispose(client.close);
   return client;
+});
+
+final pushNotificationServiceProvider = Provider<PushNotificationService>((ref) {
+  return PushNotificationService(
+    client: ref.watch(httpClientProvider),
+    prefsHelper: ref.watch(sharedPrefsHelperProvider),
+    navigatorKey: appNavigatorKey,
+  );
 });
 
 // Repositories
@@ -97,6 +108,18 @@ final orderRepositoryProvider = Provider<OrderRepository>((ref) {
     prefsHelper: ref.watch(sharedPrefsHelperProvider),
   );
 });
+
+final notificationRepositoryProvider = Provider<NotificationRepository>((ref) {
+  return NotificationRepository(
+    client: ref.watch(httpClientProvider),
+    prefsHelper: ref.watch(sharedPrefsHelperProvider),
+  );
+});
+
+final notificationProviderNotifier =
+    ChangeNotifierProvider<NotificationProvider>((ref) {
+      return NotificationProvider(ref.watch(notificationRepositoryProvider));
+    });
 
 // Use Cases
 final loginUseCaseProvider = Provider<LoginUseCase>((ref) {
