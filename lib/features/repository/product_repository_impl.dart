@@ -139,7 +139,7 @@ class ProductRepositoryImpl implements ProductRepository {
     int limit = 20,
   }) async {
     return _getPaginatedProducts(
-      ApiConstants.trendingProducts,
+      '${ApiConstants.trendingProducts}?page=$page&limit=$limit',
       'Get trending products',
     );
   }
@@ -150,7 +150,7 @@ class ProductRepositoryImpl implements ProductRepository {
     int limit = 20,
   }) async {
     return _getPaginatedProducts(
-      ApiConstants.featuredProducts,
+      '${ApiConstants.featuredProducts}?page=$page&limit=$limit',
       'Get featured products',
     );
   }
