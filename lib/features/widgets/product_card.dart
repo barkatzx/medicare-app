@@ -117,7 +117,7 @@ class ProductCard extends StatelessWidget {
         Text(
           '${product.finalPrice.toStringAsFixed(0)}৳',
           style: CustomTextStyle.heading4.copyWith(
-            color: CustomTheme.textSecondary,
+            color: CustomTheme.textPrimary,
             fontWeight: CustomTheme.fontWeightBold,
           ),
         ),
